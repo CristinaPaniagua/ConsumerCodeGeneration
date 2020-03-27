@@ -8,7 +8,7 @@ package generator.codgen;
 import com.squareup.javapoet.*;
 
 
-import static generator.codgen.ClassGen.classGen;
+import generator.codgen.ClassGen;
 import static generator.codgen.ClassGenComplex.*;
 import java.awt.Font;
 import java.io.IOException;
@@ -70,12 +70,15 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
             
         
        if(MD.getRequest()){
-        classesRequest=classGen(MD.getElements_request(),"RequestDTO");
+           ClassGen Request=new ClassGen();
+           classesRequest=Request.classGen(MD.getElements_request(),"RequestDTO");
+                     
        }
         
        
         if(MD.getResponse()){
-        classesResponse=classGen(MD.getElements_response(),"ResponseDTO"); 
+            ClassGen Response=new ClassGen();
+            classesResponse=Response.classGen(MD.getElements_response(),"ResponseDTO"); 
         }
         
         System.out.println("-----");
@@ -169,19 +172,14 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
     
     //OBJECT REQUEST
     
-    System.out.println(classesRequest.size());
-    System.out.println(classesResponse.size());
+    
     for(int i=0; i<classesRequest.size();i++){
                   String s= classesRequest.get(i);
                   System.out.println("Request s: "+s);
                   BconsumeService.addStatement("$L" ,s );
             }      
                
-    for(int i=0; i<classesResponse.size();i++){
-                  String s= classesRequest.get(i);
-                  System.out.println("Response s: "+s);
-                  
-            }  
+    
     //HTTP REQUEST
     
      if(complextype_request==null && complextype_response==null){        

@@ -25,14 +25,32 @@ import java.util.List;
  */
 public class ClassGen {
 
-    //public static ArrayList<String> Declaration_Request=new ArrayList<>();
-    //public static ArrayList<String> Declaration_Response=new ArrayList<>();
-    public static ArrayList<String> classesD=new ArrayList<>();
+   // public static ArrayList<String> Declaration_Request=new ArrayList<>();
+   // public static ArrayList<String> Declaration_Response=new ArrayList<>();
+    //public static ArrayList<String> classesD=new ArrayList<>();
+    
+    ArrayList<String> ListofDeclarations=new ArrayList<>();
     
     public ClassGen() {
     }
     
-    public static MethodSpec  constructor (String name){
+    public ClassGen(ArrayList<String> ListofDeclarations) {
+        this.ListofDeclarations=ListofDeclarations;
+    }
+
+    public ArrayList<String> getListofDeclarations() {
+        return ListofDeclarations;
+    }
+
+    public void setListofDeclarations(ArrayList<String> ListofDeclarations) {
+        this.ListofDeclarations = ListofDeclarations;
+    }
+    
+    
+    
+    
+    
+    public  MethodSpec  constructor (String name){
         
      MethodSpec consructor = MethodSpec.constructorBuilder()
      .addModifiers(Modifier.PUBLIC)
@@ -43,11 +61,11 @@ public class ClassGen {
     }
     
         
-    public static MethodSpec  fullConstructor ( ArrayList<String[]> elements,String className){
+    public MethodSpec  fullConstructor ( ArrayList<String[]> elements,String className){
      
         //TODO: WHAT HAPPEND WITH THE COMPLEX_ELEMENT? SAME ARRAY?
-      ArrayList<String> complexE= new ArrayList<String>();
-      complexE=complexelement(elements);
+           //ListDeclarations=complexelement(elements);
+           
       ArrayList<String[]> var= new ArrayList<>();
        
       String[] ele2= new String[2];  
@@ -102,7 +120,8 @@ public class ClassGen {
       
         System.out.println(var.size());
         String CS =dummyobject(className,var);
-        classesD.add(CS);
+        ListofDeclarations.add(CS);
+        
        // if(className.equals("RequestDTO")) Declaration_Request.add(CS);
         //if(className.equals("ResponseDTO")) Declaration_Response.add(CS);
         
@@ -112,7 +131,7 @@ public class ClassGen {
       return FullConsructor;
     }
     
-    public static MethodSpec  get (String name, String type){
+    public  MethodSpec  get (String name, String type){
         
      MethodSpec.Builder get = MethodSpec.methodBuilder("get"+name)
      .addModifiers(Modifier.PUBLIC);
@@ -135,7 +154,7 @@ public class ClassGen {
     }
     
     
-    public static MethodSpec  toString (ArrayList<String[]> elements){
+    public  MethodSpec  toString (ArrayList<String[]> elements){
         
           String S="";
           
@@ -165,7 +184,7 @@ public class ClassGen {
     }
     
     
-    public static MethodSpec  set (String name, String type){
+    public MethodSpec  set (String name, String type){
         
      MethodSpec.Builder set  = MethodSpec.methodBuilder("set"+name)
     .addModifiers(Modifier.PUBLIC);
@@ -187,18 +206,17 @@ public class ClassGen {
     
     
     
-     public static ArrayList<String> classGen ( ArrayList<String[]> elements , String className){
+     public  ArrayList<String> classGen ( ArrayList<String[]> elements , String className){
          
          
-         classesD.clear();
+         //ListDeclarations.clear();
         
-        ArrayList<String> ListDeclarations = new ArrayList<String>();
+      
         
         
          
         MethodSpec constructor= constructor(className);
         MethodSpec fullConstructor=fullConstructor(elements,className);
-        ListDeclarations=classesD;
         MethodSpec toString=toString(elements);
       
      TypeSpec.Builder BclassGen =TypeSpec.classBuilder(className)
@@ -271,10 +289,16 @@ public class ClassGen {
         }catch (IOException ex){
             System.out.print("Exception:" + ex.getMessage());
         }
-        return ListDeclarations;
+        
+        //if(className.equals("RequestDTO")) return Declaration_Request;
+        //else return Declaration_Response;
+        
+        return ListofDeclarations;
+        
+       
      }
      
-     public static String dummyobject (String name, ArrayList<String[]> var ){
+     public  String dummyobject (String name, ArrayList<String[]> var ){
         
          String s=null;
          s=""+name+" OBJ"+name+" = new "+name+"( ";
@@ -314,7 +338,7 @@ public class ClassGen {
         
      }
      
-     public static Type getType(String type){
+     public  Type getType(String type){
          Type t;
          
          if(type.equalsIgnoreCase("String")) t=String.class;
@@ -339,7 +363,7 @@ public class ClassGen {
          return t;
      }
      
-      public static TypeName getTypeCom(String name, String type){
+      public  TypeName getTypeCom(String name, String type){
          TypeName t;
          
          

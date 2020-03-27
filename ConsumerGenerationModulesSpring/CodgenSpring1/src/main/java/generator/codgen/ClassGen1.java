@@ -12,12 +12,8 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
-import com.sun.tools.javac.util.Convert;
-import static generator.codgen.ClassGen.get;
-import static generator.codgen.ClassGen.getType;
-import static generator.codgen.ClassGen.getTypeCom;
-import static generator.codgen.ClassGen.set;
-import static generator.codgen.ClassGenComplex.complexelement;
+
+
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -33,7 +29,7 @@ public class ClassGen1 {
     public ClassGen1() {
     }
     
-    public static MethodSpec  constructor (String name){
+    public  MethodSpec  constructor (String name){
         
      MethodSpec consructor = MethodSpec.constructorBuilder()
      .addModifiers(Modifier.PUBLIC)
@@ -44,7 +40,7 @@ public class ClassGen1 {
     }
     
         
-    public static MethodSpec  fullConstructor ( ArrayList<String[]> elements,String className){
+    public  MethodSpec  fullConstructor ( ArrayList<String[]> elements,String className){
         
         
      MethodSpec.Builder BFullConsructor = MethodSpec.constructorBuilder()
@@ -77,7 +73,7 @@ public class ClassGen1 {
       return FullConsructor;
     }
     
- public static MethodSpec  get (String name, String type){
+ public  MethodSpec  get (String name, String type){
         
      MethodSpec.Builder get = MethodSpec.methodBuilder("get"+name)
      .addModifiers(Modifier.PUBLIC);
@@ -100,7 +96,7 @@ public class ClassGen1 {
     }
     
     
-    public static MethodSpec  toString (ArrayList<String[]> elements){
+    public  MethodSpec  toString (ArrayList<String[]> elements){
         
           String S="";
      for (int i = 0; i < elements.size(); i++){ 
@@ -120,7 +116,7 @@ public class ClassGen1 {
      return toString;
     }
     
-   public static MethodSpec  set (String name, String type){
+   public  MethodSpec  set (String name, String type){
         
      MethodSpec.Builder set  = MethodSpec.methodBuilder("set"+name)
     .addModifiers(Modifier.PUBLIC);
@@ -142,7 +138,7 @@ public class ClassGen1 {
     
     
     
-     public static void classGen ( ArrayList<String[]> elements , String className){
+     public  void classGen ( ArrayList<String[]> elements , String className){
          
         
      
@@ -203,7 +199,7 @@ public class ClassGen1 {
         
      }
      
-     public static Type getType(String type){
+     public  Type getType(String type){
          Type t;
          
          if(type.equalsIgnoreCase("String")) t=String.class;
@@ -223,4 +219,16 @@ public class ClassGen1 {
          else t=Object.class;
          return t;
      }
+     
+      public  TypeName getTypeCom(String name, String type){
+         TypeName t;
+         
+         
+         if (type.equalsIgnoreCase("List"))   t = ParameterizedTypeName.get(ClassName.get(List.class),TypeVariableName.get(name) );
+         else if (type.equalsIgnoreCase("single"))  t =TypeVariableName.get(name); 
+         else  t =TypeVariableName.get(name);
+         
+         //TODO: ADD MORE COMPLEX TYPES
+             return t;
+             }
 }
