@@ -64,21 +64,24 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
     public static void main(String[] args) {
         
         String service = request.getProperty("Service", "null");
-        String system="providerTest";
+        String system="getCars";
         MD = readCDL.read("getDataManufacturer",system);
         System.out.print(MD.toString());
             
         
-       if(MD.getRequest())
+       if(MD.getRequest()){
         classesRequest=classGen(MD.getElements_request(),"RequestDTO");
-       
+       }
         
        
-        if(MD.getResponse())
+        if(MD.getResponse()){
         classesResponse=classGen(MD.getElements_response(),"ResponseDTO"); 
+        }
         
+        System.out.println("-----");
         
         ConsumerMain ();
+        
         if(MD.getProtocol().equalsIgnoreCase("COAP"))
         CoapGenerator.coap(MD);
         
@@ -137,90 +140,10 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
   
     // METHOD TO CREAT THE METHOD cosumeService//
     
-    /*
-  private static   MethodSpec consumeService( ArrayList<String> classesDummy){
-  
-      
-      
-    String arg = request.getProperty("Argument", null);
-    String protocol=MD.getProtocol();
-     MethodSpec.Builder BconsumeService= MethodSpec.methodBuilder("consumeService")
-     .addModifiers(Modifier.PRIVATE)
-     .addParameter(String.class, "address")
-     .addParameter(Integer.class, "port")
-     .addParameter(String.class, "serviceUri");
-     
-    if (protocol.equalsIgnoreCase("HTTP")){
-    //CODE FOR HTTP REST
-   BconsumeService 
-     //.returns(Response.class)
-     .addStatement("$T httpMethod=HttpMethod.$N",HttpMethod.class,MD.getMethod());
-    String complextype =MD.getComplexType_response();
-   if(MD.getMethod().equalsIgnoreCase("GET")){
-        for(int i=0; i<classesDummy.size();i++){
-          String s= classesDummy.get(i);
-          System.out.println("s: "+s);
-          BconsumeService.addStatement("$L",s );
-      }
-       
-        
-         if(MD.elements_request.equals("null")){  
-                         
-          BconsumeService.addStatement("final ResponseDTO getResponse = arrowheadService.consumeServiceHTTP(ResponseDTO.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)")
-          .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson(getResponse)))",Utilities.class);  
-           }else{
-             
-             Type t=getComplexType(complextype);
-            BconsumeService.addStatement("final $T carCreated = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",t,t) 
-     .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson(carCreated)))",Utilities.class);   
-          
-         }
-          
-    }else{
-       //String s=" ";
-        System.out.println("dummysize final: "+classesDummy.size());
-      for(int i=0; i<classesDummy.size();i++){
-            String s= classesDummy.get(i);
-          System.out.println("s: "+s);
-          BconsumeService.addStatement("$L" ,s );
-         
-      }
-          //s=s.substring(0, s.length()-1);
-          
-        
-       
-      
-              
-       if(MD.elements_response.equals("null")){        
-              
-     BconsumeService.addStatement("final ResponseDTO $L= arrowheadService.consumeServiceHTTP(ResponseDTO.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",MD.ID) 
-     .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
-     
-       }else{
-           String ctype=MD.getComplexType_response();
-            Type t=getComplexType(ctype);
-            BconsumeService.addStatement("final $T $L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",t,MD.ID,t)
-     .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
-       }
-   }
-     
-    }else{
-     
-      //FOR COAP
-     BconsumeService
-     //.returns(CoapResponse.class)
-     .addStatement("CoapClientGen c= new CoapClientGen()")
-     .addStatement("$T coapresponse=c.coapRequest(address+\":\"+port+serviceUri)",CoapResponse.class)  
-     .addStatement("System.out.println(coapresponse.getResponseText())");         
-    // .addStatement("return coapresponse");
-    
-    }
-*/
-    
+
     
      private static   MethodSpec consumeService(){
   
-      
       
     String arg = request.getProperty("Argument", null);
     String protocol=MD.getProtocol();
@@ -238,13 +161,60 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
     
     
     if(MD.getRequest()&&MD.getResponse()){
+        
+        System.out.println(" Both request and response");
+        
+        String complextype_request =MD.getComplexType_request();
+        String complextype_response =MD.getComplexType_response();
     
-    //TODO
+    //OBJECT REQUEST
+    
+    System.out.println(classesRequest.size());
+    System.out.println(classesResponse.size());
+    for(int i=0; i<classesRequest.size();i++){
+                  String s= classesRequest.get(i);
+                  System.out.println("Request s: "+s);
+                  BconsumeService.addStatement("$L" ,s );
+            }      
+               
+    for(int i=0; i<classesResponse.size();i++){
+                  String s= classesRequest.get(i);
+                  System.out.println("Response s: "+s);
+                  
+            }  
+    //HTTP REQUEST
+    
+     if(complextype_request==null && complextype_response==null){        
+              
+         System.out.println("NO complex types in the request or response");
+         
+            BconsumeService.addStatement("final ResponseDTO $L= arrowheadService.consumeServiceHTTP(ResponseDTO.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",MD.ID) 
+            .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
+     
+            //TODO: CHECK AND DEBUG THIS PART
+     }else if(complextype_request==null && complextype_response!=null){
+         
+         String ctype=MD.getComplexType_response();
+                  Type t=getComplexType(ctype);
+                  BconsumeService.addStatement("final $T $L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",t,MD.ID,t)
+                .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
+     
+     }else if(complextype_request!=null && complextype_response==null){
+         
+         String ctype=MD.getComplexType_request();
+                  Type t=getComplexType(ctype);
+                  BconsumeService.addStatement("final $T $L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",t,MD.ID,t)
+                .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
+     
+     }else{
+         //TODO
+     }
     
     }else{
         
         if(MD.getRequest()){
             
+            System.out.println(" Only request ");
              String complextype =MD.getComplexType_request();
              
           System.out.println("size final: "+classesRequest.size());
@@ -261,7 +231,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
             .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
      
              }else{
-                 String ctype=MD.getComplexType_response();
+                 String ctype=MD.getComplexType_request();
                   Type t=getComplexType(ctype);
                   BconsumeService.addStatement("final $T $L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",t,MD.ID,t)
                 .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
@@ -273,9 +243,10 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         } //if request
     
         if(MD.getResponse()){
-            
+          
+          System.out.println(" Only request ");
           String complextype =MD.getComplexType_response();
-          System.out.println(complextype);
+          
          
           if(complextype==null){        
               
@@ -447,7 +418,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
      .addComment("TO DO")
      .endControlFlow() 
      .addStatement("final $T provider=response.getResponse().get(0)",OrchestrationResultDTO.class)
-     .addStatement(" System.out.println(Utilities.toPrettyJson(Utilities.toJson(provider)))")
+     .addStatement(" System.out.println($T.toPrettyJson(Utilities.toJson(provider)))",Utilities.class)
       .addStatement("String address=provider.getProvider().getAddress()")
       .addStatement("int port=provider.getProvider().getPort()")
       .addStatement("String serviceUri=provider.getServiceUri()")

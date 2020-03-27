@@ -144,7 +144,7 @@ public class ClassGen1 {
     
      public static void classGen ( ArrayList<String[]> elements , String className){
          
-  
+        
      
         MethodSpec constructor= constructor(className);
         MethodSpec fullConstructor=fullConstructor(elements,className);

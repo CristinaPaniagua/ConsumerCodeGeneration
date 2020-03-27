@@ -24,7 +24,11 @@ import java.util.List;
  * @author cripan
  */
 public class ClassGen {
-private static ArrayList<String> classesDummy= new ArrayList<String>();
+
+    //public static ArrayList<String> Declaration_Request=new ArrayList<>();
+    //public static ArrayList<String> Declaration_Response=new ArrayList<>();
+    public static ArrayList<String> classesD=new ArrayList<>();
+    
     public ClassGen() {
     }
     
@@ -40,8 +44,11 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
     
         
     public static MethodSpec  fullConstructor ( ArrayList<String[]> elements,String className){
-      classesDummy=complexelement(elements);
-      ArrayList<String[]> var= new ArrayList<String[]>();
+     
+        //TODO: WHAT HAPPEND WITH THE COMPLEX_ELEMENT? SAME ARRAY?
+      ArrayList<String> complexE= new ArrayList<String>();
+      complexE=complexelement(elements);
+      ArrayList<String[]> var= new ArrayList<>();
        
       String[] ele2= new String[2];  
      MethodSpec.Builder BFullConsructor = MethodSpec.constructorBuilder()
@@ -95,7 +102,12 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
       
         System.out.println(var.size());
         String CS =dummyobject(className,var);
-        classesDummy.add(CS);
+        classesD.add(CS);
+       // if(className.equals("RequestDTO")) Declaration_Request.add(CS);
+        //if(className.equals("ResponseDTO")) Declaration_Response.add(CS);
+        
+        
+        
        MethodSpec FullConsructor = BFullConsructor.build();
       return FullConsructor;
     }
@@ -178,9 +190,15 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
      public static ArrayList<String> classGen ( ArrayList<String[]> elements , String className){
          
          
-
+         classesD.clear();
+        
+        ArrayList<String> ListDeclarations = new ArrayList<String>();
+        
+        
+         
         MethodSpec constructor= constructor(className);
         MethodSpec fullConstructor=fullConstructor(elements,className);
+        ListDeclarations=classesD;
         MethodSpec toString=toString(elements);
       
      TypeSpec.Builder BclassGen =TypeSpec.classBuilder(className)
@@ -253,7 +271,7 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
         }catch (IOException ex){
             System.out.print("Exception:" + ex.getMessage());
         }
-        return classesDummy;
+        return ListDeclarations;
      }
      
      public static String dummyobject (String name, ArrayList<String[]> var ){
@@ -291,7 +309,7 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
              s="List<"+var.get(a)[0]+"> ListObject=null; \n ListObject.add(OBJ"+var.get(a)[0]+"); \n"+s;
     
          }
-        System.out.println(s);
+        System.out.println("Storage of the object instance:"+s);
          return s;
         
      }

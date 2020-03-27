@@ -13,6 +13,24 @@
 	
 		<method name="GET" id="getDataManufacturer" path="/data/EquipmentInfo/manufacturer">
 
+		<request>
+			<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+					<complextype type="null"/> 					
+					<element name="test" type="String"/>
+					<element name="test2" type="Integer"/>
+				</payload>
+			
+			</request>
+
+
+
 			<response status="200">
 			<format> 
 					<encode name="JSON" mediaType= "JSON" version="0"/>

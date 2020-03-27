@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<contract >
+<contract xmlns="http://cdl/2018/01" xmlns:xsd="http://www.w3.org/2001/XMLSchema" >
 	
+	<context xml:lang="EN">
+		<keywords>Management Demo</keywords>
+	</context>
+
+
+
 	<interface protocol="HTTP" address="http://127.0.0.1/8888" >
 	
 		<method name="GET" id="getCars" path="/car">
