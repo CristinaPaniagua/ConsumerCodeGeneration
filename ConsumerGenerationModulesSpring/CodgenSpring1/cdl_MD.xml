@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contract xmlns="http://cdl/2018/01" xmlns:xsd="http://www.w3.org/2001/XMLSchema" >
+	
+	<context xml:lang="EN">
+		<keywords>Management Demo</keywords>
+	</context>
+
+
+
+	<interface protocol="HTTP" address="http://127.0.0.1/8888" >
+
+
+	
+		<method name="GET" id="getDataManufacturer" path="/data/EquipmentInfo/manufacturer">
+
+			<response status="200">
+			<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+					<complextype type="null"/> 					
+					<element name="manufacturer" type="String"/>
+				</payload>
+			
+			</response>
+	
+		</method>
+		
+		
+		
+		<method name="GET" id="getDataDevice_type" path="/data/EquipmentInfo/device_type">
+
+			
+			<response status="200">
+			<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+					<complextype type="null"/> 					
+					<element name="device_type" type="String"/>
+				</payload>
+			
+			</response>
+		</method>
+		
+			
+		<method name="GET" id="getDataSerial_number" path="/data/EquipmentInfo/serial_number">
+
+			
+			<response status="200">
+			<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+					<complextype type="null"/> 					
+					<element name="serial_number" type="String"/>
+				</payload>
+			
+			</response>
+	
+		</method>
+		
+		
+		
+		<method name="GET" id="getDataFluid_temperature" path="/data/HydaulicPumpBlock/fluid_temperature">
+
+			
+			<response status="200">
+			<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+					<complextype type="null"/> 					
+					<complexelement name="value" type="single">
+						<element name="value" type="Float"/>
+						<element name="timestamp" type="Integer"/>
+						<element name="quality" type="Integer"/>
+					
+					</complexelement>
+				</payload>
+			
+			</response>
+	
+		</method>
+		
+		
+		<method name="GET" id="getDataOutput_pressure" path="/data/HydaulicPumpBlock/output_pressure">
+
+			
+			<response status="200">
+			<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+					<complextype type="null"/> 					
+					<complexelement name="value" type="single">
+						<element name="value" type="Float"/>
+						<element name="timestamp" type="Integer"/>
+						<element name="quality" type="Integer"/>
+					
+					</complexelement>
+				</payload>
+			
+			</response>
+	
+		</method>
+		
+		
+		<method name="GET" id="getDataTemperature" path="/data/TemperatureSensorBlock/temperature">
+
+			
+			<response status="200">
+			<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+					<complextype type="null"/> 					
+					<complexelement name="value" type="single">
+						<element name="value" type="Float"/>
+						<element name="timestamp" type="Integer"/>
+						<element name="quality" type="Integer"/>
+					
+					</complexelement>
+				</payload>
+			
+			</response>
+	
+		</method>
+		
+		
+
+	</interface>
+</contract>

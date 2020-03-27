@@ -23,6 +23,8 @@ import java.util.Map;
 public class readCDL {
       public static  ArrayList<String[]> elements_request = new ArrayList<String[]>(); 
     public static  ArrayList<String[]> elements_response = new ArrayList<String[]>();
+    public static boolean request;
+    public static boolean response;
 public static InterfaceMetadata read(String service,String System){
     String sec=null;
     String protocol=null;
@@ -48,7 +50,7 @@ public static InterfaceMetadata read(String service,String System){
       try  {
           
     	
-	 File File1 = new File("cdl_contractNegotationTrusted.xml");
+	 File File1 = new File("cdl_MD.xml");
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc= dBuilder.parse(File1);
@@ -112,8 +114,11 @@ public static InterfaceMetadata read(String service,String System){
                 NodeList  lR=eMethod.getElementsByTagName("request");
                             
                          if(lR.getLength()==0){
-                           //System.out.println("Request in producer no defined");
-                         }
+                           request=false;
+                         }else{
+                           request=true;
+                         
+                         
                       
                      Node nR = lR.item(0);
                      if(nR.getNodeType() == Node.ELEMENT_NODE){
@@ -127,28 +132,7 @@ public static InterfaceMetadata read(String service,String System){
                             Element eEncode1= (Element) nEncode1;
                             
                             mediatype=eEncode1.getAttribute("name");
-  // VERSION                                
-                              // version=eEncode1.getAttribute("version")
-//Compresion
-                            //Node nCompresion1 =eR.getElementsByTagName("compresion").item(0);
-                            //Element eCompresion1= (Element) nCompresion1;
-                            
-                            //compresion=eCompresion1.getAttribute("name");
-                              
-                            
-                            
-                            
-                            
-                            
-//Semantic
-                           // Node nSemantic1 =eR.getElementsByTagName("semantic").item(0);
-                           // Element eSemantic1= (Element) nSemantic1;
-                            //semantic=eSemantic1.getAttribute("name")
-//Notation
-                            //Node nNotation1 =eR.getElementsByTagName("notation").item(0);
-                            //Element eNotation1= (Element) nNotation1;
-                            //notation=eNotation1.getAttribute("href")
-                            
+
                             // Payload
                              Node npayload1 =eR.getElementsByTagName("payload").item(0);
                              Element epayload1=(Element) npayload1;
@@ -193,16 +177,18 @@ public static InterfaceMetadata read(String service,String System){
                            
                      }
                                
-        //RESPONSE                        
                          
+        } //close else    
+           //RESPONSE    
                 NodeList  lRR=eMethod.getElementsByTagName("response");
                             
                          if(lRR.getLength()==0){
-                           //System.out.println("Request in producer no defined");
-                         } 
+                           response=false;
+                         } else{
+                             response=true;
                       
                      Node nRR = lRR.item(0);
-                     if(nR.getNodeType() == Node.ELEMENT_NODE){
+                     if(nRR.getNodeType() == Node.ELEMENT_NODE){
                             Element eRR= (Element) nRR;
                                 
                               
@@ -213,28 +199,7 @@ public static InterfaceMetadata read(String service,String System){
                             Element eEncode1= (Element) nEncode1;
                             
                             mediatype=eEncode1.getAttribute("name");
-  // VERSION                                
-                              // version=eEncode1.getAttribute("version")
-//Compresion
-                            //Node nCompresion1 =eR.getElementsByTagName("compresion").item(0);
-                            //Element eCompresion1= (Element) nCompresion1;
-                            
-                            //compresion=eCompresion1.getAttribute("name");
-                              
-                            
-                            
-                            
-                            
-                            
-//Semantic
-                           // Node nSemantic1 =eR.getElementsByTagName("semantic").item(0);
-                           // Element eSemantic1= (Element) nSemantic1;
-                            //semantic=eSemantic1.getAttribute("name")
-//Notation
-                            //Node nNotation1 =eR.getElementsByTagName("notation").item(0);
-                            //Element eNotation1= (Element) nNotation1;
-                            //notation=eNotation1.getAttribute("href")
-                            
+  
                             // Payload
                              Node npayload1 =eRR.getElementsByTagName("payload").item(0);
                              Element epayload1=(Element) npayload1;
@@ -280,10 +245,11 @@ public static InterfaceMetadata read(String service,String System){
                             
                             
                      
-                           
+        }      
                             
                             
-                  } 
+                  }
+       
            
                    
        }//else{ System.out.println( "ERROR: Service interface not found");}
@@ -297,7 +263,7 @@ public static InterfaceMetadata read(String service,String System){
         
     
       
- InterfaceMetadata MD = new InterfaceMetadata(protocol,path,method,mediatype,ID,complexType_request,complexType_response,elements_request, elements_response);  
+ InterfaceMetadata MD = new InterfaceMetadata(protocol,path,method,mediatype,ID,complexType_request,complexType_response,elements_request, elements_response, request,response);  
     return MD;
     
 }

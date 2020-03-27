@@ -65,14 +65,16 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         
         String service = request.getProperty("Service", "null");
         String system="providerTest";
-        MD = readCDL.read("offer",system);
+        MD = readCDL.read("getDataManufacturer",system);
         System.out.print(MD.toString());
-             //eadList(MD.getElements_request());
-       if(!MD.getElements_request().isEmpty())
+            
+        
+       if(MD.getRequest())
         classesRequest=classGen(MD.getElements_request(),"RequestDTO");
        
-        //readList(MD.getElements_response());
-        if(!MD.getElements_response().isEmpty())
+        
+       
+        if(MD.getResponse())
         classesResponse=classGen(MD.getElements_response(),"ResponseDTO"); 
         
         
@@ -134,6 +136,8 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
     
   
     // METHOD TO CREAT THE METHOD cosumeService//
+    
+    /*
   private static   MethodSpec consumeService( ArrayList<String> classesDummy){
   
       
@@ -160,7 +164,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
       }
        
         
-         if(complextype.equals(null)){  
+         if(MD.elements_request.equals("null")){  
                          
           BconsumeService.addStatement("final ResponseDTO getResponse = arrowheadService.consumeServiceHTTP(ResponseDTO.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)")
           .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson(getResponse)))",Utilities.class);  
@@ -199,6 +203,98 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
      .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
        }
    }
+     
+    }else{
+     
+      //FOR COAP
+     BconsumeService
+     //.returns(CoapResponse.class)
+     .addStatement("CoapClientGen c= new CoapClientGen()")
+     .addStatement("$T coapresponse=c.coapRequest(address+\":\"+port+serviceUri)",CoapResponse.class)  
+     .addStatement("System.out.println(coapresponse.getResponseText())");         
+    // .addStatement("return coapresponse");
+    
+    }
+*/
+    
+    
+     private static   MethodSpec consumeService(){
+  
+      
+      
+    String arg = request.getProperty("Argument", null);
+    String protocol=MD.getProtocol();
+     MethodSpec.Builder BconsumeService= MethodSpec.methodBuilder("consumeService")
+     .addModifiers(Modifier.PRIVATE)
+     .addParameter(String.class, "address")
+     .addParameter(Integer.class, "port")
+     .addParameter(String.class, "serviceUri");
+     
+    if (protocol.equalsIgnoreCase("HTTP")){
+    //CODE FOR HTTP REST
+   BconsumeService 
+     //.returns(Response.class)
+     .addStatement("$T httpMethod=HttpMethod.$N",HttpMethod.class,MD.getMethod());
+    
+    
+    if(MD.getRequest()&&MD.getResponse()){
+    
+    //TODO
+    
+    }else{
+        
+        if(MD.getRequest()){
+            
+             String complextype =MD.getComplexType_request();
+             
+          System.out.println("size final: "+classesRequest.size());
+          for(int i=0; i<classesRequest.size();i++){
+                  String s= classesRequest.get(i);
+                  System.out.println("s: "+s);
+                  BconsumeService.addStatement("$L" ,s );
+            }      
+               
+          
+          if(complextype==null){        
+              
+            BconsumeService.addStatement("final ResponseDTO $L= arrowheadService.consumeServiceHTTP(ResponseDTO.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",MD.ID) 
+            .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
+     
+             }else{
+                 String ctype=MD.getComplexType_response();
+                  Type t=getComplexType(ctype);
+                  BconsumeService.addStatement("final $T $L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",t,MD.ID,t)
+                .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
+                 }
+         
+            
+            
+            
+        } //if request
+    
+        if(MD.getResponse()){
+            
+          String complextype =MD.getComplexType_response();
+          System.out.println(complextype);
+         
+          if(complextype==null){        
+              
+            BconsumeService.addStatement("final ResponseDTO $L= arrowheadService.consumeServiceHTTP(ResponseDTO.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,null,null,null)",MD.ID) 
+            .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
+     
+             }else{
+                 String ctype=MD.getComplexType_response();
+                  Type t=getComplexType(ctype);
+                  BconsumeService.addStatement("final $T $L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,null,null,null)",t,MD.ID,t)
+                .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
+                 }
+         
+            
+        }//if Response
+    
+    }//else Single Case
+    
+   
      
     }else{
      
@@ -378,9 +474,10 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
     
   //METHOD TO GENERATE THE MAIN AND CREATE THE MAINCLASS      
      private static void ConsumerMain (){
-          
+            MethodSpec consumeService=consumeService();
    
-     MethodSpec consumeService =consumeService(classesRequest);
+  
+       
      //MethodSpec payloadInterpreter =payloadInterpreter();
      MethodSpec run =run();
      String Rprotocol;
