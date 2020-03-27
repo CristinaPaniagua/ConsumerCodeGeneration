@@ -65,7 +65,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         
         String service = request.getProperty("Service", "null");
         String system="getCars";
-        MD = readCDL.read("getDataManufacturer",system);
+        MD = readCDL.read("offer",system);
         System.out.print(MD.toString());
             
         
@@ -182,7 +182,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
     
     //HTTP REQUEST
     
-     if(complextype_request==null && complextype_response==null){        
+     if(complextype_request.equals("null") && complextype_response.equals("null")){        
               
          System.out.println("NO complex types in the request or response");
          
@@ -190,14 +190,14 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
             .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
      
             //TODO: CHECK AND DEBUG THIS PART
-     }else if(complextype_request==null && complextype_response!=null){
+     }else if(complextype_request.equals("null") && !complextype_response.equals("null")){
          
          String ctype=MD.getComplexType_response();
                   Type t=getComplexType(ctype);
                   BconsumeService.addStatement("final $T $L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",t,MD.ID,t)
                 .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
      
-     }else if(complextype_request!=null && complextype_response==null){
+     }else if(!complextype_request.equals("null") && complextype_response.equals("null")){
          
          String ctype=MD.getComplexType_request();
                   Type t=getComplexType(ctype);

@@ -64,7 +64,7 @@ public class ClassGen {
     public MethodSpec  fullConstructor ( ArrayList<String[]> elements,String className){
      
         //TODO: WHAT HAPPEND WITH THE COMPLEX_ELEMENT? SAME ARRAY?
-           //ListDeclarations=complexelement(elements);
+         ListofDeclarations=complexelement(elements);
            
       ArrayList<String[]> var= new ArrayList<>();
        
