@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contract xmlns="http://cdl/2018/01" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmls:at="http://attributes_v1" >
+	
+	<context xml:lang="EN">
+		<keywords>humidity</keywords>
+		<des>Domotic system with humidity sensor inside the room </des>	
+	</context>
+
+	<schemas>
+		<include href="null.xsd"/>
+	</schemas>
+
+	<interface protocol="HTTP" address="http://localhost:8888/DomoticHouse" >
+	
+		<method name="POST" id="Humidity_target" path="/post">
+			<request>
+				<format> 
+					<encode name="textplain" mediaType= "TEXT_PLAIN" version="0"/>
+					<compresion name="null" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<mapping>
+					<at:humidity>
+							<at:indoor>
+								<element name="humidity" type="xsd:string"/>
+							</at:indoor>
+					</at:humidity>
+				</mapping>
+			</request>
+
+			<response status="2.05">
+				<format> 
+					<encode name="textplain" mediaType= "TEXT_PLAIN" version="0"/>
+					<compresion name="null" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<mapping>
+					<at:humidity>
+							<at:indoor>
+								<element name="humidity" type="xsd:string"/>
+							</at:indoor>
+					</at:humidity>
+				</mapping>
+			</response>
+		</method>
+	</interface>
+</contract>

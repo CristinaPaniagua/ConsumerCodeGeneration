@@ -1,0 +1,11 @@
+eu\arrowhead\client\consumer\ConsumerApplicationInitListener.class
+eu\arrowhead\client\consumer\ResponseDTO.class
+eu\arrowhead\client\consumer\ConsumerMain.class
+eu\arrowhead\client\common\CodgenUtil.class
+eu\arrowhead\client\consumer\Contracts.class
+eu\arrowhead\client\common\TypeSafeProperties.class
+eu\arrowhead\client\consumer\Arguments.class
+eu\arrowhead\client\common\CommonConstants.class
+eu\arrowhead\client\common\JacksonJsonProviderAtRest.class
+eu\arrowhead\client\common\Defaults.class
+eu\arrowhead\client\consumer\RequestDTO.class

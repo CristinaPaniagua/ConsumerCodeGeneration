@@ -1,0 +1,11 @@
+generator\codgen\ClassGenComplex.class
+eu\arrowhead\common\CodgenUtil.class
+generator\codgen\Main.class
+generator\codgen\ClassGen1.class
+generator\codgen\CoapGenerator.class
+generator\codgen\ClassGen.class
+generator\codgen\readCDL.class
+eu\arrowhead\common\JacksonJsonProviderAtRest.class
+eu\arrowhead\common\TypeSafeProperties.class
+generator\codgen\classString.class
+generator\codgen\InterfaceMetadata.class

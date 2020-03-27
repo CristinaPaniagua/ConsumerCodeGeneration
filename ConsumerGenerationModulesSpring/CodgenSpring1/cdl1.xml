@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contract xmlns="http://cdl/2018/01" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmls:at="http://attributes_v1" >
+	
+	<context xml:lang="EN">
+		<keywords>temperature</keywords>
+		<des>Domotic system with temperature sensor inside the room and a reference temperature target programable</des>	
+	</context>
+
+	<schemas>
+		<include href="null.xsd"/>
+	</schemas>
+
+	<interface protocol="HTTP" address="http://localhost:8888/DomoticHouse" >
+	
+		<method name="PUT" id="Humidity" path="/25/humidity">
+
+			<response status="2.05">
+				<format> 
+					<encode name="JSON" mediaType= "application/senml+json" version="0"/>
+					<compresion name="none" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="senML" version="0"/>
+					<notation href="senML.xsd"/> 
+				</format> 
+				<mapping>
+					<at:temperature>
+							<at:indoor>
+								<head> Senml xmlns="urn:ietf:params:xml:ns:senml"</head>
+								<element name="bn" type="xsd:string"/>
+								<element name="bt" type="xsd:timestamp"/>
+								<element name="ver" type="xsd:int"/>
+								<complexelement name="e">
+									<element name="n" type="xsd:string"/>
+									<element name="u" type="xsd:string"/>
+									<element name="v" type="xsd:float"/>
+								</complexelement>
+							</at:indoor>
+					</at:temperature>
+				</mapping>
+			</response>
+		</method>
+		<method name="POST" id="SetReference" path="/reference">
+
+			<request>
+				<format> 
+					<encode name="JSON" mediaType= "json" version=""/>
+					<compresion name="none" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="senML" version="0"/>
+					<notation href=".xsd"/> 
+				</format> 
+				<mapping>
+					<at:temperature>
+							<at:target>
+								<head> Senml xmlns="urn:ietf:params:xml:ns:senml"</head>
+								<element name="bn" mode="optional" variation="n" type="xsd:string"/>
+								<element name="bt" type="xsd:timestamp"/>
+								<element name="ver" type="xsd:int"/>
+								<complexelement name="e">
+									<element name="n" type="xsd:string">
+										<values>
+											<Value n="temp" keywords="indoor,air,ventilation" notationID="url:https://www.arrow./notations/jskdsj.xsd#temp urn:ahnid:temp:ball-bearing" u="C"/>
+										
+										</values>
+									</element>
+									<element name="u" type="xsd:string"/>
+									<element name="v" type="xsd:float"/>
+								</complexelement>
+							</at:target>
+					</at:temperature>
+				</mapping>
+			</request>
+			<response status="2.05" />
+		</method>
+	</interface>
+</contract>

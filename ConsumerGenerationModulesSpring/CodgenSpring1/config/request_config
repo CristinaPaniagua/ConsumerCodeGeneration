@@ -1,0 +1,11 @@
+# Request
+
+Client=laptop4-dashboard-0
+Service=getCars
+#FLAGS:
+overrideStore=true
+pingProvider=false
+metadataSearch=false
+enableIntercloud=false
+
+#Argument=23
