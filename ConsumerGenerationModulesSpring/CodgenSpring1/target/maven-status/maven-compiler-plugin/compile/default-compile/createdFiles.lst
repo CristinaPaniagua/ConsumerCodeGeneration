@@ -7,5 +7,4 @@ generator\codgen\ClassGen.class
 generator\codgen\readCDL.class
 eu\arrowhead\common\JacksonJsonProviderAtRest.class
 eu\arrowhead\common\TypeSafeProperties.class
-generator\codgen\classString.class
 generator\codgen\InterfaceMetadata.class
