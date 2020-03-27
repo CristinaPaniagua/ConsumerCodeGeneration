@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 C:\Users\cripan\Desktop\Code_generation\ConsumerCode-Generation\ConsumerGenerationModulesSpring\TesterSpring\src\main\java\eu\arrowhead\client\consumer\ResponseDTO.java
 C:\Users\cripan\Desktop\Code_generation\ConsumerCode-Generation\ConsumerGenerationModulesSpring\TesterSpring\src\main\java\eu\arrowhead\client\common\TypeSafeProperties.java
 C:\Users\cripan\Desktop\Code_generation\ConsumerCode-Generation\ConsumerGenerationModulesSpring\TesterSpring\src\main\java\eu\arrowhead\client\consumer\ConsumerMain.java
@@ -10,15 +9,3 @@ C:\Users\cripan\Desktop\Code_generation\ConsumerCode-Generation\ConsumerGenerati
 C:\Users\cripan\Desktop\Code_generation\ConsumerCode-Generation\ConsumerGenerationModulesSpring\TesterSpring\src\main\java\eu\arrowhead\client\common\CommonConstants.java
 C:\Users\cripan\Desktop\Code_generation\ConsumerCode-Generation\ConsumerGenerationModulesSpring\TesterSpring\src\main\java\eu\arrowhead\client\consumer\RequestDTO.java
 C:\Users\cripan\Desktop\Code_generation\ConsumerCode-Generation\ConsumerGenerationModulesSpring\TesterSpring\src\main\java\eu\arrowhead\client\common\CodgenUtil.java
-=======
-C:\Users\cripan\Desktop\Code_generation\ConsumerGenerationModulesSpring\TesterSpring\src\main\java\eu\arrowhead\client\consumer\ConsumerMain.java
-C:\Users\cripan\Desktop\Code_generation\ConsumerGenerationModulesSpring\TesterSpring\src\main\java\eu\arrowhead\client\common\JacksonJsonProviderAtRest.java
-C:\Users\cripan\Desktop\Code_generation\ConsumerGenerationModulesSpring\TesterSpring\src\main\java\eu\arrowhead\client\consumer\RequestDTO.java
-C:\Users\cripan\Desktop\Code_generation\ConsumerGenerationModulesSpring\TesterSpring\src\main\java\eu\arrowhead\client\common\CodgenUtil.java
-C:\Users\cripan\Desktop\Code_generation\ConsumerGenerationModulesSpring\TesterSpring\src\main\java\eu\arrowhead\client\common\TypeSafeProperties.java
-C:\Users\cripan\Desktop\Code_generation\ConsumerGenerationModulesSpring\TesterSpring\src\main\java\eu\arrowhead\client\consumer\Contracts.java
-C:\Users\cripan\Desktop\Code_generation\ConsumerGenerationModulesSpring\TesterSpring\src\main\java\eu\arrowhead\client\common\Defaults.java
-C:\Users\cripan\Desktop\Code_generation\ConsumerGenerationModulesSpring\TesterSpring\src\main\java\eu\arrowhead\client\consumer\Arguments.java
-C:\Users\cripan\Desktop\Code_generation\ConsumerGenerationModulesSpring\TesterSpring\src\main\java\eu\arrowhead\client\consumer\ConsumerApplicationInitListener.java
-C:\Users\cripan\Desktop\Code_generation\ConsumerGenerationModulesSpring\TesterSpring\src\main\java\eu\arrowhead\client\common\CommonConstants.java
->>>>>>> parent of 2cbd353... Current Active project

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contract >
+	
+	<interface protocol="HTTP" address="http://127.0.0.1/8888" >
+	
+		<method name="GET" id="getCars" path="/car">
+
+			<request>
+				<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<compresion name="null" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>
+								<complextype type="null"/> 
+								<element name="brand" type="String"/>
+								<element name="color" type="String"/>
+		
+				</payload>
+			</request>
+			
+				<response status="2.05">
+				<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<compresion name="null" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+				<complextype type="null"/> 					
+				<element name="SessionId" type="long"/>
+				<element name="OfferorName" type="String"/>
+				<element name="RecieverName" type="String"/>
+				<complexelement name="Contracts" type="single">
+				<element name="TemplatedID" type="String"/>
+				<complexelement name="Arguments" type="list">
+					<element name= "name" type="String"/>
+					<element name="value" type="String"/>
+				</complexelement>
+				</complexelement>
+
+					
+				</payload>
+				</response>
+			
+			
+			
+		</method>
+
+	</interface>
+</contract>

@@ -34,10 +34,7 @@
 	<modules>
 	    <module>client-skeleton-common</module>
 	    <module>CodgenSpring1</module>
-<<<<<<< HEAD
         <module>CodgenSpring2</module>
-=======
->>>>>>> parent of 2cbd353... Current Active project
 	    <module>TesterSpring</module>
 		<module>Interface</module>
 		<module>CodGenProvider-Spring</module>
