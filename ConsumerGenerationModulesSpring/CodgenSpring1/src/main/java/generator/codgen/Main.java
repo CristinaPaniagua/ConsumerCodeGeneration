@@ -65,7 +65,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         
         String service = request.getProperty("Service", "null");
         String system="getCars";
-        MD = readCDL.read("offer",system);
+        MD = readCDL.read("getDataFluid_temperature",system);
         System.out.print(MD.toString());
             
         
@@ -225,7 +225,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
           
           if(complextype==null){        
               
-            BconsumeService.addStatement("final ResponseDTO $L= arrowheadService.consumeServiceHTTP(ResponseDTO.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",MD.ID) 
+            BconsumeService.addStatement("final String $L= arrowheadService.consumeServiceHTTP(String.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",MD.ID) 
             .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
      
              }else{

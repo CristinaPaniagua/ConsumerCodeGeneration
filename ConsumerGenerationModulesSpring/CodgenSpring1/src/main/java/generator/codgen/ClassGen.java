@@ -64,6 +64,7 @@ public class ClassGen {
     public MethodSpec  fullConstructor ( ArrayList<String[]> elements,String className){
      
         //TODO: WHAT HAPPEND WITH THE COMPLEX_ELEMENT? SAME ARRAY?
+        readList(elements);
          ListofDeclarations=complexelement(elements);
            
       ArrayList<String[]> var= new ArrayList<>();
@@ -75,7 +76,7 @@ public class ClassGen {
       for (int i = 1; i < elements.size(); i++){ 
         String name=elements.get(i)[0];
         String type=elements.get(i)[1];
-        System.out.println(i+" "+name+" "+type );
+        System.out.println("fullConstructor"+i+" "+name+" "+type );
 
         
             if(name.equals("Newclass")){
@@ -374,4 +375,15 @@ public class ClassGen {
          //TODO: ADD MORE COMPLEX TYPES
              return t;
              }
+      
+       public static void readList (ArrayList<String[]> elements){
+        
+        for (int i = 0; i < elements.size(); i++){ 
+            String[] ele=elements.get(i);
+            for (int j = 0; j < ele.length; j++){
+                System.out.println(i+"."+j+" :"+elements.get(i)[j]);
+            }
+            
+        }
+       }
 }

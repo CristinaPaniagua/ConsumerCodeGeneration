@@ -10,6 +10,37 @@
 	<interface protocol="HTTP" address="http://127.0.0.1/8888" >
 
 
+			<method name="POST" id="offer" path="/negotiation/session-data">
+
+			<request>
+				<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+					<complextype type="null"/> 					
+					<element name="SessionId" type="Integer"/>
+					<element name="OfferorName" type="String"/>
+					<element name="RecieverName" type="String"/>
+					<complexelement name="Contracts" type="single">
+						<element name="TemplatedID" type="String"/>
+						<complexelement name="Arguments" type="list">
+							<element name= "name" type="String"/>
+							<element name="value" type="String"/>
+					</complexelement>
+					</complexelement>
+
+					
+				</payload>
+			</request>
+			
+			
+	
+		</method>
+	
 	
 		<method name="GET" id="getDataManufacturer" path="/data/EquipmentInfo/manufacturer">
 
