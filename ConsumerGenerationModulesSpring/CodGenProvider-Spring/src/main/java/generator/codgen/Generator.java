@@ -9,7 +9,7 @@ import ai.aitia.demo.car_provider.controller.RequestForm;
 import com.squareup.javapoet.*;
 
 
-import static generator.codgen.ClassGen.classGen;
+
 import java.awt.Font;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -80,17 +80,22 @@ private static ArrayList<String> classesUsed= new ArrayList<String>();
         String system="providerTest";
         MD = readCDL.read(service,system);
         System.out.print(MD.toString());
-        if(!MD.getElements_request().isEmpty()){
-        classesRequest=classGen(MD.getElements_request(),"RequestDTO");
-        classesUsed.add("classesRequest");
-        }
-        //readList(MD.getElements_response());
-        if(!MD.getElements_response().isEmpty()){
-        classesResponse=classGen(MD.getElements_response(),"ResponseDTO");
-        classesUsed.add("classesResponse");
+         if(MD.getRequest()){
+           ClassGen Request=new ClassGen();
+           classesRequest=Request.classGen(MD.getElements_request(),"RequestDTO");
+                     
+       }
+        
+       
+        if(MD.getResponse()){
+            ClassGen Response=new ClassGen();
+            classesResponse=Response.classGen(MD.getElements_response(),"ResponseDTO"); 
         }
         
-        ConsumerMain (classesUsed);
+        System.out.println("-----");
+        
+        
+        ConsumerMain ();
         if(MD.getProtocol().equalsIgnoreCase("COAP"))
         CoapGenerator.coap(MD);
         try{
@@ -147,9 +152,8 @@ private static ArrayList<String> classesUsed= new ArrayList<String>();
     }
    
        // METHOD TO CREAT THE METHOD cosumeService//
-  private static   MethodSpec consumeService( ArrayList<String> classesDummy){
+    private static   MethodSpec consumeService(){
   
-      
       
     String arg = request.getProperty("Argument", null);
     String protocol=MD.getProtocol();
@@ -164,56 +168,109 @@ private static ArrayList<String> classesUsed= new ArrayList<String>();
    BconsumeService 
      //.returns(Response.class)
      .addStatement("$T httpMethod=HttpMethod.$N",HttpMethod.class,MD.getMethod());
-    String complextype =MD.getComplexType_response();
-   
-   if(MD.getMethod().equalsIgnoreCase("GET")){
-      System.out.println("dummysize final: "+classesDummy.size());
-        for(int i=0; i<classesDummy.size();i++){
-            String s= classesDummy.get(i);
-          System.out.println("s: "+s);
-          BconsumeService.addStatement("$L" ,s );
-          
-      }
-     
-         if(MD.elements_request.equals("null")){  
-                         
-          BconsumeService.addStatement("final ResponseDTO getResponse = arrowheadService.consumeServiceHTTP(ResponseDTO.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,null,null,null)")
-          .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson(getResponse)))",Utilities.class);  
-           }else{
-             
-             Type t=getComplexType(complextype);
-            BconsumeService.addStatement("final $T carCreated = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,null,null,null)",t,t) 
-     .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson(carCreated)))",Utilities.class);   
-          
-         }
-          
-    }else{
-       //String s=" ";
-        System.out.println("dummysize final: "+classesDummy.size());
-      for(int i=0; i<classesDummy.size();i++){
-            String s= classesDummy.get(i);
-          System.out.println("s: "+s);
-          BconsumeService.addStatement("$L" ,s );
-         
-      }
-          //s=s.substring(0, s.length()-1);
-          
+    
+    
+    if(MD.getRequest()&&MD.getResponse()){
         
-       
-      
+        System.out.println(" Both request and response");
+        
+        String complextype_request =MD.getComplexType_request();
+        String complextype_response =MD.getComplexType_response();
+    
+    //OBJECT REQUEST
+    
+    
+    for(int i=0; i<classesRequest.size();i++){
+                  String s= classesRequest.get(i);
+                  System.out.println("Request s: "+s);
+                  BconsumeService.addStatement("$L" ,s );
+            }      
+               
+    
+    //HTTP REQUEST
+    
+     if(complextype_request.equals("null") && complextype_response.equals("null")){        
               
-       if(MD.elements_response.equals("null")){        
-              
-     BconsumeService.addStatement("final ResponseDTO $L= arrowheadService.consumeServiceHTTP(ResponseDTO.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",MD.ID) 
-     .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
+         System.out.println("NO complex types in the request or response");
+         
+            BconsumeService.addStatement("final ResponseDTO $L= arrowheadService.consumeServiceHTTP(ResponseDTO.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",MD.ID) 
+            .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
      
-       }else{
-           String ctype=MD.getComplexType_response();
-            Type t=getComplexType(ctype);
-            BconsumeService.addStatement("final $T $L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",t,MD.ID,t)
-     .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
-       }
-   }
+            //TODO: CHECK AND DEBUG THIS PART
+     }else if(complextype_request.equals("null") && !complextype_response.equals("null")){
+         
+         String ctype=MD.getComplexType_response();
+                  Type t=getComplexType(ctype);
+                  BconsumeService.addStatement("final $T $L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",t,MD.ID,t)
+                .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
+     
+     }else if(!complextype_request.equals("null") && complextype_response.equals("null")){
+         
+         String ctype=MD.getComplexType_request();
+                  Type t=getComplexType(ctype);
+                  BconsumeService.addStatement("final $T $L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",t,MD.ID,t)
+                .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
+     
+     }else{
+         //TODO
+     }
+    
+    }else{
+        
+        if(MD.getRequest()){
+            
+            System.out.println(" Only request ");
+             String complextype =MD.getComplexType_request();
+             
+          System.out.println("size final: "+classesRequest.size());
+          for(int i=0; i<classesRequest.size();i++){
+                  String s= classesRequest.get(i);
+                  System.out.println("s: "+s);
+                  BconsumeService.addStatement("$L" ,s );
+            }      
+               
+          
+          if(complextype==null){        
+              
+            BconsumeService.addStatement("final String $L= arrowheadService.consumeServiceHTTP(String.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",MD.ID) 
+            .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
+     
+             }else{
+                 String ctype=MD.getComplexType_request();
+                  Type t=getComplexType(ctype);
+                  BconsumeService.addStatement("final $T $L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO,null,null)",t,MD.ID,t)
+                .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
+                 }
+         
+            
+            
+            
+        } //if request
+    
+        if(MD.getResponse()){
+          
+          System.out.println(" Only request ");
+          String complextype =MD.getComplexType_response();
+          
+         
+          if(complextype==null){        
+              
+            BconsumeService.addStatement("final ResponseDTO $L= arrowheadService.consumeServiceHTTP(ResponseDTO.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,null,null,null)",MD.ID) 
+            .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
+     
+             }else{
+                 String ctype=MD.getComplexType_response();
+                  Type t=getComplexType(ctype);
+                  BconsumeService.addStatement("final $T $L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,null,null,null)",t,MD.ID,t)
+                .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L)))",Utilities.class,MD.ID);   
+                 }
+         
+            
+        }//if Response
+    
+    }//else Single Case
+    
+   
      
     }else{
      
@@ -232,7 +289,7 @@ private static ArrayList<String> classesUsed= new ArrayList<String>();
     
   return BconsumeService.build();
         
-  } 
+  }   
   
    // METHOD TO CREAT THE METHOD payloadInterpreter//
   private static   MethodSpec payloadInterpreter(){
@@ -388,14 +445,9 @@ private static ArrayList<String> classesUsed= new ArrayList<String>();
     
     
   //METHOD TO GENERATE THE MAIN AND CREATE THE MAINCLASS      
-     private static void ConsumerMain ( ArrayList<String> CUsed){
-           MethodSpec consumeService;
-  // if(CUsed.get(0).equals("classesRequest")){
-   //    consumeService =consumeService(classesRequest);
-  // }else{
-      consumeService =consumeService(classesRequest);
-  // }
-     
+     private static void ConsumerMain ( ){
+          MethodSpec consumeService=consumeService();
+   
      //MethodSpec payloadInterpreter =payloadInterpreter();
      MethodSpec run =run();
      String Rprotocol;

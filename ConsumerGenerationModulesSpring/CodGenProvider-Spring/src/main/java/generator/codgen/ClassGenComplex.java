@@ -5,8 +5,6 @@
  */
 package generator.codgen;
 
-import static generator.codgen.ClassGen.dummyobject;
-import static generator.codgen.ClassGen1.classGen;
 import java.util.ArrayList;
 
 /**
@@ -22,8 +20,8 @@ public class ClassGenComplex {
        System.out.println("\n\nARRAYLIST SIZE:"+elements.size());
        for (int i = 0; i < elements.size(); i++){ 
         String e =elements.get(i)[0];
-        System.out.println(i+" 1 " + elements.get(i)[0]);
-        System.out.println(i+" 2 " +elements.get(i)[1]);
+        System.out.println("complexElement"+i+" 1 " + elements.get(i)[0]);
+        System.out.println("complexElement"+i+" 2 " +elements.get(i)[1]);
         
         if(e!=null){
          if(e.equals("Newclass")){
@@ -118,11 +116,14 @@ public class ClassGenComplex {
                 }
            
         }   
-          
-        String CS =dummyobject(className,newclass);
+        
+        ClassGen c=new ClassGen();
+        String CS =c.dummyobject(className,newclass);
         classesDummy.add(CS); 
+        System.out.println("ADDTION TO CS:"+CS);
         //System.out.println(newclass.get(0)[0]+" , "+newclass.get(1)[0]);
-        classGen(newclass,className);
+        ClassGen1 c1=new ClassGen1();
+        c1.classGen(newclass,className);
         return j;
     }
     
