@@ -20,14 +20,18 @@ public class InterfaceMetadata {
     String ID;
     String complexType_response;
     String complexType_request;
-    ArrayList<String[]> elements_request ; 
-    ArrayList<String[]> elements_response ;
+    ArrayList<ElementsPayload> elements_request ; 
+    ArrayList<ElementsPayload> elements_response ;
     boolean request;
     boolean response;
+    boolean param; 
+    ArrayList<Param> parameters;
+    
+    
     public InterfaceMetadata() {
     }
 
-    public InterfaceMetadata(String Protocol, String PathResource, String Method, String Mediatype, String ID, String complexType_response, String complexType_request, ArrayList<String[]> elements_request, ArrayList<String[]> elements_response, boolean request, boolean response) {
+    public InterfaceMetadata(String Protocol, String PathResource, String Method, String Mediatype, String ID, String complexType_response, String complexType_request, ArrayList<ElementsPayload> elements_request, ArrayList<ElementsPayload> elements_response, boolean request, boolean response, boolean param, ArrayList<Param> parameters ) {
         this.Protocol = Protocol;
         this.PathResource = PathResource;
         this.Method = Method;
@@ -39,6 +43,8 @@ public class InterfaceMetadata {
         this.elements_response = elements_response;
         this.request = request;
         this.response = response;
+        this.param=param; 
+        this.parameters=parameters;
     }
 
 
@@ -83,19 +89,19 @@ public class InterfaceMetadata {
         return Mediatype;
     }
 
-    public ArrayList<String[]> getElements_request() {
+    public ArrayList<ElementsPayload> getElements_request() {
         return elements_request;
     }
 
-    public ArrayList<String[]> getElements_response() {
+    public ArrayList<ElementsPayload> getElements_response() {
         return elements_response;
     }
 
-    public void setElements_request(ArrayList<String[]> elements_request) {
+    public void setElements_request(ArrayList<ElementsPayload> elements_request) {
         this.elements_request = elements_request;
     }
 
-    public void setElements_response(ArrayList<String[]> elements_response) {
+    public void setElements_response(ArrayList<ElementsPayload> elements_response) {
         this.elements_response = elements_response;
     }
 
@@ -133,10 +139,28 @@ public class InterfaceMetadata {
         this.response = response;
     }
 
+    public boolean isParam() {
+        return param;
+    }
+
+    public void setParam(boolean param) {
+        this.param = param;
+    }
+
+    public ArrayList<Param> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(ArrayList<Param> parameters) {
+        this.parameters = parameters;
+    }
+
     @Override
     public String toString() {
-        return "InterfaceMetadata{" + "Protocol=" + Protocol + ", PathResource=" + PathResource + ", Method=" + Method + ", Mediatype=" + Mediatype + ", ID=" + ID + ", complexType_response=" + complexType_response + ", complexType_request=" + complexType_request + ", elements_request=" + elements_request + ", elements_response=" + elements_response + ", request=" + request + ", response=" + response + '}';
+        return "InterfaceMetadata{" + "Protocol=" + Protocol + ", PathResource=" + PathResource + ", Method=" + Method + ", Mediatype=" + Mediatype + ", ID=" + ID + ", complexType_response=" + complexType_response + ", complexType_request=" + complexType_request + ", elements_request=" + elements_request + ", elements_response=" + elements_response + ", request=" + request + ", response=" + response + ", param=" + param + ", parameters=" + parameters + '}';
     }
+
+
 
     
     

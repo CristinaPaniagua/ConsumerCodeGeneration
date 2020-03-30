@@ -21,10 +21,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class readCDL {
-      public static  ArrayList<String[]> elements_request = new ArrayList<String[]>(); 
-    public static  ArrayList<String[]> elements_response = new ArrayList<String[]>();
+     
+    public static  ArrayList<ElementsPayload> elements_request = new ArrayList<ElementsPayload>(); 
+    public static  ArrayList<ElementsPayload> elements_response = new ArrayList<ElementsPayload>();
+    public static  ArrayList<String[]> payload_request = new ArrayList<String[]>(); 
+    public static  ArrayList<String[]> payload_response = new ArrayList<String[]>();
     public static boolean request;
     public static boolean response;
+    public static boolean param;
+    public static  ArrayList<Param> parameters = new ArrayList<>();
 public static InterfaceMetadata read(String service,String System){
     String sec=null;
     String protocol=null;
@@ -49,7 +54,7 @@ public static InterfaceMetadata read(String service,String System){
     
       try  {
           
-    	
+    	//cdl_MD_parameters.xml
 	 File File1 = new File("cdl_MD.xml");
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -109,6 +114,11 @@ public static InterfaceMetadata read(String service,String System){
                         path=eMethod.getAttribute("path");
                         
                         
+          //PARAM
+           NodeList  paramR=eMethod.getElementsByTagName("param");
+           if (paramR.getLength()==0){
+               param=false;
+                        
           //REQUEST                         
                          
                 NodeList  lR=eMethod.getElementsByTagName("request");
@@ -163,7 +173,174 @@ public static InterfaceMetadata read(String service,String System){
                                    ele=new String[2];
                                    ele[0]=e.getAttribute("name");
                                    ele[1]=e.getAttribute("type");
-                                   elements_request.add(ele);
+                                   payload_request.add(ele);
+                                   }
+                                    
+                               }
+                              
+                             }
+                             
+                             
+                              ElementsPayload payloadRequest=new ElementsPayload(payload_request);
+                              elements_request.add(payloadRequest);
+                             
+
+                               
+                           
+                            
+                                   
+                           
+                     }
+                               
+                         
+        } //close else    
+           //RESPONSE    
+                NodeList  lRR=eMethod.getElementsByTagName("response");
+                            
+                         if(lRR.getLength()==0){
+                           response=false;
+                         } else{
+                             response=true;
+                      
+                     Node nRR = lRR.item(0);
+                     if(nRR.getNodeType() == Node.ELEMENT_NODE){
+                            Element eRR= (Element) nRR;
+                                
+                              
+
+//Format comparision
+//Encoding
+                            Node nEncode1 =eRR.getElementsByTagName("encode").item(0);
+                            Element eEncode1= (Element) nEncode1;
+                            
+                            mediatype=eEncode1.getAttribute("name");
+  
+                            // Payload
+                             Node npayload1 =eRR.getElementsByTagName("payload").item(0);
+                             Element epayload1=(Element) npayload1;
+                             
+                             NodeList complex2=epayload1.getElementsByTagName("complextype");
+                             //if(!complex2.equals(null)){
+                                  Node ncomplex1=complex2.item(0); 
+                                  Element ecomplex= (Element)ncomplex1;
+                              complexType_response=ecomplex.getAttribute("type");   
+                             //} 
+                             
+                   
+                             Node childNode=epayload1.getFirstChild();
+
+                             while(childNode.getNextSibling()!=null){          
+                                    childNode = childNode.getNextSibling(); 
+                                    if (childNode.getNodeType() == Node.ELEMENT_NODE) {    
+                                   Element e =(Element) childNode;
+                                   String[] ele;
+                                   
+                                   String tagname= e.getTagName();
+
+                                    if("complexelement".equals(tagname)){
+    
+                                        complexelFunction ("RESPONSE",e,"Newclass");
+                                        
+         
+                                 
+                                   }else{
+                                   ele=new String[2];
+                                   ele[0]=e.getAttribute("name");
+                                   ele[1]=e.getAttribute("type");
+                                  
+                                   payload_response.add(ele);
+                                   }
+                                    //elements_response.add(ele);
+                               }
+                              
+                             }
+                             ElementsPayload payloadResponse=new ElementsPayload(payload_response);
+                              elements_response.add(payloadResponse);
+
+                                   
+                           }
+                     }
+                            
+        }//END:NO parameters
+           else{ //BEGINGING PARAMETERS
+               param=true;
+               
+               for(int p=0; p>paramR.getLength();p++){
+                    Node nparam = paramR.item(p);
+                    if(nparam.getNodeType() == Node.ELEMENT_NODE){
+                        Element eparam=(Element) nparam;
+                        String name= eparam.getAttribute("name");
+                        String type=eparam.getAttribute("type");
+                        String style=eparam.getAttribute("style");        
+                        String required=eparam.getAttribute("required");
+                        
+                        Param parameter=new Param(name,type,style,required);
+                        parameters.add(parameter);
+                        
+                    }
+                    
+                    
+                    
+                    //REQUEST                         
+                         
+                NodeList  lR=eMethod.getElementsByTagName("request");
+                            
+                         if(lR.getLength()==0){
+                           request=false;
+                         }else{
+                           request=true;
+                         
+                         
+                      
+                     Node nR = lR.item(0);
+                     if(nR.getNodeType() == Node.ELEMENT_NODE){
+                            Element eR= (Element) nR;
+                                
+                              
+
+//Format comparision
+//Encoding
+                            Node nEncode1 =eR.getElementsByTagName("encode").item(0);
+                            Element eEncode1= (Element) nEncode1;
+                            
+                            mediatype=eEncode1.getAttribute("name");
+
+                            // Payload
+                             Node npayload1 =eR.getElementsByTagName("payload").item(0);
+                             Element epayload1=(Element) npayload1;
+                             
+                        //Payload with options
+                             NodeList options=epayload1.getElementsByTagName("option");
+                             
+                             
+                             NodeList complex1=epayload1.getElementsByTagName("complextype");
+                             //if(!complex1.equals(null)){
+                                  Node ncomplex1=complex1.item(0); 
+                                  Element ecomplex= (Element)ncomplex1;
+                              complexType_request=ecomplex.getAttribute("type");   
+                            // } 
+
+                             Node childNode=epayload1.getFirstChild();
+                             
+                             while(childNode.getNextSibling()!=null){          
+                                    childNode = childNode.getNextSibling(); 
+                                    if (childNode.getNodeType() == Node.ELEMENT_NODE) {    
+                                   Element e =(Element) childNode;
+                                   String[] ele;
+                                   
+                                   String tagname= e.getTagName();
+
+                                    if("complexelement".equals(tagname)){
+    
+                                        complexelFunction ("REQUEST",e,"Newclass");
+                                        
+         
+                                 
+                                   }else{
+                                   ele=new String[2];
+                                   ele[0]=e.getAttribute("name");
+                                   ele[1]=e.getAttribute("type");
+                                   payload_request.add(ele);
                                    }
                                     //elements_response.add(ele);
                                }
@@ -232,7 +409,7 @@ public static InterfaceMetadata read(String service,String System){
                                    ele=new String[2];
                                    ele[0]=e.getAttribute("name");
                                    ele[1]=e.getAttribute("type");
-                                   elements_response.add(ele);
+                                   payload_response.add(ele);
                                    }
                                     //elements_response.add(ele);
                                }
@@ -242,10 +419,17 @@ public static InterfaceMetadata read(String service,String System){
                                    
                            }
                      }
-                            
-                            
+                    
+                    
+                    
+               }
+                
                      
-        }      
+                           
+               
+           }//There are paramters
+                     
+        }//METHOD      
                             
                             
                   }
@@ -263,7 +447,7 @@ public static InterfaceMetadata read(String service,String System){
         
     
       
- InterfaceMetadata MD = new InterfaceMetadata(protocol,path,method,mediatype,ID,complexType_request,complexType_response,elements_request, elements_response, request,response);  
+ InterfaceMetadata MD = new InterfaceMetadata(protocol,path,method,mediatype,ID,complexType_request,complexType_response,elements_request, elements_response, request,response,param,parameters);  
     return MD;
     
 }
@@ -275,8 +459,8 @@ public static void complexelFunction ( String r, Element e, String level){
                                      String classname=e.getAttribute("name");
                                      c[1]=classname;
                                      c[2]=e.getAttribute("type");
-                                     if (r.equalsIgnoreCase("REQUEST"))  elements_request.add(c);
-                                      else elements_response.add(c);
+                                     if (r.equalsIgnoreCase("REQUEST"))  payload_request.add(c);
+                                      else payload_response.add(c);
 
                                      Node elechild=e.getFirstChild();
 
@@ -304,8 +488,8 @@ public static void complexelFunction ( String r, Element e, String level){
                                              f[2]=e2.getAttribute("type");
                                              
                                               if (r.equalsIgnoreCase("REQUEST"))
-                                             elements_request.add(f);
-                                             else elements_response.add(f);
+                                             payload_request.add(f);
+                                             else payload_response.add(f);
                                              
  
                                           }
@@ -319,8 +503,8 @@ public static void complexelFunction ( String r, Element e, String level){
                                      StopClass[0]="StopClass"; 
                                      
                                       if (r.equalsIgnoreCase("REQUEST"))
-                                    elements_request.add(StopClass);
-                                     else elements_response.add(StopClass);
+                                    payload_request.add(StopClass);
+                                     else payload_response.add(StopClass);
                                      
                                        
 }

@@ -65,20 +65,23 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         
         String service = request.getProperty("Service", "null");
         String system="getCars";
-        MD = readCDL.read("getDataFluid_temperature",system);
+        MD = readCDL.read("getDataManufacturer",system);
         System.out.print(MD.toString());
             
         
        if(MD.getRequest()){
            ClassGen Request=new ClassGen();
-           classesRequest=Request.classGen(MD.getElements_request(),"RequestDTO");
+           ArrayList<String[]> elements_request=MD.elements_request.get(0).getElements();
+          
+           classesRequest=Request.classGen(elements_request,"RequestDTO");
                      
        }
         
        
         if(MD.getResponse()){
             ClassGen Response=new ClassGen();
-            classesResponse=Response.classGen(MD.getElements_response(),"ResponseDTO"); 
+            ArrayList<String[]> elements_response=MD.elements_response.get(0).getElements();
+            classesResponse=Response.classGen(elements_response,"ResponseDTO"); 
         }
         
         System.out.println("-----");
@@ -286,7 +289,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
   
   
   
-  
+  /*
    // METHOD TO CREAT THE METHOD payloadInterpreter//
   private static   MethodSpec payloadInterpreter(){
       
@@ -379,7 +382,8 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
   return payloadInterpreter;
         
   }   
-  
+  */
+     
 //METHOD SPRING RUN 
   
     private static MethodSpec run(){
