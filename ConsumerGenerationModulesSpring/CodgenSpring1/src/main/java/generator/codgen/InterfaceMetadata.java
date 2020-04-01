@@ -26,12 +26,13 @@ public class InterfaceMetadata {
     boolean response;
     boolean param; 
     ArrayList<Param> parameters;
+   ArrayList<String> subpaths;
     
     
     public InterfaceMetadata() {
     }
 
-    public InterfaceMetadata(String Protocol, String PathResource, String Method, String Mediatype, String ID, String complexType_response, String complexType_request, ArrayList<ElementsPayload> elements_request, ArrayList<ElementsPayload> elements_response, boolean request, boolean response, boolean param, ArrayList<Param> parameters ) {
+    public InterfaceMetadata(String Protocol, String PathResource, String Method, String Mediatype, String ID, String complexType_response, String complexType_request, ArrayList<ElementsPayload> elements_request, ArrayList<ElementsPayload> elements_response, boolean request, boolean response, boolean param, ArrayList<Param> parameters, ArrayList<String> subpaths) {
         this.Protocol = Protocol;
         this.PathResource = PathResource;
         this.Method = Method;
@@ -43,9 +44,12 @@ public class InterfaceMetadata {
         this.elements_response = elements_response;
         this.request = request;
         this.response = response;
-        this.param=param; 
-        this.parameters=parameters;
+        this.param = param;
+        this.parameters = parameters;
+        this.subpaths = subpaths;
     }
+
+
 
 
 
@@ -155,10 +159,20 @@ public class InterfaceMetadata {
         this.parameters = parameters;
     }
 
+    public ArrayList<String> getSubpaths() {
+        return subpaths;
+    }
+
+    public void setSubpaths(ArrayList<String> subpaths) {
+        this.subpaths = subpaths;
+    }
+
     @Override
     public String toString() {
-        return "InterfaceMetadata{" + "Protocol=" + Protocol + ", PathResource=" + PathResource + ", Method=" + Method + ", Mediatype=" + Mediatype + ", ID=" + ID + ", complexType_response=" + complexType_response + ", complexType_request=" + complexType_request + ", elements_request=" + elements_request + ", elements_response=" + elements_response + ", request=" + request + ", response=" + response + ", param=" + param + ", parameters=" + parameters + '}';
+        return "InterfaceMetadata{" + "Protocol=" + Protocol + ", PathResource=" + PathResource + ", Method=" + Method + ", Mediatype=" + Mediatype + ", ID=" + ID + ", complexType_response=" + complexType_response + ", complexType_request=" + complexType_request + ", elements_request=" + elements_request + ", elements_response=" + elements_response + ", request=" + request + ", response=" + response + ", param=" + param + ", parameters=" + parameters + ", subpaths=" + subpaths + '}';
     }
+
+  
 
 
 

@@ -31,6 +31,7 @@ public class readCDL {
     public static boolean response;
     public static boolean param;
     public static  ArrayList<Param> parameters = new ArrayList<>();
+    public static ArrayList<String> subpaths=new ArrayList<>();
 public static InterfaceMetadata read(String service,String System){
     String sec=null;
     String protocol=null;
@@ -330,7 +331,7 @@ public static InterfaceMetadata read(String service,String System){
                                  Node noption1=options1.item(k);
                                  Element eoption1= (Element)noption1;
                                  String subpath=eoption1.getAttribute("value");
-                                
+                                 subpaths.add(subpath);
                                  
                                   NodeList complex1=eoption1.getElementsByTagName("complextype");
                              //if(!complex1.equals(null)){
@@ -513,7 +514,7 @@ public static InterfaceMetadata read(String service,String System){
         
     
       
- InterfaceMetadata MD = new InterfaceMetadata(protocol,path,method,mediatype,ID,complexType_request,complexType_response,elements_request, elements_response, request,response,param,parameters);  
+ InterfaceMetadata MD = new InterfaceMetadata(protocol,path,method,mediatype,ID,complexType_request,complexType_response,elements_request, elements_response, request,response,param,parameters,subpaths);  
     return MD;
     
 }
