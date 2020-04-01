@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import static java.lang.System.out;
 
 public class readCDL {
      
@@ -55,7 +56,7 @@ public static InterfaceMetadata read(String service,String System){
       try  {
           
     	//cdl_MD_parameters.xml
-	 File File1 = new File("cdl_MD.xml");
+	 File File1 = new File("cdl_MD_parameters.xml");
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc= dBuilder.parse(File1);
@@ -144,6 +145,7 @@ public static InterfaceMetadata read(String service,String System){
                             mediatype=eEncode1.getAttribute("name");
 
                             // Payload
+                             
                              Node npayload1 =eR.getElementsByTagName("payload").item(0);
                              Element epayload1=(Element) npayload1;
                              NodeList complex1=epayload1.getElementsByTagName("complextype");
@@ -173,6 +175,8 @@ public static InterfaceMetadata read(String service,String System){
                                    ele=new String[2];
                                    ele[0]=e.getAttribute("name");
                                    ele[1]=e.getAttribute("type");
+                                   
+                                   if(!ele[1].equals("null"))
                                    payload_request.add(ele);
                                    }
                                     
@@ -247,7 +251,8 @@ public static InterfaceMetadata read(String service,String System){
                                    ele=new String[2];
                                    ele[0]=e.getAttribute("name");
                                    ele[1]=e.getAttribute("type");
-                                  
+                                   
+                                   if(!ele[1].equals("null"))
                                    payload_response.add(ele);
                                    }
                                     //elements_response.add(ele);
@@ -259,13 +264,13 @@ public static InterfaceMetadata read(String service,String System){
 
                                    
                            }
-                     }
+                     }//close else RESPONSE=TRUE
                             
         }//END:NO parameters
            else{ //BEGINGING PARAMETERS
                param=true;
-               
-               for(int p=0; p>paramR.getLength();p++){
+              
+               for(int p=0; p<paramR.getLength();p++){
                     Node nparam = paramR.item(p);
                     if(nparam.getNodeType() == Node.ELEMENT_NODE){
                         Element eparam=(Element) nparam;
@@ -279,7 +284,7 @@ public static InterfaceMetadata read(String service,String System){
                         
                     }
                     
-                    
+               }
                     
                     //REQUEST                         
                          
@@ -310,29 +315,48 @@ public static InterfaceMetadata read(String service,String System){
                              Element epayload1=(Element) npayload1;
                              
                         //Payload with options
-                             NodeList options=epayload1.getElementsByTagName("option");
+                             NodeList options1=epayload1.getElementsByTagName("option");
+                             
+                             out.println("options found, number:"+options1.getLength());
                              
                              
-                             NodeList complex1=epayload1.getElementsByTagName("complextype");
+                             for(int k=0; k<options1.getLength();k++){
+                                
+                                 ArrayList<String[]> arrayPayload = new ArrayList<String[]>(); 
+                                 out.println("option: "+k);
+                                 //payload_request.clear();
+                               
+                                 
+                                 Node noption1=options1.item(k);
+                                 Element eoption1= (Element)noption1;
+                                 String subpath=eoption1.getAttribute("value");
+                                
+                                 
+                                  NodeList complex1=eoption1.getElementsByTagName("complextype");
                              //if(!complex1.equals(null)){
                                   Node ncomplex1=complex1.item(0); 
                                   Element ecomplex= (Element)ncomplex1;
                               complexType_request=ecomplex.getAttribute("type");   
                             // } 
-
-                             Node childNode=epayload1.getFirstChild();
+                                
+                             Node childNode=eoption1.getFirstChild();
+                                 
                              
-                             while(childNode.getNextSibling()!=null){          
+                               
+                             while(childNode.getNextSibling()!=null){     
+                                 
                                     childNode = childNode.getNextSibling(); 
-                                    if (childNode.getNodeType() == Node.ELEMENT_NODE) {    
+                                    if (childNode.getNodeType() == Node.ELEMENT_NODE) {  
+                                      
                                    Element e =(Element) childNode;
                                    String[] ele;
                                    
                                    String tagname= e.getTagName();
+                                   out.println(tagname);
 
                                     if("complexelement".equals(tagname)){
     
-                                        complexelFunction ("REQUEST",e,"Newclass");
+                                        complexelFunction("REQUEST",e,"Newclass");
                                         
          
                                  
@@ -340,23 +364,41 @@ public static InterfaceMetadata read(String service,String System){
                                    ele=new String[2];
                                    ele[0]=e.getAttribute("name");
                                    ele[1]=e.getAttribute("type");
-                                   payload_request.add(ele);
+                                   if(!ele[1].equals("null")){
+                                    
+                                   
+                                   arrayPayload.add(ele);
+                                   //out.println("option: "+k+": "+arrayPayload.get(0)[0]);
                                    }
-                                    //elements_response.add(ele);
+                                   
+                                   }
+                                   
                                }
                               
-                             }
-
-                               
-                           
+                             } //END WHILE NODES In the payload
+                             
+                             ElementsPayload payloadRequest =new ElementsPayload(arrayPayload);
+                              payloadRequest.getElements();
+                             elements_request.add(payloadRequest);
+                             
+                             
+                             
+                             } //END "FOR" LOOP: OPTIONS
+                             
+                             out.println("number of objects in the array:"+elements_request.size());
+                             out.println(" 1  -----"+elements_request.get(0));
+                             out.println(elements_request.get(0).elements.get(0)[0]);
                             
-                                   
+                             out.println(" 2 -----"+elements_request.get(1));
+                             out.println(elements_request.get(1).elements.get(0)[0]);
+                             //printElements(elements_request.get(1).getElements());
                            
-                     }
+                     }//end request nodes
                                
                          
-        } //close else    
-           //RESPONSE    
+        } //close else  REQUEST=TRUE 
+                         
+                                    //RESPONSE    
                 NodeList  lRR=eMethod.getElementsByTagName("response");
                             
                          if(lRR.getLength()==0){
@@ -378,22 +420,38 @@ public static InterfaceMetadata read(String service,String System){
                             mediatype=eEncode1.getAttribute("name");
   
                             // Payload
-                             Node npayload1 =eRR.getElementsByTagName("payload").item(0);
-                             Element epayload1=(Element) npayload1;
+                             Node npayload2 =eRR.getElementsByTagName("payload").item(0);
+                             Element epayload2=(Element) npayload2;
                              
-                             NodeList complex2=epayload1.getElementsByTagName("complextype");
-                             //if(!complex2.equals(null)){
-                                  Node ncomplex1=complex2.item(0); 
-                                  Element ecomplex= (Element)ncomplex1;
-                              complexType_response=ecomplex.getAttribute("type");   
-                             //} 
+                       //Payload with options
+                             NodeList options2=epayload2.getElementsByTagName("option");
                              
-                   
-                             Node childNode=epayload1.getFirstChild();
-
-                             while(childNode.getNextSibling()!=null){          
+                             out.println("options found, number:"+options2.getLength());
+                             ElementsPayload payloadResponse=new ElementsPayload();
+                             for(int k=0; k<options2.getLength();k++){
+                                ArrayList<String[]> arrayPayload = new ArrayList<String[]>(); 
+                                 
+                                 Node noption2=options2.item(k);
+                                 Element eoption2= (Element)noption2;
+                                 String subpath=eoption2.getAttribute("value");
+                                
+                                 
+                                  NodeList complex2=eoption2.getElementsByTagName("complextype");
+                             //if(!complex1.equals(null)){
+                                  Node ncomplex2=complex2.item(0); 
+                                  Element ecomplex= (Element)ncomplex2;
+                              complexType_request=ecomplex.getAttribute("type");   
+                            // } 
+                                
+                             Node childNode=eoption2.getFirstChild();
+                                 
+                             out.println(subpath);
+                               
+                             while(childNode.getNextSibling()!=null){     
+                                  
                                     childNode = childNode.getNextSibling(); 
-                                    if (childNode.getNodeType() == Node.ELEMENT_NODE) {    
+                                    if (childNode.getNodeType() == Node.ELEMENT_NODE) {  
+                                       
                                    Element e =(Element) childNode;
                                    String[] ele;
                                    
@@ -401,7 +459,7 @@ public static InterfaceMetadata read(String service,String System){
 
                                     if("complexelement".equals(tagname)){
     
-                                        complexelFunction ("RESPONSE",e,"Newclass");
+                                        complexelFunction("REQUEST",e,"Newclass");
                                         
          
                                  
@@ -409,21 +467,29 @@ public static InterfaceMetadata read(String service,String System){
                                    ele=new String[2];
                                    ele[0]=e.getAttribute("name");
                                    ele[1]=e.getAttribute("type");
-                                   payload_response.add(ele);
+                                   if(!ele[1].equals("null")){
+                                    
+                                   arrayPayload.add(ele);
                                    }
-                                    //elements_response.add(ele);
+                                   
+                                   }
+                                   
                                }
                               
-                             }
-
-                                   
-                           }
-                     }
-                    
-                    
-                    
-               }
-                
+                             } //END WHILE NODES In the payload
+                             
+                             payloadResponse.setElements( arrayPayload);
+                             elements_response.add(payloadResponse);
+                             
+                             
+                             } //END "FOR" LOOP: OPTIONS
+                             
+                             
+                              
+                           
+                        }//close response elements
+                     }//close else RESPONSE=TRUE
+          
                      
                            
                
@@ -508,7 +574,22 @@ public static void complexelFunction ( String r, Element e, String level){
                                      
                                        
 }
+
+
+
+    public static void printElements(ArrayList<String[]> elements){
+        for(int i=0; i>elements.size();i++){
+            String[] list=elements.get(i);
+            for(int j=0; j>list.length;j++){
+                out.println(list[j]);
+            }
+            
+        }
     }
 
-  
+
+
+    }
+
+
 

@@ -12,7 +12,6 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
-import static generator.codgen.ClassGenComplex.complexelement;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -25,9 +24,7 @@ import java.util.List;
  */
 public class ClassGen {
 
-   // public static ArrayList<String> Declaration_Request=new ArrayList<>();
-   // public static ArrayList<String> Declaration_Response=new ArrayList<>();
-    //public static ArrayList<String> classesD=new ArrayList<>();
+ 
     
     ArrayList<String> ListofDeclarations=new ArrayList<>();
     
@@ -63,9 +60,8 @@ public class ClassGen {
         
     public MethodSpec  fullConstructor ( ArrayList<String[]> elements,String className){
      
-        //TODO: WHAT HAPPEND WITH THE COMPLEX_ELEMENT? SAME ARRAY?
-        readList(elements);
-         ListofDeclarations=complexelement(elements);
+        ClassGenComplex  cc = new ClassGenComplex();
+        ListofDeclarations=cc.complexelement(elements);
            
       ArrayList<String[]> var= new ArrayList<>();
        
@@ -73,7 +69,7 @@ public class ClassGen {
      MethodSpec.Builder BFullConsructor = MethodSpec.constructorBuilder()
      .addModifiers(Modifier.PUBLIC);
    
-      for (int i = 1; i < elements.size(); i++){ 
+      for (int i = 0; i < elements.size(); i++){ 
         String name=elements.get(i)[0];
         String type=elements.get(i)[1];
         System.out.println("fullConstructor"+i+" "+name+" "+type );
@@ -123,8 +119,7 @@ public class ClassGen {
         String CS =dummyobject(className,var);
         ListofDeclarations.add(CS);
         
-       // if(className.equals("RequestDTO")) Declaration_Request.add(CS);
-        //if(className.equals("ResponseDTO")) Declaration_Response.add(CS);
+       
         
         
         
@@ -159,7 +154,7 @@ public class ClassGen {
         
           String S="";
           
-     for (int i = 1; i < elements.size(); i++){ 
+     for (int i = 0; i < elements.size(); i++){ 
          String name=elements.get(i)[0];
          if(name.equals("Newclass")){
              name=elements.get(i)[1];
@@ -229,7 +224,7 @@ public class ClassGen {
       
       
       
-    for (int i = 1; i < elements.size(); i++){ 
+    for (int i = 0; i < elements.size(); i++){ 
         String name=elements.get(i)[0];
         String type=elements.get(i)[1];
        

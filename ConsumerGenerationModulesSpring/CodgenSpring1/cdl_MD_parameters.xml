@@ -68,7 +68,6 @@
 					<element name="test" type="String"/>
 					<element name="test2" type="Integer"/>
 				</option>
-				
 				<option value="/EquipmentInfo/device_type" >
 					<complextype type="null"/> 					
 					<element name="testdevice_type" type="String"/>
@@ -79,7 +78,8 @@
 			
 			</request>
 			
-			<response status="200">
+			
+		<response status="200">
 			<format> 
 					<encode name="JSON" mediaType= "JSON" version="0"/>
 					<security name="null" version="0"/>
@@ -93,10 +93,7 @@
 					<complextype type="null"/> 					
 					<element name="manufacturer" type="String"/>
 				</option>
-				
-				
-				
-				
+	
 				<option value="/EquipmentInfo/device_type" >
 					<complextype type="null"/> 					
 					<element name="device_type" type="String"/>
@@ -106,6 +103,9 @@
 			</payload>
 			
 			</response>
+			
+			
+
 		
 		
 		</method>
@@ -131,10 +131,8 @@
 			
 			</request>
 
-
-
 			<response status="200">
-			<format> 
+				<format> 
 					<encode name="JSON" mediaType= "JSON" version="0"/>
 					<security name="null" version="0"/>
 					<qos name="null" version="0"/> 
@@ -146,7 +144,9 @@
 					<element name="manufacturer" type="String"/>
 				</payload>
 			
-			</response>
+			</response>	
+
+			
 	
 		</method>
 		
@@ -216,6 +216,11 @@
 				</payload>
 			
 			</response>
+			
+	
+			
+			
+		
 	
 		</method>
 		

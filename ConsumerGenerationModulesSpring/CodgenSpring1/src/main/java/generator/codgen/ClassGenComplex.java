@@ -13,9 +13,22 @@ import java.util.ArrayList;
  */
 public class ClassGenComplex {
     
-   public static ArrayList<String> classesDummy= new ArrayList<String>();
+   public  ArrayList<String> classesDummy= new ArrayList<String>();
+
+    public ClassGenComplex() {
+    }
+
+    public ArrayList<String> getClassesDummy() {
+        return classesDummy;
+    }
+
+    public void setClassesDummy(ArrayList<String> classesDummy) {
+        this.classesDummy = classesDummy;
+    }
+   
+   
     
-    public static ArrayList<String> complexelement (ArrayList<String[]> elements){
+    public ArrayList<String> complexelement (ArrayList<String[]> elements){
         boolean boo=false;
        System.out.println("\n\nARRAYLIST SIZE:"+elements.size());
        for (int i = 0; i < elements.size(); i++){ 
@@ -42,7 +55,7 @@ public class ClassGenComplex {
     }
     
     
-    public static int genClomplex (ArrayList<String[]> elements, int i){
+    public  int genClomplex (ArrayList<String[]> elements, int i){
         //ArrayList<String[]> var= new ArrayList<String[]>();
         ArrayList<String[]> newclass = new ArrayList<String[]>();
         boolean out=false;
@@ -128,7 +141,7 @@ public class ClassGenComplex {
     }
     
     
-    public static void readList (ArrayList<String[]> elements){
+    public void readList (ArrayList<String[]> elements){
         
         for (int i = 0; i < elements.size(); i++){ 
             String[] ele=elements.get(i);

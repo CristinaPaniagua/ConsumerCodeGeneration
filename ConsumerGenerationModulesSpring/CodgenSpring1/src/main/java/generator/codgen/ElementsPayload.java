@@ -30,6 +30,19 @@ public class ElementsPayload {
     public void setElements(ArrayList<String[]> elements) {
         this.elements = elements;
     }
+    
+    
+    
+    
+    public void printElements(){
+        for(int i=0; i>elements.size();i++){
+            String[] list=elements.get(i);
+            for(int j=0; j>list.length;j++){
+                System.out.println(list[j]);
+            }
+            
+        }
+    }
      
     
      
