@@ -179,9 +179,6 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
      .addStatement("$T httpMethod=HttpMethod.$N",HttpMethod.class,MD.getMethod())
      .addCode(consumeService);
     
-    
-  
-     
     }else{
      
       //FOR COAP
@@ -191,12 +188,9 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
      .addStatement("$T coapresponse=c.coapRequest(address+\":\"+port+serviceUri)",CoapResponse.class)  
      .addStatement("System.out.println(coapresponse.getResponseText())");         
     // .addStatement("return coapresponse");
-    
+
     }
 
-    
-    
-    
   return BconsumeService.build();
         
   }   
@@ -227,18 +221,19 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
    
      BconsumeService 
      .addStatement("$T httpMethod=HttpMethod.$N",HttpMethod.class,MD.getMethod())
-     .addStatement("String path=\" \"")
-     .beginControlFlow("switch(path)");
+      .addStatement("String path=\" \"")       
+      .beginControlFlow("switch(path)");
     System.out.println("Subpath size:"+ MD.subpaths.size()); 
     
     for(int m=0; m<MD.subpaths.size();m++){
         
         String subpath=MD.subpaths.get(m);
         CodeBlock optionCase=ServiceCode("OBJRequestDTO"+m,"OBJResponseDTO"+m,m);
-        BconsumeService
-     .addCode("case \"$L\": \n",subpath)
-     .addCode(optionCase)
-     .addStatement("break");
+        BconsumeService           
+        .addCode("case \"$L\": \n",subpath)
+        .addStatement("serviceUri=\"$L\"",subpath)
+        .addCode(optionCase)
+        .addStatement("break");
     }
         
     
