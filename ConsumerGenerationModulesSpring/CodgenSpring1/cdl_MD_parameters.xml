@@ -50,9 +50,11 @@
 		
 		<param name="BlockInstance" required="true" style="template" type="String" />
 		<param name="DataEntry" required="true" style="template" type="String" />
+
 		
 		
-		<request>
+	
+			<response status="200">
 			<format> 
 					<encode name="JSON" mediaType= "JSON" version="0"/>
 					<security name="null" version="0"/>
@@ -60,53 +62,20 @@
 					<semantic name="null" version="0"/>
 					<notation href="null"/> 
 				</format> 
-				
-				<payload>	
-				
-				<option value="/EquipmentInfo/manufacturer" >
-					<complextype type="null"/> 					
-					<element name="test" type="String"/>
-					<element name="test2" type="Integer"/>
-				</option>
-				<option value="/EquipmentInfo/device_type" >
-					<complextype type="null"/> 					
-					<element name="testdevice_type" type="String"/>
-					<element name="test2device_type" type="Integer"/>
-				</option>
-				
-				</payload>
-			
-			</request>
-			
-			
-		<response status="200">
-			<format> 
-					<encode name="JSON" mediaType= "JSON" version="0"/>
-					<security name="null" version="0"/>
-					<qos name="null" version="0"/> 
-					<semantic name="null" version="0"/>
-					<notation href="null"/> 
-				</format> 
-				<payload>	
-				
+			<payload>				
 				<option value="/EquipmentInfo/manufacturer" >
 					<complextype type="null"/> 					
 					<element name="manufacturer" type="String"/>
 				</option>
-	
 				<option value="/EquipmentInfo/device_type" >
 					<complextype type="null"/> 					
-					<element name="device_type" type="String"/>
+					<element name="quality" type="Integer"/>
 				</option>
-			
-			
+
 			</payload>
 			
 			</response>
 			
-			
-
-		
 		
 		</method>
 	
@@ -194,7 +163,7 @@
 		
 		
 		
-		<method name="GET" id="getDataFluid_temperature" path="/data/HydaulicPumpBlock/fluid_temperature">
+		<method name="GET" id="getDataFluid_temperature" path="/data/HydraulicPumpBlock/fluid_temperature">
 
 			
 			<response status="200">

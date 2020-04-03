@@ -268,6 +268,9 @@ public static InterfaceMetadata read(String service,String System){
                      }//close else RESPONSE=TRUE
                             
         }//END:NO parameters
+           
+ //********************************************************************************************************************************************************
+          
            else{ //BEGINGING PARAMETERS
                param=true;
               
@@ -366,9 +369,7 @@ public static InterfaceMetadata read(String service,String System){
                                    ele[0]=e.getAttribute("name");
                                    ele[1]=e.getAttribute("type");
                                    if(!ele[1].equals("null")){
-                                    
-                                   
-                                   arrayPayload.add(ele);
+                                    arrayPayload.add(ele);
                                    //out.println("option: "+k+": "+arrayPayload.get(0)[0]);
                                    }
                                    
@@ -387,11 +388,11 @@ public static InterfaceMetadata read(String service,String System){
                              } //END "FOR" LOOP: OPTIONS
                              
                              out.println("number of objects in the array:"+elements_request.size());
-                             out.println(" 1  -----"+elements_request.get(0));
-                             out.println(elements_request.get(0).elements.get(0)[0]);
+                            // out.println(" 1  -----"+elements_request.get(0));
+                            // out.println(elements_request.get(0).elements.get(0)[0]);
                             
-                             out.println(" 2 -----"+elements_request.get(1));
-                             out.println(elements_request.get(1).elements.get(0)[0]);
+                             //out.println(" 2 -----"+elements_request.get(1));
+                             //out.println(elements_request.get(1).elements.get(0)[0]);
                              //printElements(elements_request.get(1).getElements());
                            
                      }//end request nodes
@@ -399,7 +400,7 @@ public static InterfaceMetadata read(String service,String System){
                          
         } //close else  REQUEST=TRUE 
                          
-                                    //RESPONSE    
+              //RESPONSE    
                 NodeList  lRR=eMethod.getElementsByTagName("response");
                             
                          if(lRR.getLength()==0){
@@ -428,25 +429,27 @@ public static InterfaceMetadata read(String service,String System){
                              NodeList options2=epayload2.getElementsByTagName("option");
                              
                              out.println("options found, number:"+options2.getLength());
-                             ElementsPayload payloadResponse=new ElementsPayload();
-                             for(int k=0; k<options2.getLength();k++){
-                                ArrayList<String[]> arrayPayload = new ArrayList<String[]>(); 
+                             
+                             for(int l=0; l<options2.getLength();l++){
+                                 out.println("option:"+l);
+                                ArrayList<String[]> arrayPayloadR = new ArrayList<String[]>(); 
                                  
-                                 Node noption2=options2.item(k);
+                                 Node noption2=options2.item(l);
                                  Element eoption2= (Element)noption2;
                                  String subpath=eoption2.getAttribute("value");
-                                
+                                 subpaths.add(subpath);
                                  
-                                  NodeList complex2=eoption2.getElementsByTagName("complextype");
+                                 
+                                NodeList complex2=eoption2.getElementsByTagName("complextype");
                              //if(!complex1.equals(null)){
                                   Node ncomplex2=complex2.item(0); 
-                                  Element ecomplex= (Element)ncomplex2;
-                              complexType_request=ecomplex.getAttribute("type");   
+                                  Element ecomplex2= (Element)ncomplex2;
+                              complexType_response=ecomplex2.getAttribute("type");   
                             // } 
                                 
                              Node childNode=eoption2.getFirstChild();
                                  
-                             out.println(subpath);
+                            
                                
                              while(childNode.getNextSibling()!=null){     
                                   
@@ -457,10 +460,10 @@ public static InterfaceMetadata read(String service,String System){
                                    String[] ele;
                                    
                                    String tagname= e.getTagName();
-
+                                   out.println(tagname);
                                     if("complexelement".equals(tagname)){
     
-                                        complexelFunction("REQUEST",e,"Newclass");
+                                        complexelFunction("RESPONSE",e,"Newclass");
                                         
          
                                  
@@ -469,8 +472,8 @@ public static InterfaceMetadata read(String service,String System){
                                    ele[0]=e.getAttribute("name");
                                    ele[1]=e.getAttribute("type");
                                    if(!ele[1].equals("null")){
-                                    
-                                   arrayPayload.add(ele);
+                                     out.println(ele[0]+"  - "+ele[1]);
+                                   arrayPayloadR.add(ele);
                                    }
                                    
                                    }
@@ -479,13 +482,19 @@ public static InterfaceMetadata read(String service,String System){
                               
                              } //END WHILE NODES In the payload
                              
-                             payloadResponse.setElements( arrayPayload);
+                              ElementsPayload payloadResponse =new ElementsPayload(arrayPayloadR);
+                              payloadResponse.getElements();
                              elements_response.add(payloadResponse);
                              
                              
                              } //END "FOR" LOOP: OPTIONS
                              
-                             
+                             out.println("number of objects in the array:"+elements_response.size());
+                             //out.println(" 1  -----"+elements_response.get(0));
+                             //out.println(elements_response.get(0).elements.get(0)[0]);
+                            
+                             //out.println(" 2 -----"+elements_response.get(1));
+                             //out.println(elements_response.get(1).elements.get(0)[0]);
                               
                            
                         }//close response elements
