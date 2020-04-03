@@ -8,18 +8,11 @@ package generator.codgen;
 import com.squareup.javapoet.*;
 
 
-import generator.codgen.ClassGen;
-import static generator.codgen.ClassGenComplex.*;
-import java.awt.Font;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import javax.lang.model.element.Modifier;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.ws.rs.core.Response;
 import org.eclipse.californium.core.CoapResponse;
-import org.json.JSONObject;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +33,6 @@ import eu.arrowhead.common.dto.shared.ServiceQueryFormDTO;
 import eu.arrowhead.common.dto.shared.OrchestrationFormRequestDTO.Builder;
 import eu.arrowhead.common.dto.shared.OrchestrationResultDTO;
 import eu.arrowhead.common.exception.ArrowheadException;
-import static generator.codgen.ClassGen.readList;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -217,11 +209,19 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
     if (protocol.equalsIgnoreCase("HTTP")){
     //CODE FOR HTTP REST
     
+    //CommandLineScann
+    BconsumeService 
+    .addStatement(" final Scanner sc = new Scanner(System.in)")
+    .addStatement("String path=commandLineUI(sc)")
+    .addStatement("sc.close()");
+    
+        
+    
     //CODE PARAMETERS: 
    
      BconsumeService 
      .addStatement("$T httpMethod=HttpMethod.$N",HttpMethod.class,MD.getMethod())
-      .addStatement("String path=\" \"")       
+        
       .beginControlFlow("switch(path)");
     System.out.println("Subpath size:"+ MD.subpaths.size()); 
     
@@ -231,7 +231,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         CodeBlock optionCase=ServiceCode("OBJRequestDTO"+m,"OBJResponseDTO"+m,m);
         BconsumeService           
         .addCode("case \"$L\": \n",subpath)
-        .addStatement("serviceUri=\"$L\"",subpath)
+        .addStatement("serviceUri=serviceUri+\"$L\"",subpath)
         .addCode(optionCase)
         .addStatement("break");
     }
@@ -561,7 +561,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         }else consumeService=consumeService();
          
            
-            
+        MethodSpec commandLine =UtilGen.commandLine();    
   
        
      //MethodSpec payloadInterpreter =payloadInterpreter();
@@ -596,7 +596,8 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
                   .build())
                 .addMethod(main)
                 .addMethod(run)
-                .addMethod(consumeService);
+                .addMethod(consumeService)
+                .addMethod(commandLine);
         
         
         TypeSpec ConsumerMain=BConsumerMain.build();
