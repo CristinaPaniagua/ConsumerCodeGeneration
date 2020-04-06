@@ -360,7 +360,7 @@ public static InterfaceMetadata read(String service,String System){
 
                                     if("complexelement".equals(tagname)){
     
-                                        complexelFunction("REQUEST",e,"Newclass");
+                                        arrayPayload=complexelFunction("REQUEST",e,"Newclass");
                                         
          
                                  
@@ -380,7 +380,7 @@ public static InterfaceMetadata read(String service,String System){
                              } //END WHILE NODES In the payload
                              
                              ElementsPayload payloadRequest =new ElementsPayload(arrayPayload);
-                              payloadRequest.getElements();
+                             
                              elements_request.add(payloadRequest);
                              
                              
@@ -431,14 +431,17 @@ public static InterfaceMetadata read(String service,String System){
                              out.println("options found, number:"+options2.getLength());
                              
                              for(int l=0; l<options2.getLength();l++){
+                                 boolean complex=false;
                                  out.println("option:"+l);
-                                ArrayList<String[]> arrayPayloadR = new ArrayList<String[]>(); 
+                                ArrayList<String[]> arrayPayloadR = new ArrayList<>(); 
                                  
                                  Node noption2=options2.item(l);
                                  Element eoption2= (Element)noption2;
                                  String subpath=eoption2.getAttribute("value");
-                                 subpaths.add(subpath);
                                  
+                                 if(!subpaths.contains(subpath)){
+                                 subpaths.add(subpath);
+                                 }
                                  
                                 NodeList complex2=eoption2.getElementsByTagName("complextype");
                              //if(!complex1.equals(null)){
@@ -463,8 +466,8 @@ public static InterfaceMetadata read(String service,String System){
                                    out.println(tagname);
                                     if("complexelement".equals(tagname)){
     
-                                        complexelFunction("RESPONSE",e,"Newclass");
-                                        
+                                        arrayPayloadR=complexelFunction("RESPONSE",e,"Newclass");
+                                       
          
                                  
                                    }else{
@@ -482,8 +485,9 @@ public static InterfaceMetadata read(String service,String System){
                               
                              } //END WHILE NODES In the payload
                              
-                              ElementsPayload payloadResponse =new ElementsPayload(arrayPayloadR);
-                              payloadResponse.getElements();
+                             
+                                ElementsPayload  payloadResponse =new ElementsPayload(arrayPayloadR);
+                             
                              elements_response.add(payloadResponse);
                              
                              
@@ -528,45 +532,43 @@ public static InterfaceMetadata read(String service,String System){
     
 }
 
-public static void complexelFunction ( String r, Element e, String level){
-    
-                                     String [] c=new String[3];
-                                     c[0]=level;
-                                     String classname=e.getAttribute("name");
-                                     c[1]=classname;
-                                     c[2]=e.getAttribute("type");
-                                     if (r.equalsIgnoreCase("REQUEST"))  payload_request.add(c);
-                                      else payload_response.add(c);
+public static ArrayList<String[]> complexelFunction ( String r, Element e, String level){
+    ArrayList<String[]> complexPayload =new ArrayList<>();
+ String [] c=new String[3];
+  c[0]=level;
+ String classname=e.getAttribute("name");
+  c[1]=classname;
+  c[2]=e.getAttribute("type");
+     if (r.equalsIgnoreCase("REQUEST"))  payload_request.add(c);
+     else payload_response.add(c);
+     complexPayload.add(c);
+     Node elechild=e.getFirstChild();
 
-                                     Node elechild=e.getFirstChild();
-
-
-                                        while(elechild.getNextSibling()!=null){ 
-                                            elechild=elechild.getNextSibling();
-                                            if (elechild.getNodeType() == Node.ELEMENT_NODE) { 
-                                             
-                                             Element e2 =(Element) elechild;
-                                          String tagname= e2.getTagName();
-                                          String ename=e2.getAttribute("name");
-
-
-                                    if("complexelement".equals(tagname)){
-                                              complexelFunction (r,e2,"child:Newclass");
-                                              elechild=elechild.getNextSibling();
+while(elechild.getNextSibling()!=null){ 
+         elechild=elechild.getNextSibling();
+         if (elechild.getNodeType() == Node.ELEMENT_NODE) { 
+              Element e2 =(Element) elechild;
+               String tagname= e2.getTagName();
+               String ename=e2.getAttribute("name");
+                 if("complexelement".equals(tagname)){
+                      complexelFunction (r,e2,"child:Newclass");
+                        elechild=elechild.getNextSibling();
                                               //if(elechild!=null)
                                              //while(elechild.getNodeType() != Node.ELEMENT_NODE) { 
                                                //elechild=elechild.getNextSibling();
                                              //}
-                                          }else{
-                                             String [] f=new String[3];
-                                             f[0]="child";
-                                             f[1]=e2.getAttribute("name");
-                                             f[2]=e2.getAttribute("type");
+                      }else{
+                          String [] f=new String[3];
+                           f[0]="child";
+                           f[1]=e2.getAttribute("name");
+                           f[2]=e2.getAttribute("type");
+                           out.println(f[0]+f[1]+f[2]);
                                              
-                                              if (r.equalsIgnoreCase("REQUEST"))
-                                             payload_request.add(f);
-                                             else payload_response.add(f);
-                                             
+                           if (r.equalsIgnoreCase("REQUEST"))
+                            payload_request.add(f);
+                             else payload_response.add(f);
+                             
+                           complexPayload.add(f);
  
                                           }
                                                                                     
@@ -581,8 +583,11 @@ public static void complexelFunction ( String r, Element e, String level){
                                       if (r.equalsIgnoreCase("REQUEST"))
                                     payload_request.add(StopClass);
                                      else payload_response.add(StopClass);
+                                     complexPayload.add(StopClass);
                                      
-                                       
+           //if(r.equalsIgnoreCase("REQUEST")) return payload_request;
+          // else return payload_response;
+          return complexPayload;
 }
 
 

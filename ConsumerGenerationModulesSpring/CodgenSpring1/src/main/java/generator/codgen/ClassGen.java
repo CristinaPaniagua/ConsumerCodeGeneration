@@ -316,9 +316,10 @@ public class ClassGen {
                  s=s+"ListObject";
                  ListFlag=true;
                  a=i;
-                     }else 
+             }else 
+                 
                      s=s+"OBJ"+var.get(i)[0]+"";
-             
+                     
             if((i+1)<var.size()) s=s+" , ";
          }
          
@@ -341,7 +342,7 @@ public class ClassGen {
          else if (type.equalsIgnoreCase("Boolean")) t=Boolean.class;
          else if (type.equalsIgnoreCase("Integer")) t=Integer.class;
          else if (type.equalsIgnoreCase("Byte")) t=Byte.class;
-         else if (type.equalsIgnoreCase("Double")) t=Double.class;
+         else if (type.equalsIgnoreCase("Double")) t=double.class;
          else if (type.equalsIgnoreCase("Float")) t=Float.class;
          else if (type.equalsIgnoreCase("Short")) t=Short.class;
          else if (type.equalsIgnoreCase("Long")) t=Long.class;

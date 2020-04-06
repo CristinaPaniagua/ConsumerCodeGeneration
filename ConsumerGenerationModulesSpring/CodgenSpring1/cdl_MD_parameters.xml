@@ -52,7 +52,7 @@
 		<param name="DataEntry" required="true" style="template" type="String" />
 
 		
-		
+			
 	
 			<response status="200">
 			<format> 
@@ -65,11 +65,15 @@
 			<payload>				
 				<option value="/EquipmentInfo/manufacturer" >
 					<complextype type="null"/> 					
-					<element name="manufacturer" type="String"/>
+					<element name="value" type="String"/>
 				</option>
-				<option value="/EquipmentInfo/device_type" >
+				<option value="/HydraulicPumpBlock/output_pressure" >
 					<complextype type="null"/> 					
-					<element name="quality" type="Integer"/>
+					<complexelement name="value" type="single">
+						<element name="value" type="Float"/>
+						<element name="timestamp" type="Double"/>
+						<element name="quality" type="Double"/>
+					</complexelement>
 				</option>
 
 			</payload>
@@ -180,7 +184,6 @@
 						<element name="value" type="Float"/>
 						<element name="timestamp" type="Integer"/>
 						<element name="quality" type="Integer"/>
-					
 					</complexelement>
 				</payload>
 			
