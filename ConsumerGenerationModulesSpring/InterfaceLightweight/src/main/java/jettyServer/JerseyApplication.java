@@ -19,7 +19,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
 
 import static org.eclipse.jetty.servlet.ServletContextHandler.NO_SESSIONS;
-import resources.HelloResource;
+import resources.RESTResources;
 
 public class JerseyApplication {
     public static void main(String[] args) throws Exception {
@@ -39,7 +39,7 @@ public class JerseyApplication {
         servletHolder.setInitOrder(0);
         servletHolder.setInitParameter(
                "jersey.config.server.provider.classnames",
-                HelloResource.class.getCanonicalName()
+                RESTResources.class.getCanonicalName()
         );
 
         try {
