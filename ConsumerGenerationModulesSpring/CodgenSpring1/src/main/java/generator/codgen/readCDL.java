@@ -42,7 +42,7 @@ public static InterfaceMetadata read(String service,String System){
      String complexType_response=null;
     String complexType_request=null;
     
-
+Reset();
     
     Map<String,String> CDLstorage= new HashMap<>();
     CDLstorage.put("providerTest","cdl_cars.xml");
@@ -321,13 +321,13 @@ public static InterfaceMetadata read(String service,String System){
                         //Payload with options
                              NodeList options1=epayload1.getElementsByTagName("option");
                              
-                             out.println("options found, number:"+options1.getLength());
+                            // out.println("options found, number:"+options1.getLength());
                              
                              
                              for(int k=0; k<options1.getLength();k++){
                                 
                                  ArrayList<String[]> arrayPayload = new ArrayList<String[]>(); 
-                                 out.println("option: "+k);
+                                // out.println("option: "+k);
                                  //payload_request.clear();
                                
                                  
@@ -356,7 +356,7 @@ public static InterfaceMetadata read(String service,String System){
                                    String[] ele;
                                    
                                    String tagname= e.getTagName();
-                                   out.println(tagname);
+                                  // out.println(tagname);
 
                                     if("complexelement".equals(tagname)){
     
@@ -387,7 +387,7 @@ public static InterfaceMetadata read(String service,String System){
                              
                              } //END "FOR" LOOP: OPTIONS
                              
-                             out.println("number of objects in the array:"+elements_request.size());
+                            // out.println("number of objects in the array:"+elements_request.size());
                             // out.println(" 1  -----"+elements_request.get(0));
                             // out.println(elements_request.get(0).elements.get(0)[0]);
                             
@@ -428,11 +428,11 @@ public static InterfaceMetadata read(String service,String System){
                        //Payload with options
                              NodeList options2=epayload2.getElementsByTagName("option");
                              
-                             out.println("options found, number:"+options2.getLength());
+                             //out.println("options found, number:"+options2.getLength());
                              
                              for(int l=0; l<options2.getLength();l++){
                                  boolean complex=false;
-                                 out.println("option:"+l);
+                                // out.println("option:"+l);
                                 ArrayList<String[]> arrayPayloadR = new ArrayList<>(); 
                                  
                                  Node noption2=options2.item(l);
@@ -463,7 +463,7 @@ public static InterfaceMetadata read(String service,String System){
                                    String[] ele;
                                    
                                    String tagname= e.getTagName();
-                                   out.println(tagname);
+                                   //out.println(tagname);
                                     if("complexelement".equals(tagname)){
     
                                         arrayPayloadR=complexelFunction("RESPONSE",e,"Newclass");
@@ -475,7 +475,7 @@ public static InterfaceMetadata read(String service,String System){
                                    ele[0]=e.getAttribute("name");
                                    ele[1]=e.getAttribute("type");
                                    if(!ele[1].equals("null")){
-                                     out.println(ele[0]+"  - "+ele[1]);
+                                    // out.println(ele[0]+"  - "+ele[1]);
                                    arrayPayloadR.add(ele);
                                    }
                                    
@@ -493,7 +493,7 @@ public static InterfaceMetadata read(String service,String System){
                              
                              } //END "FOR" LOOP: OPTIONS
                              
-                             out.println("number of objects in the array:"+elements_response.size());
+                             //out.println("number of objects in the array:"+elements_response.size());
                              //out.println(" 1  -----"+elements_response.get(0));
                              //out.println(elements_response.get(0).elements.get(0)[0]);
                             
@@ -562,7 +562,7 @@ while(elechild.getNextSibling()!=null){
                            f[0]="child";
                            f[1]=e2.getAttribute("name");
                            f[2]=e2.getAttribute("type");
-                           out.println(f[0]+f[1]+f[2]);
+                          // out.println(f[0]+f[1]+f[2]);
                                              
                            if (r.equalsIgnoreCase("REQUEST"))
                             payload_request.add(f);
@@ -596,13 +596,20 @@ while(elechild.getNextSibling()!=null){
         for(int i=0; i>elements.size();i++){
             String[] list=elements.get(i);
             for(int j=0; j>list.length;j++){
-                out.println(list[j]);
+                //out.println(list[j]);
             }
             
         }
     }
 
-
+public static void Reset(){
+   elements_request.clear(); 
+   elements_response.clear();
+   payload_request.clear();
+   payload_response.clear();
+   parameters.clear();
+   subpaths.clear();
+ }
 
     }
 

@@ -37,6 +37,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.sql.Timestamp;
 import java.util.List;
 import org.springframework.http.HttpMethod;
 
@@ -58,9 +59,12 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         
         String service = request.getProperty("Service", "null");
         String system="SYS";
-        MD = readCDL.read("getData",system);
+        MD = readCDL.read("offer",system);
         System.out.println(MD.toString());
             
+       Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+       // System.out.println(timestamp);
+        long tstart =timestamp.getTime();
         
        if(MD.getRequest()){
            ClassGen Request=new ClassGen();
@@ -94,8 +98,12 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         if(MD.getProtocol().equalsIgnoreCase("COAP"))
         CoapGenerator.coap(MD);
         
+        clean();
         
-       
+       Timestamp timestampEnd = new Timestamp(System.currentTimeMillis());
+        //System.out.println(timestampEnd);
+         long tend = timestampEnd.getTime();
+       System.out.println("TG, "+(tend-tstart));
         
   
         
@@ -223,7 +231,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
      .addStatement("$T httpMethod=HttpMethod.$N",HttpMethod.class,MD.getMethod())
         
       .beginControlFlow("switch(path)");
-    System.out.println("Subpath size:"+ MD.subpaths.size()); 
+    //System.out.println("Subpath size:"+ MD.subpaths.size()); 
     
     for(int m=0; m<MD.subpaths.size();m++){
         
@@ -267,13 +275,14 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
    String arg = request.getProperty("Argument", null);
     String protocol=MD.getProtocol();
      
-    CodeBlock.Builder BconsumeService  = CodeBlock.builder();
+    CodeBlock.Builder BconsumeService  = CodeBlock.builder()
+            .addStatement ("//Import $T",ArrayList.class);
     
      
     
     if(MD.getRequest()&&MD.getResponse()){
         
-        System.out.println(" Both request and response");
+        //System.out.println(" Both request and response");
         
         String complextype_request =MD.getComplexType_request();
         String complextype_response =MD.getComplexType_response();
@@ -287,7 +296,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         
                 for(int j=0; j<ValueRequest.size();j++){
                      String s= ValueRequest.get(j);
-                     System.out.println("Request s: "+s);
+                     //System.out.println("Request s: "+s);
                      BconsumeService.addStatement("$L" ,s ); 
                 }     
                
@@ -324,7 +333,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         
         if(MD.getRequest()){
             
-            System.out.println(" Only request ");
+            //System.out.println(" Only request ");
              String complextype =MD.getComplexType_request();
              
           
@@ -333,7 +342,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         
                 for(int j=0; j<ValueRequest.size();j++){
                      String s= ValueRequest.get(j);
-                     System.out.println("Request s: "+s);
+                    // System.out.println("Request s: "+s);
                      BconsumeService.addStatement("$L" ,s ); 
                 }
                
@@ -358,7 +367,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
     
         if(MD.getResponse()){
           
-          System.out.println(" Only response ");
+         // System.out.println(" Only response ");
           String complextype =MD.getComplexType_response();
           
          
@@ -596,8 +605,9 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
                   .build())
                 .addMethod(main)
                 .addMethod(run)
-                .addMethod(consumeService)
-                .addMethod(commandLine);
+                .addMethod(consumeService);
+        if(MD.param)
+               BConsumerMain.addMethod(commandLine);
         
         
         TypeSpec ConsumerMain=BConsumerMain.build();
@@ -615,7 +625,10 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         
      }
         
-        
+         public static void clean(){
+    MD.elements_request.clear();
+ }
+     
         
          
 }
