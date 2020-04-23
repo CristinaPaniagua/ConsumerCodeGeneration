@@ -39,10 +39,6 @@ import eu.arrowhead.common.dto.shared.ServiceQueryFormDTO;
 import eu.arrowhead.common.dto.shared.OrchestrationFormRequestDTO.Builder;
 import eu.arrowhead.common.dto.shared.OrchestrationResultDTO;
 import eu.arrowhead.common.exception.ArrowheadException;
-import static generator.codgen.ResourceGen.ResourcesGen;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.List;
 import org.springframework.http.HttpMethod;
@@ -66,8 +62,12 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         String service = request.getProperty("Service", "null");
         String system="providerTest";
         MD = readCDL.read("offer",system);
-        System.out.print(MD.toString());
+        //System.out.print(MD.toString());
              //eadList(MD.getElements_request());
+             
+          
+      
+             
        if(!MD.getElements_request().isEmpty())
         classesRequest=classGen(MD.getElements_request(),"RequestDTO");
        
@@ -76,14 +76,14 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         classesResponse=classGen(MD.getElements_response(),"ResponseDTO"); 
         
         
-        ConsumerMain ();
+        //ConsumerMain ();
         if(MD.getProtocol().equalsIgnoreCase("COAP"))
         CoapGenerator.coap(MD);
         
+        ResourceLWGen.ResourcesLWGen();
+       //ResourcesGen(MD,classesRequest);
         
-       ResourcesGen(MD,classesRequest);
-        
-  
+       
         
         //r=complexelement(MD.getElements_response());
                 //System.out.println("DONDE:" + r);
@@ -417,11 +417,11 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
                 .build();
  
   
-        JavaFile javaFile2 = JavaFile.builder("eu.arrowhead.client.consumer",ConsumerMain)
-                .addFileComment("Auto generated")
-                .build();
+        JavaFile javaFile2 = JavaFile.builder("resources",ConsumerMain)
+               .addFileComment("Auto generated")
+               .build();
         try{
-            javaFile2.writeTo(Paths.get("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCode-Generation\\ConsumerGenerationModulesSpring\\Interface\\src\\main\\java"));
+            javaFile2.writeTo(Paths.get("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCodeGeneration\\ConsumerGenerationModulesSpring\\InterfaceLightweight\\src\\main\\java"));
         }catch (IOException ex){
             System.out.print("Exception:" + ex.getMessage());
         }

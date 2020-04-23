@@ -132,11 +132,11 @@ public static MethodSpec  coapRequest (InterfaceMetadata MD){
                 .build();
  
   
-        JavaFile javaFile2 = JavaFile.builder("eu.arrowhead.client.consumer",CoapClient)
+        JavaFile javaFile2 = JavaFile.builder("resources",CoapClient)
                 .addFileComment("Auto generated")
                 .build();
         try{
-            javaFile2.writeTo(Paths.get("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerGenerationModulesSpring\\Interface\\src\\main\\java"));
+            javaFile2.writeTo(Paths.get("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCodeGeneration\\ConsumerGenerationModulesSpring\\InterfaceLightweight\\src\\main\\java"));
         }catch (IOException ex){
             System.out.print("Exception:" + ex.getMessage());
         }

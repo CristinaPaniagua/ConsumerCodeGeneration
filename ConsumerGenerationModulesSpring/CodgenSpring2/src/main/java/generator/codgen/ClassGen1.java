@@ -192,11 +192,11 @@ public class ClassGen1 {
                
  
   
-        JavaFile javaFile2 = JavaFile.builder("eu.arrowhead.client.consumer",classGen)
+        JavaFile javaFile2 = JavaFile.builder("resources",classGen)
                 .addFileComment("Auto generated")
                 .build();
         try{
-            javaFile2.writeTo(Paths.get("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCode-Generation\\ConsumerGenerationModulesSpring\\Interface\\src\\main\\java"));
+            javaFile2.writeTo(Paths.get("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCodeGeneration\\ConsumerGenerationModulesSpring\\InterfaceLightweight\\src\\main\\java"));
         }catch (IOException ex){
             System.out.print("Exception:" + ex.getMessage());
         }
