@@ -42,7 +42,7 @@ public static InterfaceMetadata read(String service,String System){
      String complexType_response=null;
     String complexType_request=null;
     
-
+    Reset();
     
     Map<String,String> CDLstorage= new HashMap<>();
     CDLstorage.put("providerTest","cdl_cars.xml");
@@ -602,7 +602,14 @@ while(elechild.getNextSibling()!=null){
         }
     }
 
-
+public static void Reset(){
+   elements_request.clear(); 
+   elements_response.clear();
+   payload_request.clear();
+   payload_response.clear();
+   parameters.clear();
+   subpaths.clear();
+ }
 
     }
 

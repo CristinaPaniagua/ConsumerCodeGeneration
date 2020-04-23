@@ -75,6 +75,8 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
    public static void startGeneration(RequestForm rf){
      System.out.print("CODGEGEN START********************************************************* \n");   
         
+     
+     
         String service = rf.getRequestedService();
         String system="providerTest";
         MD = readCDL.read(service,system);
@@ -82,12 +84,17 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         
          if(MD.getRequest()){
            ClassGen Request=new ClassGen();
-       
+        
+        ArrayList<String[]> elements_request=new ArrayList<>();
              for(int i=0; i<MD.elements_request.size();i++)
              {
-                ArrayList<String[]> elements_request=MD.elements_request.get(i).getElements();
+               elements_request.clear();
+               elements_request=MD.elements_request.get(i).getElements();
                classesRequest.add(Request.classGen(elements_request,"RequestDTO"+i));
+               
+                 
              }
+            
             //for(int h=0;h<classesRequest.size();h++)
                 //System.out.println("..........."+classesRequest.get(h));
   
@@ -109,8 +116,14 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         
         ConsumerMain ();
         
+        clean();
+       
+        
         if(MD.getProtocol().equalsIgnoreCase("COAP"))
         CoapGenerator.coap(MD);
+        
+        
+        
         
         try{
         execute();
@@ -625,7 +638,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         
         TypeSpec ConsumerMain=BConsumerMain.build();
                 
- 
+        
   
         JavaFile javaFile2 = JavaFile.builder("eu.arrowhead.client.consumer",ConsumerMain)
                 .addFileComment("Auto generated")
@@ -637,6 +650,10 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         }
         
      }
+ 
+ public static void clean(){
+    MD.elements_request.clear();
+ }
         
         
          
