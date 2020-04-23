@@ -12,7 +12,6 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
-import static generator.codgen.ClassGenComplex.complexelement;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -25,9 +24,7 @@ import java.util.List;
  */
 public class ClassGen {
 
-   // public static ArrayList<String> Declaration_Request=new ArrayList<>();
-   // public static ArrayList<String> Declaration_Response=new ArrayList<>();
-    //public static ArrayList<String> classesD=new ArrayList<>();
+ 
     
     ArrayList<String> ListofDeclarations=new ArrayList<>();
     
@@ -63,9 +60,8 @@ public class ClassGen {
         
     public MethodSpec  fullConstructor ( ArrayList<String[]> elements,String className){
      
-        //TODO: WHAT HAPPEND WITH THE COMPLEX_ELEMENT? SAME ARRAY?
-        readList(elements);
-         ListofDeclarations=complexelement(elements);
+        ClassGenComplex  cc = new ClassGenComplex();
+        ListofDeclarations=cc.complexelement(elements);
            
       ArrayList<String[]> var= new ArrayList<>();
        
@@ -73,10 +69,10 @@ public class ClassGen {
      MethodSpec.Builder BFullConsructor = MethodSpec.constructorBuilder()
      .addModifiers(Modifier.PUBLIC);
    
-      for (int i = 1; i < elements.size(); i++){ 
+      for (int i = 0; i < elements.size(); i++){ 
         String name=elements.get(i)[0];
         String type=elements.get(i)[1];
-        System.out.println("fullConstructor"+i+" "+name+" "+type );
+        //System.out.println("fullConstructor"+i+" "+name+" "+type );
 
         
             if(name.equals("Newclass")){
@@ -107,7 +103,7 @@ public class ClassGen {
                 String[] ele= new String[2]; 
                 ele[0]=name;
                 ele[1]=type;
-                System.out.println(i+" "+ele[0]);
+                //System.out.println(i+" "+ele[0]);
                 var.add(ele); 
                 //System.out.println(i+" "+ele[0]);
                    BFullConsructor
@@ -119,12 +115,11 @@ public class ClassGen {
 
      }
       
-        System.out.println(var.size());
+        //System.out.println(var.size());
         String CS =dummyobject(className,var);
         ListofDeclarations.add(CS);
         
-       // if(className.equals("RequestDTO")) Declaration_Request.add(CS);
-        //if(className.equals("ResponseDTO")) Declaration_Response.add(CS);
+       
         
         
         
@@ -159,7 +154,7 @@ public class ClassGen {
         
           String S="";
           
-     for (int i = 1; i < elements.size(); i++){ 
+     for (int i = 0; i < elements.size(); i++){ 
          String name=elements.get(i)[0];
          if(name.equals("Newclass")){
              name=elements.get(i)[1];
@@ -229,7 +224,7 @@ public class ClassGen {
       
       
       
-    for (int i = 1; i < elements.size(); i++){ 
+    for (int i = 0; i < elements.size(); i++){ 
         String name=elements.get(i)[0];
         String type=elements.get(i)[1];
        
@@ -241,7 +236,7 @@ public class ClassGen {
             //var.add(ele);
             MethodSpec methodget= get(name,type);
             MethodSpec methodset= set(name,type);
-             System.out.println("type " +type+" name "+name);
+             //System.out.println("type " +type+" name "+name);
             if(type.equalsIgnoreCase("single")||type.startsWith("List")){
 
                TypeName t= getTypeCom(name, type);
@@ -288,7 +283,7 @@ public class ClassGen {
         try{
             javaFile2.writeTo(Paths.get("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCodeGeneration\\ConsumerGenerationModulesSpring\\TesterSpring\\src\\main\\java"));
         }catch (IOException ex){
-            System.out.print("Exception:" + ex.getMessage());
+           // System.out.print("Exception:" + ex.getMessage());
         }
         
         //if(className.equals("RequestDTO")) return Declaration_Request;
@@ -305,7 +300,7 @@ public class ClassGen {
          s=""+name+" OBJ"+name+" = new "+name+"( ";
          int a=0;
          boolean ListFlag=false;
-         System.out.println(var.size());
+         //System.out.println(var.size());
          if(var.size()>1){
          for (int i=0;i<var.size();i++){
           
@@ -321,9 +316,10 @@ public class ClassGen {
                  s=s+"ListObject";
                  ListFlag=true;
                  a=i;
-                     }else 
+             }else 
+                 
                      s=s+"OBJ"+var.get(i)[0]+"";
-             
+                     
             if((i+1)<var.size()) s=s+" , ";
          }
          
@@ -331,10 +327,10 @@ public class ClassGen {
          s=s+")";
          
          if(ListFlag){
-             s="List<"+var.get(a)[0]+"> ListObject=null; \n ListObject.add(OBJ"+var.get(a)[0]+"); \n"+s;
+             s="List<"+var.get(a)[0]+"> ListObject=new ArrayList<>(); \n ListObject.add(OBJ"+var.get(a)[0]+"); \n"+s;
     
          }
-        System.out.println("Storage of the object instance:"+s);
+        //System.out.println("Storage of the object instance:"+s);
          return s;
         
      }
@@ -346,7 +342,7 @@ public class ClassGen {
          else if (type.equalsIgnoreCase("Boolean")) t=Boolean.class;
          else if (type.equalsIgnoreCase("Integer")) t=Integer.class;
          else if (type.equalsIgnoreCase("Byte")) t=Byte.class;
-         else if (type.equalsIgnoreCase("Double")) t=Double.class;
+         else if (type.equalsIgnoreCase("Double")) t=double.class;
          else if (type.equalsIgnoreCase("Float")) t=Float.class;
          else if (type.equalsIgnoreCase("Short")) t=Short.class;
          else if (type.equalsIgnoreCase("Long")) t=Long.class;
@@ -381,7 +377,7 @@ public class ClassGen {
         for (int i = 0; i < elements.size(); i++){ 
             String[] ele=elements.get(i);
             for (int j = 0; j < ele.length; j++){
-                System.out.println(i+"."+j+" :"+elements.get(i)[j]);
+                //System.out.println(i+"."+j+" :"+elements.get(i)[j]);
             }
             
         }

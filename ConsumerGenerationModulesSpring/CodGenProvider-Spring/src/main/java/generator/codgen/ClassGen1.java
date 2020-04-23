@@ -194,7 +194,7 @@ public class ClassGen1 {
         try{
             javaFile2.writeTo(Paths.get("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCodeGeneration\\ConsumerGenerationModulesSpring\\TesterSpring\\src\\main\\java"));
         }catch (IOException ex){
-            System.out.print("Exception:" + ex.getMessage());
+           // System.out.print("Exception:" + ex.getMessage());
         }
         
      }

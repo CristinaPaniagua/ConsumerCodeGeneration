@@ -136,7 +136,7 @@ public static MethodSpec  coapRequest (InterfaceMetadata MD){
                 .addFileComment("Auto generated")
                 .build();
         try{
-            javaFile2.writeTo(Paths.get("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCode-Generation\\ConsumerGenerationModulesSpring\\TesterSpring\\src\\main\\java"));
+            javaFile2.writeTo(Paths.get("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCodeGeneration\\ConsumerGenerationModulesSpring\\TesterSpring\\src\\main\\java"));
         }catch (IOException ex){
             System.out.print("Exception:" + ex.getMessage());
         }
