@@ -12,7 +12,6 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
-import static generator.codgen.ClassGenComplex.complexelement;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -24,11 +23,31 @@ import java.util.List;
  * @author cripan
  */
 public class ClassGen {
-private static ArrayList<String> classesDummy= new ArrayList<String>();
+
+ 
+    
+    ArrayList<String> ListofDeclarations=new ArrayList<>();
+    
     public ClassGen() {
     }
     
-    public static MethodSpec  constructor (String name){
+    public ClassGen(ArrayList<String> ListofDeclarations) {
+        this.ListofDeclarations=ListofDeclarations;
+    }
+
+    public ArrayList<String> getListofDeclarations() {
+        return ListofDeclarations;
+    }
+
+    public void setListofDeclarations(ArrayList<String> ListofDeclarations) {
+        this.ListofDeclarations = ListofDeclarations;
+    }
+    
+    
+    
+    
+    
+    public  MethodSpec  constructor (String name){
         
      MethodSpec consructor = MethodSpec.constructorBuilder()
      .addModifiers(Modifier.PUBLIC)
@@ -39,18 +58,21 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
     }
     
         
-    public static MethodSpec  fullConstructor ( ArrayList<String[]> elements,String className){
-      classesDummy=complexelement(elements);
-      ArrayList<String[]> var= new ArrayList<String[]>();
+    public MethodSpec  fullConstructor ( ArrayList<String[]> elements,String className){
+     
+        ClassGenComplex  cc = new ClassGenComplex();
+        ListofDeclarations=cc.complexelement(elements);
+           
+      ArrayList<String[]> var= new ArrayList<>();
        
       String[] ele2= new String[2];  
      MethodSpec.Builder BFullConsructor = MethodSpec.constructorBuilder()
      .addModifiers(Modifier.PUBLIC);
    
-      for (int i = 1; i < elements.size(); i++){ 
+      for (int i = 0; i < elements.size(); i++){ 
         String name=elements.get(i)[0];
         String type=elements.get(i)[1];
-        System.out.println(i+" "+name+" "+type );
+        //System.out.println("fullConstructor"+i+" "+name+" "+type );
 
         
             if(name.equals("Newclass")){
@@ -81,7 +103,7 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
                 String[] ele= new String[2]; 
                 ele[0]=name;
                 ele[1]=type;
-                System.out.println(i+" "+ele[0]);
+                //System.out.println(i+" "+ele[0]);
                 var.add(ele); 
                 //System.out.println(i+" "+ele[0]);
                    BFullConsructor
@@ -93,14 +115,19 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
 
      }
       
-        System.out.println(var.size());
+        //System.out.println(var.size());
         String CS =dummyobject(className,var);
-        classesDummy.add(CS);
+        ListofDeclarations.add(CS);
+        
+       
+        
+        
+        
        MethodSpec FullConsructor = BFullConsructor.build();
       return FullConsructor;
     }
     
-    public static MethodSpec  get (String name, String type){
+    public  MethodSpec  get (String name, String type){
         
      MethodSpec.Builder get = MethodSpec.methodBuilder("get"+name)
      .addModifiers(Modifier.PUBLIC);
@@ -123,11 +150,11 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
     }
     
     
-    public static MethodSpec  toString (ArrayList<String[]> elements){
+    public  MethodSpec  toString (ArrayList<String[]> elements){
         
           String S="";
           
-     for (int i = 1; i < elements.size(); i++){ 
+     for (int i = 0; i < elements.size(); i++){ 
          String name=elements.get(i)[0];
          if(name.equals("Newclass")){
              name=elements.get(i)[1];
@@ -153,7 +180,7 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
     }
     
     
-    public static MethodSpec  set (String name, String type){
+    public MethodSpec  set (String name, String type){
         
      MethodSpec.Builder set  = MethodSpec.methodBuilder("set"+name)
     .addModifiers(Modifier.PUBLIC);
@@ -175,10 +202,15 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
     
     
     
-     public static ArrayList<String> classGen ( ArrayList<String[]> elements , String className){
+     public  ArrayList<String> classGen ( ArrayList<String[]> elements , String className){
          
          
-
+         //ListDeclarations.clear();
+        
+      
+        
+        
+         
         MethodSpec constructor= constructor(className);
         MethodSpec fullConstructor=fullConstructor(elements,className);
         MethodSpec toString=toString(elements);
@@ -192,7 +224,7 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
       
       
       
-    for (int i = 1; i < elements.size(); i++){ 
+    for (int i = 0; i < elements.size(); i++){ 
         String name=elements.get(i)[0];
         String type=elements.get(i)[1];
        
@@ -204,7 +236,7 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
             //var.add(ele);
             MethodSpec methodget= get(name,type);
             MethodSpec methodset= set(name,type);
-             System.out.println("type " +type+" name "+name);
+             //System.out.println("type " +type+" name "+name);
             if(type.equalsIgnoreCase("single")||type.startsWith("List")){
 
                TypeName t= getTypeCom(name, type);
@@ -251,18 +283,24 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
         try{
             javaFile2.writeTo(Paths.get("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCodeGeneration\\ConsumerGenerationModulesSpring\\InterfaceLightweight\\src\\main\\java"));
         }catch (IOException ex){
-            System.out.print("Exception:" + ex.getMessage());
+           // System.out.print("Exception:" + ex.getMessage());
         }
-        return classesDummy;
+        
+        //if(className.equals("RequestDTO")) return Declaration_Request;
+        //else return Declaration_Response;
+        
+        return ListofDeclarations;
+        
+       
      }
      
-     public static String dummyobject (String name, ArrayList<String[]> var ){
+     public  String dummyobject (String name, ArrayList<String[]> var ){
         
          String s=null;
          s=""+name+" OBJ"+name+" = new "+name+"( ";
          int a=0;
          boolean ListFlag=false;
-         System.out.println(var.size());
+         //System.out.println(var.size());
          if(var.size()>1){
          for (int i=0;i<var.size();i++){
           
@@ -278,9 +316,10 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
                  s=s+"ListObject";
                  ListFlag=true;
                  a=i;
-                     }else 
+             }else 
+                 
                      s=s+"OBJ"+var.get(i)[0]+"";
-             
+                     
             if((i+1)<var.size()) s=s+" , ";
          }
          
@@ -288,22 +327,22 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
          s=s+")";
          
          if(ListFlag){
-             s="List<"+var.get(a)[0]+"> ListObject=null; \n ListObject.add(OBJ"+var.get(a)[0]+"); \n"+s;
+             s="List<"+var.get(a)[0]+"> ListObject=new ArrayList<>(); \n ListObject.add(OBJ"+var.get(a)[0]+"); \n"+s;
     
          }
-        System.out.println(s);
+        //System.out.println("Storage of the object instance:"+s);
          return s;
         
      }
      
-     public static Type getType(String type){
+     public  Type getType(String type){
          Type t;
          
          if(type.equalsIgnoreCase("String")) t=String.class;
          else if (type.equalsIgnoreCase("Boolean")) t=Boolean.class;
          else if (type.equalsIgnoreCase("Integer")) t=Integer.class;
          else if (type.equalsIgnoreCase("Byte")) t=Byte.class;
-         else if (type.equalsIgnoreCase("Double")) t=Double.class;
+         else if (type.equalsIgnoreCase("Double")) t=double.class;
          else if (type.equalsIgnoreCase("Float")) t=Float.class;
          else if (type.equalsIgnoreCase("Short")) t=Short.class;
          else if (type.equalsIgnoreCase("Long")) t=Long.class;
@@ -321,7 +360,7 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
          return t;
      }
      
-      public static TypeName getTypeCom(String name, String type){
+      public  TypeName getTypeCom(String name, String type){
          TypeName t;
          
          
@@ -332,4 +371,15 @@ private static ArrayList<String> classesDummy= new ArrayList<String>();
          //TODO: ADD MORE COMPLEX TYPES
              return t;
              }
+      
+       public static void readList (ArrayList<String[]> elements){
+        
+        for (int i = 0; i < elements.size(); i++){ 
+            String[] ele=elements.get(i);
+            for (int j = 0; j < ele.length; j++){
+                //System.out.println(i+"."+j+" :"+elements.get(i)[j]);
+            }
+            
+        }
+       }
 }

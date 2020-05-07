@@ -28,6 +28,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.client.methods.HttpPost;
@@ -67,11 +68,15 @@ public class ResourceLWGen {
           return methodgen.build();
      }
     
-    public static MethodSpec methodgen (){
-          
+    public static MethodSpec methodgen (InterfaceMetadata MD_C){
+        String Mediatype="";
+    if(MD_C.getMediatype().equalsIgnoreCase("JSON")){
+        Mediatype="APPLICATION_JSON";
+        
+    }      
      AnnotationSpec produces= AnnotationSpec
                  .builder(Produces.class)
-                 .addMember("value", "$T.APPLICATION_JSON", MediaType.class)
+                 .addMember("value", "$T.$L", MediaType.class,Mediatype)
                  .build();
      
      
@@ -80,23 +85,29 @@ public class ResourceLWGen {
                  .addMember("value", "$T.APPLICATION_JSON", MediaType.class)
                  .build();
      
-     
+     String pathResource=MD_C.getPathResource();
        AnnotationSpec path= AnnotationSpec
                  .builder(Path.class)
-                 .addMember("value", "$S", "/negotiation/session-data")
+                 .addMember("value", "$S", pathResource)
                  .build();
          
-     MethodSpec.Builder methodgen = MethodSpec.methodBuilder("offer")
+     MethodSpec.Builder methodgen = MethodSpec.methodBuilder(MD_C.getID())
      .addModifiers(Modifier.PUBLIC)
-     .returns(String.class)
-     .addAnnotation(POST.class)
-     .addAnnotation(path)
+     .returns(String.class);
+     
+     //TODO: ADD THE REST OF THE METHODS (PUT AND DELETE)
+     if(MD_C.getMethod().equalsIgnoreCase("POST")){
+         methodgen.addAnnotation(POST.class);
+     }else if(MD_C.getMethod().equalsIgnoreCase("GET"))  methodgen.addAnnotation(GET.class);
+     
+    
+      methodgen.addAnnotation(path)
      .addAnnotation(produces)
      .addAnnotation(consumes)
      .addParameter(String.class,"jsonPayload")
      .addStatement(" String response=null")
      .beginControlFlow("try")
-      .addStatement("response=sendPOST(\"http://127.0.0.1:8889/demo/negotiation/session-data\",jsonPayload)")
+      .addStatement("response=consumeService(\"http://127.0.0.1:8889/demo/negotiation/session-data\",jsonPayload)")
      .endControlFlow()
      .beginControlFlow("catch ($T e)",IOException.class)      
      .addStatement(" e.printStackTrace()")
@@ -112,9 +123,9 @@ public class ResourceLWGen {
           return methodgen.build();
      }
     
-     public static MethodSpec consumeService (){
+     public static MethodSpec consumeService (InterfaceMetadata MD_P){
          
-     MethodSpec.Builder consumer = MethodSpec.methodBuilder("sendPOST")
+     MethodSpec.Builder consumer = MethodSpec.methodBuilder("consumeService")
      .addModifiers(Modifier.PRIVATE)
      .addModifiers(Modifier.STATIC)
      .returns(String.class)
@@ -126,9 +137,20 @@ public class ResourceLWGen {
       consumer
      .addStatement("$T httpClient = $T.createDefault()",CloseableHttpClient.class,HttpClients.class)
      .addStatement(" String result = \"\"")   
-     .beginControlFlow("try")
-       .addStatement(" $T request = new $T(url)",HttpPost.class,HttpPost.class)   
-       .addStatement(" request.addHeader(\"content-type\", \"application/json\")")  
+     .beginControlFlow("try");
+      //TODO: ADD THE REST OF THE METHODS (PUT AND DELETE)
+     if(MD_P.getMethod().equalsIgnoreCase("POST")){
+         consumer.addStatement(" $T request = new $T(url)",HttpPost.class,HttpPost.class);
+     }else if(MD_P.getMethod().equalsIgnoreCase("GET"))
+       consumer.addStatement(" $T request = new $T(url)",HttpGet.class,HttpGet.class);
+     
+     String Mediatype="";
+      if(MD_P.getMediatype().equalsIgnoreCase("JSON")){
+        Mediatype="application/json";
+        
+    }  
+       
+       consumer.addStatement(" request.addHeader(\"content-type\", \"$L\")",Mediatype) 
        .addStatement(" request.setEntity(new $T(payload))",StringEntity.class) 
        .addStatement(" $T response = httpClient.execute(request)",CloseableHttpResponse.class) 
        .beginControlFlow("try")  
@@ -154,12 +176,12 @@ public class ResourceLWGen {
       return consumer.build();
      }
     
-     public static void ResourcesLWGen (){
+     public static void ResourcesLWGen (InterfaceMetadata MD_C, InterfaceMetadata MD_P ){
          
   
        MethodSpec testEcho=  testEcho();
-        MethodSpec methodgen=methodgen();
-       MethodSpec consumeService =consumeService(); 
+        MethodSpec methodgen=methodgen(MD_C);
+       MethodSpec consumeService =consumeService(MD_P); 
         
         
         

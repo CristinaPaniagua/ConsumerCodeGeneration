@@ -5,8 +5,6 @@
  */
 package generator.codgen;
 
-import static generator.codgen.ClassGen.dummyobject;
-import static generator.codgen.ClassGen1.classGen;
 import java.util.ArrayList;
 
 /**
@@ -15,15 +13,28 @@ import java.util.ArrayList;
  */
 public class ClassGenComplex {
     
-   public static ArrayList<String> classesDummy= new ArrayList<String>();
+   public  ArrayList<String> classesDummy= new ArrayList<String>();
+
+    public ClassGenComplex() {
+    }
+
+    public ArrayList<String> getClassesDummy() {
+        return classesDummy;
+    }
+
+    public void setClassesDummy(ArrayList<String> classesDummy) {
+        this.classesDummy = classesDummy;
+    }
+   
+   
     
-    public static ArrayList<String> complexelement (ArrayList<String[]> elements){
+    public ArrayList<String> complexelement (ArrayList<String[]> elements){
         boolean boo=false;
-       System.out.println("\n\nARRAYLIST SIZE:"+elements.size());
+      // System.out.println("\n\nARRAYLIST SIZE:"+elements.size());
        for (int i = 0; i < elements.size(); i++){ 
         String e =elements.get(i)[0];
-        System.out.println(i+" 1 " + elements.get(i)[0]);
-        System.out.println(i+" 2 " +elements.get(i)[1]);
+        //System.out.println("complexElement"+i+" 1 " + elements.get(i)[0]);
+        //System.out.println("complexElement"+i+" 2 " +elements.get(i)[1]);
         
         if(e!=null){
          if(e.equals("Newclass")){
@@ -44,14 +55,14 @@ public class ClassGenComplex {
     }
     
     
-    public static int genClomplex (ArrayList<String[]> elements, int i){
+    public  int genClomplex (ArrayList<String[]> elements, int i){
         //ArrayList<String[]> var= new ArrayList<String[]>();
         ArrayList<String[]> newclass = new ArrayList<String[]>();
         boolean out=false;
               int j=i+1;
               
             String className=elements.get(i)[1];  
-            System.out.println("class name "+className);
+            //System.out.println("class name "+className);
            //while(!((className.equals(elements.get(j)[0]))&& ("StopClass".equals(elements.get(j+1)[0])))){ 
           // while((!(className.equals(elements.get(j)[1])))&& out==false){
           while(out==false){
@@ -61,17 +72,17 @@ public class ClassGenComplex {
                   
             
                   
-               System.out.println(elements.get(j)[0]);
+               //System.out.println(elements.get(j)[0]);
               if("child:Newclass".equals(elements.get(j)[0])){
                   int current_j=genClomplex (elements,j);
-                  System.out.println("Clase creada vuelvo "+current_j);
+                  //System.out.println("Clase creada vuelvo "+current_j);
                   String[] ele=new String[2];
                   if("single".equals(elements.get(j)[2])){
                   
                   ele[0]=elements.get(j)[1];
                   ele[1]=elements.get(j)[1];
-                  System.out.println("ele0:" +ele[0]);
-                  System.out.println("ele1:" +ele[1]); 
+                 // System.out.println("ele0:" +ele[0]);
+                 // System.out.println("ele1:" +ele[1]); 
                   
                   newclass.add(ele);
                   
@@ -79,8 +90,8 @@ public class ClassGenComplex {
                   
                   ele[0]=elements.get(j)[1];
                   ele[1]="List";
-                  System.out.println("ele0:" +ele[0]);
-                  System.out.println("ele1:" +ele[1]); 
+                  //System.out.println("ele0:" +ele[0]);
+                  //System.out.println("ele1:" +ele[1]); 
                   newclass.add(ele);
                   
                   }
@@ -97,42 +108,45 @@ public class ClassGenComplex {
                   
                   String value=elements.get(j)[0];
                  while("child".equals(value)){
-                   System.out.println(elements.get(j)[1]);
-                   System.out.println(elements.get(j)[2]);
+                   //System.out.println(elements.get(j)[1]);
+                   //System.out.println(elements.get(j)[2]);
                   
                   String[] ele=new String[2];
                   ele[0]=elements.get(j)[1];
                   ele[1]=elements.get(j)[2];
-                  System.out.println("ele0:" +ele[0]);
-                  System.out.println("ele1:" +ele[1]); 
+                  //System.out.println("ele0:" +ele[0]);
+                 // System.out.println("ele1:" +ele[1]); 
                   newclass.add(ele);
-                   System.out.println(j);
+                  // System.out.println(j);
                
                         j++;
                   
                  value=elements.get(j)[0];
-                 System.out.println("new value: "+value);
+                // System.out.println("new value: "+value);
               }
                 
               }
                 }
            
         }   
-          
-        String CS =dummyobject(className,newclass);
+        
+        ClassGen c=new ClassGen();
+        String CS =c.dummyobject(className,newclass);
         classesDummy.add(CS); 
+       // System.out.println("ADDTION TO CS:"+CS);
         //System.out.println(newclass.get(0)[0]+" , "+newclass.get(1)[0]);
-        classGen(newclass,className);
+        ClassGen1 c1=new ClassGen1();
+        c1.classGen(newclass,className);
         return j;
     }
     
     
-    public static void readList (ArrayList<String[]> elements){
+    public void readList (ArrayList<String[]> elements){
         
         for (int i = 0; i < elements.size(); i++){ 
             String[] ele=elements.get(i);
             for (int j = 0; j < ele.length; j++){
-                System.out.println(i+"."+j+" :"+elements.get(i)[j]);
+                //System.out.println(i+"."+j+" :"+elements.get(i)[j]);
             }
             
         }
