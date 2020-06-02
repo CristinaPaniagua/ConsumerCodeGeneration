@@ -5,6 +5,8 @@
  */
 package generator.codgen;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import javax.lang.model.element.Modifier;
 import java.lang.reflect.Type;
 import java.util.List;
+import javax.ws.rs.core.MediaType;
 /**
  *
  * @author cripan
@@ -59,10 +62,11 @@ public class ClassGen {
     
         
     public MethodSpec  fullConstructor ( ArrayList<String[]> elements,String className){
-     
+       
+        //readList(elements);
         ClassGenComplex  cc = new ClassGenComplex();
         ListofDeclarations=cc.complexelement(elements);
-           
+        //readList(elements);
       ArrayList<String[]> var= new ArrayList<>();
        
       String[] ele2= new String[2];  
@@ -72,19 +76,21 @@ public class ClassGen {
       for (int i = 0; i < elements.size(); i++){ 
         String name=elements.get(i)[0];
         String type=elements.get(i)[1];
+        
         //System.out.println("fullConstructor"+i+" "+name+" "+type );
 
         
             if(name.equals("Newclass")){
                     name=elements.get(i)[1];
                     type=elements.get(i)[2];
-                    
                       ele2[0]=name;
                       ele2[1]=type;
                      var.add(ele2);
                     
          if(type.equalsIgnoreCase("single")||type.startsWith("List")){
 
+             
+             
                TypeName t= getTypeCom(name, type);
                  BFullConsructor
                     .addParameter(t,name)
@@ -163,7 +169,7 @@ public class ClassGen {
            //NOTHING :D
          }else{
         
-        S=S+"+ \""+name+"=\" + "+name;
+        S=S+"+ \""+name+"=\" + "+name+"+ \",  \"";
      }
      }
         
@@ -207,16 +213,23 @@ public class ClassGen {
          
          //ListDeclarations.clear();
         
-      
+      String ClassName =className.substring(0, 1).toUpperCase() + className.substring(1,className.length()); 
         
         
          
-        MethodSpec constructor= constructor(className);
-        MethodSpec fullConstructor=fullConstructor(elements,className);
+        MethodSpec constructor= constructor(ClassName);
+        MethodSpec fullConstructor=fullConstructor(elements,ClassName);
         MethodSpec toString=toString(elements);
+        
+        
+         AnnotationSpec Jackson= AnnotationSpec
+                 .builder(JsonIgnoreProperties.class)
+                 .addMember("ignoreUnknown", "true")
+                 .build();
       
-     TypeSpec.Builder BclassGen =TypeSpec.classBuilder(className)
+     TypeSpec.Builder BclassGen =TypeSpec.classBuilder(ClassName)
               .addModifiers(Modifier.PUBLIC)
+             .addAnnotation(Jackson)
              .addMethod(constructor)
              .addMethod(fullConstructor)
              .addMethod(toString); 
@@ -227,10 +240,12 @@ public class ClassGen {
     for (int i = 0; i < elements.size(); i++){ 
         String name=elements.get(i)[0];
         String type=elements.get(i)[1];
-       
+        System.out.println(type);
+        
         if(name.equals("Newclass")){
             name=elements.get(i)[1];
             type=elements.get(i)[2];
+            
             //ele[0]=name;
             //ele[1]=type;
             //var.add(ele);
@@ -257,7 +272,7 @@ public class ClassGen {
         }else if(name.equals("child")||name.equals("child:Newclass")|| name.equals("StopClass") ){
            //NOTHING :D
         }else{
-    
+           
         MethodSpec methodget= get(name,type);
         MethodSpec methodset= set(name,type);
         Type T=getType(type);
@@ -362,11 +377,11 @@ public class ClassGen {
      
       public  TypeName getTypeCom(String name, String type){
          TypeName t;
-         
+         String Name = name.substring(0, 1).toUpperCase() + name.substring(1, name.length()); 
          
          if (type.equalsIgnoreCase("List"))   t = ParameterizedTypeName.get(ClassName.get(List.class),TypeVariableName.get(name) );
-         else if (type.equalsIgnoreCase("single"))  t =TypeVariableName.get(name); 
-         else  t =TypeVariableName.get(name);
+         else if (type.equalsIgnoreCase("single"))  t =TypeVariableName.get(Name); 
+         else  t =TypeVariableName.get(Name);
          
          //TODO: ADD MORE COMPLEX TYPES
              return t;
@@ -377,7 +392,7 @@ public class ClassGen {
         for (int i = 0; i < elements.size(); i++){ 
             String[] ele=elements.get(i);
             for (int j = 0; j < ele.length; j++){
-                //System.out.println(i+"."+j+" :"+elements.get(i)[j]);
+                System.out.println(i+"."+j+" :"+elements.get(i)[j]);
             }
             
         }

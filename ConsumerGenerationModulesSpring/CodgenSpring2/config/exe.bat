@@ -1,12 +1,8 @@
-
-
-
-
 cd ..
-cd TesterSpring
+cd InterfaceLightweight
 
 mvn clean install 
 PAUSE
 cd target
- pscp -C -pw raspberry TesterSpring-4.1.3.1.jar pi@130.240.172.253:
+ java -jar InterfaceLightweight-1.0.jar 
 PAUSE

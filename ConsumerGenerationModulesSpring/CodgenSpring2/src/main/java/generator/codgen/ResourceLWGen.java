@@ -13,10 +13,14 @@ package generator.codgen;
 
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
+import static generator.codgen.EncodingParser.createObjectMapper;
+import resources.RequestDTO_C0;
 import java.io.IOException;
 import java.nio.file.Paths;
 import javax.ws.rs.Path;
@@ -73,18 +77,27 @@ public class ResourceLWGen {
     if(MD_C.getMediatype().equalsIgnoreCase("JSON")){
         Mediatype="APPLICATION_JSON";
         
-    }      
+    }else if(MD_C.getMediatype().equalsIgnoreCase("XML")){
+        Mediatype="APPLICATION_XML";
+    }
+    
      AnnotationSpec produces= AnnotationSpec
                  .builder(Produces.class)
-                 .addMember("value", "$T.$L", MediaType.class,Mediatype)
-                 .build();
-     
-     
-     AnnotationSpec consumes= AnnotationSpec
-                 .builder(Consumes.class)
                  .addMember("value", "$T.APPLICATION_JSON", MediaType.class)
                  .build();
-     
+     AnnotationSpec consumes;
+     if(MD_C.getMediatype().equalsIgnoreCase("CBOR")){
+             consumes= AnnotationSpec
+                 .builder(Consumes.class)
+                 .addMember("value", "\"application/cbor\"")
+                 .build(); 
+     }else{
+         consumes= AnnotationSpec
+                 .builder(Consumes.class)
+                 .addMember("value", "$T.$L", MediaType.class,Mediatype)
+                 .build(); 
+     }
+         
      String pathResource=MD_C.getPathResource();
        AnnotationSpec path= AnnotationSpec
                  .builder(Path.class)
@@ -100,23 +113,33 @@ public class ResourceLWGen {
          methodgen.addAnnotation(POST.class);
      }else if(MD_C.getMethod().equalsIgnoreCase("GET"))  methodgen.addAnnotation(GET.class);
      
-    
+     CodeBlock mapperCode=createObjectMapper(MD_C.getMediatype());
+     
       methodgen.addAnnotation(path)
      .addAnnotation(produces)
-     .addAnnotation(consumes)
-     .addParameter(String.class,"jsonPayload")
+     .addAnnotation(consumes);
+      if(MD_C.getMediatype().equalsIgnoreCase("CBOR")){
+          methodgen.addParameter(byte[].class,"receivedPayload");
+      }else{
+           methodgen.addParameter(String.class,"receivedPayload");
+      }
+       methodgen 
+     .addStatement("RequestDTO_C0 payload=new RequestDTO_C0()")
      .addStatement(" String response=null")
+     .addCode(mapperCode)
      .beginControlFlow("try")
-      .addStatement("response=consumeService(\"http://127.0.0.1:8889/demo/negotiation/session-data\",jsonPayload)")
+      .addStatement("payload=objMapper.readValue(receivedPayload, RequestDTO_C0.class)")
+      .addStatement("System.out.println(payload.toString())")
+      .addStatement("response=consumeService(\"http://127.0.0.1:8889/demo/testTranslation\",payload)")
      .endControlFlow()
-     .beginControlFlow("catch ($T e)",IOException.class)      
+     .beginControlFlow("catch ($T e)",Exception.class)      
      .addStatement(" e.printStackTrace()")
      .endControlFlow() 
      .beginControlFlow("if(response==null)")
      .addStatement("  return \"ERROR: EMPTY RESPONSE\"")
      .endControlFlow() 
      .beginControlFlow("else")
-     .addStatement("return \"\\\"Response\\\":\\\"\"+response+\"\\\"\"")
+     .addStatement("return response")
      .endControlFlow() 
      ;
    
@@ -130,7 +153,7 @@ public class ResourceLWGen {
      .addModifiers(Modifier.STATIC)
      .returns(String.class)
      .addParameter(String.class, "url")
-     .addParameter(String.class, "payload")
+     .addParameter(RequestDTO_C0.class, "payload")
      .addException(IOException.class);
          
      
@@ -151,7 +174,9 @@ public class ResourceLWGen {
     }  
        
        consumer.addStatement(" request.addHeader(\"content-type\", \"$L\")",Mediatype) 
-       .addStatement(" request.setEntity(new $T(payload))",StringEntity.class) 
+       .addComment("I haven't try this writevalue. For a test change all to String Json")
+       .addStatement("String jsonPayload=new $T().writeValueAsString(payload)",ObjectMapper.class)
+       .addStatement(" request.setEntity(new $T(jsonPayload))",StringEntity.class) 
        .addStatement(" $T response = httpClient.execute(request)",CloseableHttpResponse.class) 
        .beginControlFlow("try")  
             .addStatement(" $T entity = response.getEntity()", HttpEntity.class)
@@ -180,7 +205,7 @@ public class ResourceLWGen {
          
   
        MethodSpec testEcho=  testEcho();
-        MethodSpec methodgen=methodgen(MD_C);
+       MethodSpec methodgen=methodgen(MD_C);
        MethodSpec consumeService =consumeService(MD_P); 
         
         

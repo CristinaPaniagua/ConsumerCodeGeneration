@@ -101,14 +101,14 @@ public class ClassGen1 {
           String S="";
      for (int i = 0; i < elements.size(); i++){ 
         String name=elements.get(i)[0];
-        S=S+"+ \""+name+"=\" + "+name;
+        S=S+"+ \""+name+"=\" + "+name+"+ \", \"";
      }
         
      MethodSpec toString  = MethodSpec.methodBuilder("toString")
     .addModifiers(Modifier.PUBLIC)
      .addAnnotation(Override.class)
      .returns(String.class)
-     .addStatement("return \"ProviderPayload{\" $L +\"}\"",S)
+     .addStatement("return \"{\" $L +\"}\"",S)
      .build();
     
      
@@ -141,12 +141,13 @@ public class ClassGen1 {
      public  void classGen ( ArrayList<String[]> elements , String className){
          
         
+     String ClassName =className.substring(0, 1).toUpperCase() + className.substring(1,className.length()); 
      
-        MethodSpec constructor= constructor(className);
-        MethodSpec fullConstructor=fullConstructor(elements,className);
+        MethodSpec constructor= constructor(ClassName);
+        MethodSpec fullConstructor=fullConstructor(elements,ClassName);
         MethodSpec toString=toString(elements);
       
-     TypeSpec.Builder BclassGen =TypeSpec.classBuilder(className)
+     TypeSpec.Builder BclassGen =TypeSpec.classBuilder(ClassName)
               .addModifiers(Modifier.PUBLIC)
              .addMethod(constructor)
              .addMethod(fullConstructor)

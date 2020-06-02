@@ -23,16 +23,21 @@ import static java.lang.System.out;
 
 public class readCDL {
      
-    public static  ArrayList<ElementsPayload> elements_request = new ArrayList<ElementsPayload>(); 
-    public static  ArrayList<ElementsPayload> elements_response = new ArrayList<ElementsPayload>();
-    public static  ArrayList<String[]> payload_request = new ArrayList<String[]>(); 
-    public static  ArrayList<String[]> payload_response = new ArrayList<String[]>();
-    public static boolean request;
-    public static boolean response;
-    public static boolean param;
-    public static  ArrayList<Param> parameters = new ArrayList<>();
-    public static ArrayList<String> subpaths=new ArrayList<>();
-public static InterfaceMetadata read(String service,String System){
+     
+    public   ArrayList<ElementsPayload> elements_request = new ArrayList<ElementsPayload>(); 
+    public   ArrayList<ElementsPayload> elements_response = new ArrayList<ElementsPayload>();
+    public   ArrayList<String[]> payload_request = new ArrayList<String[]>(); 
+    public   ArrayList<String[]> payload_response = new ArrayList<String[]>();
+    public  boolean request;
+    public  boolean response;
+    public  boolean param;
+    public   ArrayList<Param> parameters = new ArrayList<>();
+    public  ArrayList<String> subpaths=new ArrayList<>();
+
+    public readCDL() {
+    }
+    
+public InterfaceMetadata read(String service,String System){
     String sec=null;
     String protocol=null;
     String path=null;
@@ -45,8 +50,8 @@ public static InterfaceMetadata read(String service,String System){
     Reset();
     
     Map<String,String> CDLstorage= new HashMap<>();
-    CDLstorage.put("provider","cdl_contractNegotationTrusted.xml");
-    CDLstorage.put("consumer","cdl_contractNegotationTrusted.xml");
+    CDLstorage.put("provider","cdl_PROVIDER.xml");
+    CDLstorage.put("consumer","cdl_CONSUMER.xml");
     
     
     String CDLName=CDLstorage.get(System);
@@ -56,7 +61,7 @@ public static InterfaceMetadata read(String service,String System){
     
       try  {
           
-    	
+    	out.println(CDLName);
 	 File File1 = new File(CDLName);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -162,8 +167,8 @@ public static InterfaceMetadata read(String service,String System){
                                     childNode = childNode.getNextSibling(); 
                                     if (childNode.getNodeType() == Node.ELEMENT_NODE) {    
                                    Element e =(Element) childNode;
-                                   String[] ele;
-                                   
+                                   //String[] ele;
+                                   String[] ele=new String[2];
                                    String tagname= e.getTagName();
 
                                     if("complexelement".equals(tagname)){
@@ -173,26 +178,21 @@ public static InterfaceMetadata read(String service,String System){
          
                                  
                                    }else{
-                                   ele=new String[2];
-                                   ele[0]=e.getAttribute("name");
+                                    ele[0]=e.getAttribute("name");
                                    ele[1]=e.getAttribute("type");
-                                   
+                                   out.println(ele[0]+" - "+ele[1]);
                                    if(!ele[1].equals("null"))
-                                   payload_request.add(ele);
+                                       payload_request.add(ele);
                                    }
                                     
                                }
                               
                              }
                              
-                             
-                              ElementsPayload payloadRequest=new ElementsPayload(payload_request);
-                              elements_request.add(payloadRequest);
-                             
-
-                               
-                           
                             
+                                 ElementsPayload payloadRequest=new ElementsPayload(payload_request);
+                                 elements_request.add(payloadRequest);
+                      
                                    
                            
                      }
@@ -475,7 +475,7 @@ public static InterfaceMetadata read(String service,String System){
                                    ele[0]=e.getAttribute("name");
                                    ele[1]=e.getAttribute("type");
                                    if(!ele[1].equals("null")){
-                                    // out.println(ele[0]+"  - "+ele[1]);
+                                    //out.println(ele[0]+"  - "+ele[1]);
                                    arrayPayloadR.add(ele);
                                    }
                                    
@@ -524,15 +524,16 @@ public static InterfaceMetadata read(String service,String System){
 	e.printStackTrace();
     }
                    
-        
     
-      
+ out.println("elemtents: ");
+ printElements(elements_request.get(0).getElements());
+ 
  InterfaceMetadata MD = new InterfaceMetadata(protocol,path,method,mediatype,ID,complexType_request,complexType_response,elements_request, elements_response, request,response,param,parameters,subpaths);  
     return MD;
     
 }
 
-public static ArrayList<String[]> complexelFunction ( String r, Element e, String level){
+public ArrayList<String[]> complexelFunction ( String r, Element e, String level){
     ArrayList<String[]> complexPayload =new ArrayList<>();
  String [] c=new String[3];
   c[0]=level;
@@ -596,13 +597,13 @@ while(elechild.getNextSibling()!=null){
         for(int i=0; i>elements.size();i++){
             String[] list=elements.get(i);
             for(int j=0; j>list.length;j++){
-                //out.println(list[j]);
+                out.println(list[j]);
             }
             
         }
     }
 
-public static void Reset(){
+public void Reset(){
    elements_request.clear(); 
    elements_response.clear();
    payload_request.clear();
