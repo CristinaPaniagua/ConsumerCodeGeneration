@@ -14,6 +14,8 @@ package generator.codgen;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
@@ -31,6 +33,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -72,21 +75,50 @@ public class ResourceLWGen {
           return methodgen.build();
      }
     
-    public static MethodSpec methodgen (InterfaceMetadata MD_C){
-        String Mediatype="";
-    if(MD_C.getMediatype().equalsIgnoreCase("JSON")){
-        Mediatype="APPLICATION_JSON";
-        
-    }else if(MD_C.getMediatype().equalsIgnoreCase("XML")){
-        Mediatype="APPLICATION_XML";
-    }
+    public static MethodSpec methodgen (InterfaceMetadata MD_C,InterfaceMetadata MD_P ){
+ 
     
-     AnnotationSpec produces= AnnotationSpec
+    
+    
+    
+    
+     AnnotationSpec produces;
+     
+     
+        if(MD_C.getMediatype_response().equalsIgnoreCase("JSON")){
+       
+         produces= AnnotationSpec
                  .builder(Produces.class)
                  .addMember("value", "$T.APPLICATION_JSON", MediaType.class)
                  .build();
+        
+    }else if(MD_C.getMediatype_response().equalsIgnoreCase("XML")){
+        produces= AnnotationSpec
+                 .builder(Produces.class)
+                 .addMember("value", "$T.APPLICATION_XML", MediaType.class)
+                 .build();
+    }else{
+          produces= AnnotationSpec
+                 .builder(Produces.class)
+                 .addMember("value", "*/*", MediaType.class)
+                 .build();
+    } 
+     
+     
+     
+    
+          String Mediatype="";
+    if(MD_C.getMediatype_request().equalsIgnoreCase("JSON")){
+        Mediatype="APPLICATION_JSON";
+        
+    }else if(MD_C.getMediatype_request().equalsIgnoreCase("XML")){
+        Mediatype="APPLICATION_XML";
+    }
+    
+     
+     
      AnnotationSpec consumes;
-     if(MD_C.getMediatype().equalsIgnoreCase("CBOR")){
+     if(MD_C.getMediatype_request().equalsIgnoreCase("CBOR")){
              consumes= AnnotationSpec
                  .builder(Consumes.class)
                  .addMember("value", "\"application/cbor\"")
@@ -113,12 +145,12 @@ public class ResourceLWGen {
          methodgen.addAnnotation(POST.class);
      }else if(MD_C.getMethod().equalsIgnoreCase("GET"))  methodgen.addAnnotation(GET.class);
      
-     CodeBlock mapperCode=createObjectMapper(MD_C.getMediatype());
+     CodeBlock mapperCode=createObjectMapper(MD_C.getMediatype_request());
      
       methodgen.addAnnotation(path)
      .addAnnotation(produces)
      .addAnnotation(consumes);
-      if(MD_C.getMediatype().equalsIgnoreCase("CBOR")){
+      if(MD_C.getMediatype_request().equalsIgnoreCase("CBOR")){
           methodgen.addParameter(byte[].class,"receivedPayload");
       }else{
            methodgen.addParameter(String.class,"receivedPayload");
@@ -168,22 +200,44 @@ public class ResourceLWGen {
        consumer.addStatement(" $T request = new $T(url)",HttpGet.class,HttpGet.class);
      
      String Mediatype="";
-      if(MD_P.getMediatype().equalsIgnoreCase("JSON")){
-        Mediatype="application/json";
-        
-    }  
+      if(MD_P.getMediatype_request().equalsIgnoreCase("JSON")){
+       consumer.addStatement(" request.addHeader(\"content-type\", \"application/json\")") 
+       .addStatement("String createdPayload=new $T().writeValueAsString(payload)",ObjectMapper.class);
        
-       consumer.addStatement(" request.addHeader(\"content-type\", \"$L\")",Mediatype) 
-       .addComment("I haven't try this writevalue. For a test change all to String Json")
-       .addStatement("String jsonPayload=new $T().writeValueAsString(payload)",ObjectMapper.class)
-       .addStatement(" request.setEntity(new $T(jsonPayload))",StringEntity.class) 
-       .addStatement(" $T response = httpClient.execute(request)",CloseableHttpResponse.class) 
+        
+    }else if(MD_P.getMediatype_request().equalsIgnoreCase("XML")){
+        consumer.addStatement(" request.addHeader(\"content-type\", \"application/xml\")") 
+       .addStatement("$T xmlMapper = new XmlMapper()",XmlMapper.class)
+       .addStatement("String createdPayload=xmlMapper.writeValueAsString(payload)",ObjectMapper.class);
+      
+    
+      }else if(MD_P.getMediatype_request().equalsIgnoreCase("CBOR")){
+        consumer.addStatement(" request.addHeader(\"content-type\", \"pplication/cbor\")") 
+       .addStatement("$T f = new CBORFactory()",CBORFactory.class)
+       .addStatement("$T cborMapper = new ObjectMapper(f)",ObjectMapper.class)
+       .addStatement("byte[] createdPayload = cborMapper.writeValueAsBytes(payload)");
+      
+    }
+       
+        consumer.addStatement(" System.out.println(\"Payload: \"+ createdPayload )");
+                
+       if(MD_P.getMediatype_request().equalsIgnoreCase("CBOR")){
+            consumer.addStatement("$T eb = EntityBuilder.create()",EntityBuilder.class)
+                    .addStatement("eb.setBinary(createdPayload)")
+                    .addStatement("request.setEntity(eb.build())");
+       }else{
+                
+       consumer.addStatement(" request.setEntity(new $T(createdPayload))",StringEntity.class);  
+               
+               }
+       
+       consumer.addStatement(" $T response = httpClient.execute(request)",CloseableHttpResponse.class) 
        .beginControlFlow("try")  
             .addStatement(" $T entity = response.getEntity()", HttpEntity.class)
             .beginControlFlow("if (entity != null)")
             .addStatement(" result = $T.toString(entity)",EntityUtils.class) 
-            .addStatement(" System.out.println(result)")
-            .endControlFlow() 
+            .addStatement("System.out.println(\"Result: \"+ result)")
+            .endControlFlow() //TODO: ADD ELSE 
        .endControlFlow() 
        .beginControlFlow("finally")
         .addStatement(" response.close()")
@@ -205,7 +259,7 @@ public class ResourceLWGen {
          
   
        MethodSpec testEcho=  testEcho();
-       MethodSpec methodgen=methodgen(MD_C);
+       MethodSpec methodgen=methodgen(MD_C, MD_P);
        MethodSpec consumeService =consumeService(MD_P); 
         
         

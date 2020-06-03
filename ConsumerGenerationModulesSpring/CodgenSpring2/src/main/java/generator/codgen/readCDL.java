@@ -42,7 +42,8 @@ public InterfaceMetadata read(String service,String System){
     String protocol=null;
     String path=null;
     String method=null;
-    String mediatype=null;
+    String mediatype_request=null;
+    String mediatype_response=null;
     String ID=null;
      String complexType_response=null;
     String complexType_request=null;
@@ -148,7 +149,7 @@ public InterfaceMetadata read(String service,String System){
                             Node nEncode1 =eR.getElementsByTagName("encode").item(0);
                             Element eEncode1= (Element) nEncode1;
                             
-                            mediatype=eEncode1.getAttribute("name");
+                            mediatype_request=eEncode1.getAttribute("name");
 
                             // Payload
                              
@@ -218,7 +219,7 @@ public InterfaceMetadata read(String service,String System){
                             Node nEncode1 =eRR.getElementsByTagName("encode").item(0);
                             Element eEncode1= (Element) nEncode1;
                             
-                            mediatype=eEncode1.getAttribute("name");
+                            mediatype_response=eEncode1.getAttribute("name");
   
                             // Payload
                              Node npayload1 =eRR.getElementsByTagName("payload").item(0);
@@ -312,7 +313,7 @@ public InterfaceMetadata read(String service,String System){
                             Node nEncode1 =eR.getElementsByTagName("encode").item(0);
                             Element eEncode1= (Element) nEncode1;
                             
-                            mediatype=eEncode1.getAttribute("name");
+                            mediatype_request=eEncode1.getAttribute("name");
 
                             // Payload
                              Node npayload1 =eR.getElementsByTagName("payload").item(0);
@@ -419,7 +420,7 @@ public InterfaceMetadata read(String service,String System){
                             Node nEncode1 =eRR.getElementsByTagName("encode").item(0);
                             Element eEncode1= (Element) nEncode1;
                             
-                            mediatype=eEncode1.getAttribute("name");
+                            mediatype_response=eEncode1.getAttribute("name");
   
                             // Payload
                              Node npayload2 =eRR.getElementsByTagName("payload").item(0);
@@ -528,7 +529,7 @@ public InterfaceMetadata read(String service,String System){
  out.println("elemtents: ");
  printElements(elements_request.get(0).getElements());
  
- InterfaceMetadata MD = new InterfaceMetadata(protocol,path,method,mediatype,ID,complexType_request,complexType_response,elements_request, elements_response, request,response,param,parameters,subpaths);  
+ InterfaceMetadata MD = new InterfaceMetadata(protocol,path,method,mediatype_request, mediatype_response,ID,complexType_request,complexType_response,elements_request, elements_response, request,response,param,parameters,subpaths);  
     return MD;
     
 }

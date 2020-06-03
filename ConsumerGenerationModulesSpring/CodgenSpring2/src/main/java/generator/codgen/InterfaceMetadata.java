@@ -16,10 +16,11 @@ public class InterfaceMetadata {
     String Protocol;
     String PathResource;
     String Method;
-    String Mediatype;
+    String Mediatype_request;
+    String Mediatype_response;
     String ID;
-    String complexType_response;
     String complexType_request;
+    String complexType_response;
     ArrayList<ElementsPayload> elements_request ; 
     ArrayList<ElementsPayload> elements_response ;
     boolean request;
@@ -32,11 +33,12 @@ public class InterfaceMetadata {
     public InterfaceMetadata() {
     }
 
-    public InterfaceMetadata(String Protocol, String PathResource, String Method, String Mediatype, String ID, String complexType_response, String complexType_request, ArrayList<ElementsPayload> elements_request, ArrayList<ElementsPayload> elements_response, boolean request, boolean response, boolean param, ArrayList<Param> parameters, ArrayList<String> subpaths) {
+    public InterfaceMetadata(String Protocol, String PathResource, String Method, String Mediatype_request, String Mediatype_response, String ID, String complexType_request, String complexType_response, ArrayList<ElementsPayload> elements_request, ArrayList<ElementsPayload> elements_response, boolean request, boolean response, boolean param, ArrayList<Param> parameters, ArrayList<String> subpaths) {
         this.Protocol = Protocol;
         this.PathResource = PathResource;
         this.Method = Method;
-        this.Mediatype = Mediatype;
+        this.Mediatype_request = Mediatype_request;
+        this.Mediatype_response = Mediatype_response;
         this.ID = ID;
         this.complexType_response = complexType_response;
         this.complexType_request = complexType_request;
@@ -49,10 +51,7 @@ public class InterfaceMetadata {
         this.subpaths = subpaths;
     }
 
-
-
-
-
+ 
     public void setID(String ID) {
         this.ID = ID;
     }
@@ -85,13 +84,23 @@ public class InterfaceMetadata {
         return Method;
     }
 
-    public void setMediatype(String Mediatype) {
-        this.Mediatype = Mediatype;
+    public String getMediatype_request() {
+        return Mediatype_request;
     }
 
-    public String getMediatype() {
-        return Mediatype;
+    public String getMediatype_response() {
+        return Mediatype_response;
     }
+
+  
+    public void setMediatype_request(String Mediatype_request) {
+        this.Mediatype_request = Mediatype_request;
+    }
+
+    public void setMediatype_response(String Mediatype_response) {
+        this.Mediatype_response = Mediatype_response;
+    }
+
 
     public ArrayList<ElementsPayload> getElements_request() {
         return elements_request;
@@ -169,8 +178,10 @@ public class InterfaceMetadata {
 
     @Override
     public String toString() {
-        return "InterfaceMetadata{" + "Protocol=" + Protocol + ", PathResource=" + PathResource + ", Method=" + Method + ", Mediatype=" + Mediatype + ", ID=" + ID + ", complexType_response=" + complexType_response + ", complexType_request=" + complexType_request + ", elements_request=" + elements_request + ", elements_response=" + elements_response + ", request=" + request + ", response=" + response + ", param=" + param + ", parameters=" + parameters + ", subpaths=" + subpaths + '}';
+        return "InterfaceMetadata{" + "Protocol=" + Protocol + ", PathResource=" + PathResource + ", Method=" + Method + ", Mediatype_request=" + Mediatype_request + ", Mediatype_response=" + Mediatype_response + ", ID=" + ID + ", complexType_response=" + complexType_response + ", complexType_request=" + complexType_request + ", elements_request=" + elements_request + ", elements_response=" + elements_response + ", request=" + request + ", response=" + response + ", param=" + param + ", parameters=" + parameters + ", subpaths=" + subpaths + '}';
     }
+   
+}
 
   
 
@@ -192,5 +203,3 @@ public class InterfaceMetadata {
 
 
   
-
-}
