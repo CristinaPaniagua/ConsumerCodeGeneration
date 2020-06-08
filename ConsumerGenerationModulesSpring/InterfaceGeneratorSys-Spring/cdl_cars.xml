@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contract xmlns="http://cdl/2018/01" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmls:at="http://attributes_v1" >
+	
+	<context xml:lang="EN">
+		<keywords>car</keywords>
+		<des>... </des>	
+	</context>
+
+	<schemas>
+		<include href="null.xsd"/>
+	</schemas>
+
+	<interface protocol="HTTP" address="http://127.0.0.1/8888" >
+	
+		<method name="POST" id="create-car" path="/car">
+
+			<request>
+				<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<compresion name="null" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>
+								<complextype type="null"/> 
+								<element name="brand" type="String"/>
+								<element name="color" type="String"/>
+		
+				</payload>
+			</request>
+			
+				<response status="2.05">
+				<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<compresion name="null" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>
+								<complextype type="null"/> 
+								<element name="id" type="Integer"/>
+								<element name="brand" type="String"/>
+								<element name="color" type="String"/>
+		
+				</payload>
+				</response>
+			
+			
+			
+		</method>
+
+
+<method name="GET" id="getCars" path="/car">
+
+			<request>
+				<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<compresion name="null" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>
+								<complextype type="List"/> 
+								<element name="brand" type="String"/>
+								<element name="color" type="String"/>
+		
+				</payload>
+			</request>
+
+				<response status="2.05">
+				<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<compresion name="null" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>
+								<complextype type="List"/> 
+								<element name="id" type="Integer"/>
+								<element name="brand" type="String"/>
+								<element name="color" type="String"/>
+		
+				</payload>
+				</response>
+		</method>
+
+		<method name="POST" id="Humidity_target" path="/post">
+			<request>
+				<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<compresion name="null" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<mapping>
+					<at:humidity>
+							<at:indoor>
+								<element name="humidity" type="xsd:string"/>
+							</at:indoor>
+					</at:humidity>
+				</mapping>
+			</request>
+
+			<response status="2.05">
+				<format> 
+					<encode name="textplain" mediaType= "JSON" version="0"/>
+					<compresion name="null" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<mapping>
+					<at:humidity>
+							<at:indoor>
+								<element name="humidity" type="xsd:string"/>
+							</at:indoor>
+					</at:humidity>
+				</mapping>
+			</response>
+		</method>
+	</interface>
+</contract>

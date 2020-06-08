@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contract xmlns="http://cdl/2018/01" xmlns:xsd="http://www.w3.org/2001/XMLSchema" >
+	
+	<context xml:lang="EN">
+		<keywords>contract negotation</keywords>
+	</context>
+
+
+
+	<interface protocol="HTTP" address="http://127.0.0.1/8888" >
+	
+		<method name="POST" id="offer" path="/negotiation/session-data">
+
+			<request>
+				<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+					<complextype type="null"/> 					
+					<element name="SessionId" type="Integer"/>
+					<element name="OfferorName" type="String"/>
+					<element name="RecieverName" type="String"/>
+					<complexelement name="Contracts" type="single">
+						<element name="TemplatedID" type="String"/>
+						<complexelement name="Arguments" type="list">
+							<element name= "name" type="String"/>
+							<element name="value" type="String"/>
+					</complexelement>
+					</complexelement>
+
+					
+				</payload>
+			</request>
+			
+			<response status="204" />
+	
+		</method>
+
+	</interface>
+</contract>
