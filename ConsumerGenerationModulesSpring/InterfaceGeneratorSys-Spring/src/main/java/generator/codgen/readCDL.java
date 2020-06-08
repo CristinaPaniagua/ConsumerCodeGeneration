@@ -153,7 +153,18 @@ public InterfaceMetadata read(String service,String System){
 
                             // Payload
                              
-                             Node npayload1 =eR.getElementsByTagName("payload").item(0);
+                             
+                             
+                             NodeList  lpayload=eR.getElementsByTagName("payload");
+                            
+                         if(lpayload.getLength()==0){
+                              out.println("No payload Request defined");
+                               
+                           }else{  
+                             
+                               Node npayload1 = lpayload.item(0);
+                               
+                             
                              Element epayload1=(Element) npayload1;
                              NodeList complex1=epayload1.getElementsByTagName("complextype");
                              //if(!complex1.equals(null)){
@@ -181,7 +192,7 @@ public InterfaceMetadata read(String service,String System){
                                    }else{
                                     ele[0]=e.getAttribute("name");
                                    ele[1]=e.getAttribute("type");
-                                   out.println(ele[0]+" - "+ele[1]);
+                                   //out.println(ele[0]+" - "+ele[1]);
                                    if(!ele[1].equals("null"))
                                        payload_request.add(ele);
                                    }
@@ -195,7 +206,7 @@ public InterfaceMetadata read(String service,String System){
                                  elements_request.add(payloadRequest);
                       
                                    
-                           
+                         }//payload no null    
                      }
                                
                          
@@ -222,16 +233,29 @@ public InterfaceMetadata read(String service,String System){
                             mediatype_response=eEncode1.getAttribute("name");
   
                             // Payload
-                             Node npayload1 =eRR.getElementsByTagName("payload").item(0);
+                        
+                             
+                             
+                         NodeList  lRpayload=eRR.getElementsByTagName("payload");
+                            
+                         if(lRpayload.getLength()==0){
+                              out.println("No payload Response defined");
+                               
+                           }else{  
+                             
+                               Node npayload1 = lRpayload.item(0);
+                               
                              Element epayload1=(Element) npayload1;
                              
                              NodeList complex2=epayload1.getElementsByTagName("complextype");
-                             //if(!complex2.equals(null)){
+                             if(!complex2.equals(null)){
+                               complexType_response=null;
+                              }else{ 
                                   Node ncomplex1=complex2.item(0); 
                                   Element ecomplex= (Element)ncomplex1;
                               complexType_response=ecomplex.getAttribute("type");   
-                             //} 
-                             
+                            
+                             }
                    
                              Node childNode=epayload1.getFirstChild();
 
@@ -265,7 +289,8 @@ public InterfaceMetadata read(String service,String System){
                               elements_response.add(payloadResponse);
 
                                    
-                           }
+                           }//Payload not null
+                     }
                      }//close else RESPONSE=TRUE
                             
         }//END:NO parameters
@@ -316,7 +341,19 @@ public InterfaceMetadata read(String service,String System){
                             mediatype_request=eEncode1.getAttribute("name");
 
                             // Payload
-                             Node npayload1 =eR.getElementsByTagName("payload").item(0);
+                            
+                             
+                             NodeList  lpayload=eR.getElementsByTagName("payload");
+                            
+                         if(lpayload.getLength()==0){
+                              out.println("No payload Request defined");
+                               
+                           }else{  
+                             
+                               Node npayload1 = lpayload.item(0);
+                               
+                             
+                             
                              Element epayload1=(Element) npayload1;
                              
                         //Payload with options
@@ -395,9 +432,11 @@ public InterfaceMetadata read(String service,String System){
                              //out.println(" 2 -----"+elements_request.get(1));
                              //out.println(elements_request.get(1).elements.get(0)[0]);
                              //printElements(elements_request.get(1).getElements());
-                           
+                             
+                             
+                          }//no null payload END ELSE      
                      }//end request nodes
-                               
+                           
                          
         } //close else  REQUEST=TRUE 
                          
@@ -423,7 +462,17 @@ public InterfaceMetadata read(String service,String System){
                             mediatype_response=eEncode1.getAttribute("name");
   
                             // Payload
-                             Node npayload2 =eRR.getElementsByTagName("payload").item(0);
+                           
+                             
+                         NodeList  lRpayload=eRR.getElementsByTagName("payload");
+                            
+                         if(lRpayload.getLength()==0){
+                              out.println("No payload Request defined");
+                               
+                           }else{  
+                             
+                               Node npayload2 = lRpayload.item(0);
+                             
                              Element epayload2=(Element) npayload2;
                              
                        //Payload with options
@@ -501,8 +550,12 @@ public InterfaceMetadata read(String service,String System){
                              //out.println(" 2 -----"+elements_response.get(1));
                              //out.println(elements_response.get(1).elements.get(0)[0]);
                               
-                           
+                             
+                             
+                           }// Payload no null END ELSE
                         }//close response elements
+                     
+                         
                      }//close else RESPONSE=TRUE
           
                      

@@ -1,3 +1,2 @@
 
-Start C:\Users\cripan\Desktop\Code_generation\ConsumerGenerationModulesSpring\CodGenProvider-Spring\config\exe.bat
-
+Start C:\Users\cripan\Desktop\Code_generation\ConsumerCodeGeneration\ConsumerGenerationModulesSpring\InterfaceGeneratorSys-Spring\config\exe.bat

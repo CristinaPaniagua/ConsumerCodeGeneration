@@ -173,7 +173,7 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
        ExecutorService executor = Executors.newSingleThreadExecutor();
         ProcessBuilder processBuilder = new ProcessBuilder();
 
-        processBuilder.command(("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCodeGeneration\\ConsumerGenerationModulesSpring\\CodgenSpring2\\config\\Init.bat"));
+        processBuilder.command(("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCodeGeneration\\ConsumerGenerationModulesSpring\\InterfaceGeneratorSys-Spring\\config\\Init.bat"));
 
         try {
 
