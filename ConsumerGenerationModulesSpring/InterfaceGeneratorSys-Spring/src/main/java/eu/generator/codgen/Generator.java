@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package generator.codgen;
+package eu.generator.codgen;
 
-import ai.aitia.demo.car_provider.controller.RequestForm;
+import eu.generator.controller.RequestForm;
 import com.squareup.javapoet.*;
 
 

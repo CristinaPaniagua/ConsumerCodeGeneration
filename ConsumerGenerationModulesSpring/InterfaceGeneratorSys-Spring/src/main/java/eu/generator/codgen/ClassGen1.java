@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package generator.codgen;
+package eu.generator.codgen;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;

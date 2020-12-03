@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package generator.codgen;
+package eu.generator.codgen;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator.Feature;
@@ -31,7 +31,7 @@ public class EncodingParser {
      * 
      * @return The Jackson object mapper.
      */
- public static CodeBlock createObjectMapper(String MediaType) {
+ public static CodeBlock createObjectMapper(String MediaType, String MapperName) {
      
       CodeBlock.Builder BmapperBlock = CodeBlock.builder();
            
@@ -39,18 +39,18 @@ public class EncodingParser {
     
     if (MediaType.equalsIgnoreCase("JSON")) {
        BmapperBlock
-               .addStatement("$T jsonFactory = new JsonFactory()",JsonFactory.class)
-               .addStatement("$T objMapper=new ObjectMapper(jsonFactory)",ObjectMapper.class);
+               .addStatement("$T jsonFactory_$L = new JsonFactory()",JsonFactory.class,MapperName)
+               .addStatement("$T $L=new ObjectMapper(jsonFactory_$L)",ObjectMapper.class,MapperName, MapperName);
                 
     } else if (MediaType.equalsIgnoreCase("JSON_SMILE")) {
          BmapperBlock
                   .addStatement("$T smileFactory = new SmileFactory()",SmileFactory.class)
-                  .addStatement("ObjectMapper objMapper=new ObjectMapper(smileFactory)",ObjectMapper.class);
+                  .addStatement("ObjectMapper $L=new ObjectMapper(smileFactory)",ObjectMapper.class,MapperName);
         
     } else if (MediaType.equalsIgnoreCase("CBOR")) {
          BmapperBlock
                 .addStatement( "$T cborFactory = new CBORFactory()",CBORFactory.class)
-               .addStatement("$T objMapper=new ObjectMapper(cborFactory)",ObjectMapper.class);
+               .addStatement("$T $L=new ObjectMapper(cborFactory)",ObjectMapper.class,MapperName);
         
 
     } else if (MediaType.equalsIgnoreCase("XML")) { //TO DO: CHECK IF I NEED THE XMLFACTORY OR NOT
@@ -63,21 +63,21 @@ public class EncodingParser {
        // xmlFactory.configure(Feature.AUTO_CLOSE_TARGET, false);
         //result = new XmlMapper(xmlFactory);
         
-         BmapperBlock.addStatement( "$T objMapper=new $T()",ObjectMapper.class, XmlMapper.class);
+         BmapperBlock.addStatement( "$T $L=new $T()",ObjectMapper.class,MapperName, XmlMapper.class);
 
     } else if (MediaType.equalsIgnoreCase("YAML")) {
           BmapperBlock
                  .addStatement( " $T yamlFactory = new YAMLFactory()",YAMLFactory.class)
-                .addStatement( "$T objMapper=new ObjectMapper(yamlFactory)",ObjectMapper.class);
+                .addStatement( "$T $L=new ObjectMapper(yamlFactory)",ObjectMapper.class,MapperName);
         
     } else if (MediaType.equalsIgnoreCase("CSV")) {
         BmapperBlock
                 .addStatement("$T csvFactory = new CsvFactory()",CsvFactory.class)
-                .addStatement( "$T objMapper=new $T(csvFactory))",ObjectMapper.class,CsvMapper.class);
+                .addStatement( "$T $L=new $T(csvFactory))",ObjectMapper.class,CsvMapper.class,MapperName);
         
   
     } else {
-         BmapperBlock.addStatement("$T objMapper=new ObjectMapper()",ObjectMapper.class);
+         BmapperBlock.addStatement("$T $L=new ObjectMapper()",ObjectMapper.class,MapperName);
     }
     
     

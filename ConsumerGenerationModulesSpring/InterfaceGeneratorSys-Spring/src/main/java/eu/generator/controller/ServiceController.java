@@ -1,6 +1,5 @@
-package ai.aitia.demo.car_provider.controller;
+package eu.generator.controller;
 
-import Codgen_provider.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,12 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.aitia.demo.dto.CarRequestDTO;
 import com.aitia.demo.dto.CarResponseDTO;
 
-import Codgen_provider.CarProviderConstants;
-import ai.aitia.demo.car_provider.database.DTOConverter;
-import ai.aitia.demo.car_provider.database.InMemoryCarDB;
-import ai.aitia.demo.car_provider.entity.Car;
+
 import eu.arrowhead.common.exception.BadPayloadException;
-import generator.codgen.Generator;
+import eu.generator.codgen.Generator;
 
 @RestController
 @RequestMapping("/codgen")
@@ -36,8 +32,6 @@ public class ServiceController {
 
 	
 	
-	@Autowired
-	private InMemoryCarDB carDB;
 
 	//=================================================================================================
 	// methods

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package generator.codgen;
+package eu.generator.codgen;
 
 /**
  *
@@ -22,8 +22,8 @@ import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
-import static generator.codgen.EncodingParser.createObjectMapper;
-import resources.RequestDTO_C0;
+import static eu.generator.codgen.EncodingParser.createObjectMapper;
+import eu.generator.resources.RequestDTO_C0;
 import java.io.IOException;
 import java.nio.file.Paths;
 import javax.ws.rs.Path;
@@ -43,6 +43,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import eu.generator.resources.ResponseDTO_P0;
 public class ResourceLWGen {
     
     
@@ -80,6 +81,7 @@ public class ResourceLWGen {
     public static MethodSpec methodgen (InterfaceMetadata MD_C,InterfaceMetadata MD_P ){
  
     
+    String pathP=MD_P.getPathResource();
     
     
     
@@ -152,7 +154,7 @@ public class ResourceLWGen {
          methodgen.addAnnotation(POST.class);
      }else if(MD_C.getMethod().equalsIgnoreCase("GET"))  methodgen.addAnnotation(GET.class);
      
-     CodeBlock mapperCode=createObjectMapper(MD_C.getMediatype_request());
+     CodeBlock mapperCode=createObjectMapper(MD_C.getMediatype_request(),"objMapper");
      
       methodgen.addAnnotation(path)
      .addAnnotation(produces)
@@ -163,13 +165,14 @@ public class ResourceLWGen {
            methodgen.addParameter(String.class,"receivedPayload");
       }
        methodgen 
+     .addStatement("System.out.println(\"Consumer Payload: \"+ receivedPayload)")
      .addStatement("RequestDTO_C0 payload=new RequestDTO_C0()")
      .addStatement(" String response=null")
      .addCode(mapperCode)
      .beginControlFlow("try")
       .addStatement("payload=objMapper.readValue(receivedPayload, RequestDTO_C0.class)")
-      .addStatement("System.out.println(payload.toString())")
-      .addStatement("response=consumeService(\"http://127.0.0.1:8889/demo/testTranslation\",payload)")
+      //.addStatement("System.out.println(payload.toString())")
+      .addStatement("response=consumeService(\"http://127.0.0.1:8889/demo$L\",payload)",pathP)
      .endControlFlow()
      .beginControlFlow("catch ($T e)",Exception.class)      
      .addStatement(" e.printStackTrace()")
@@ -237,23 +240,36 @@ public class ResourceLWGen {
                 
        consumer.addStatement(" request.setEntity(new $T(createdPayload))",StringEntity.class);  
                
-               }
-       
+               } 
+
+            CodeBlock mapperResponseProvider=createObjectMapper(MD_P.getMediatype_response(),"objMapperP");
+            CodeBlock mapperResponseConsumer=createObjectMapper(MD_C.getMediatype_response(),"objMapperC");
+           
        consumer.addStatement(" $T response = httpClient.execute(request)",CloseableHttpResponse.class) 
        .beginControlFlow("try")  
             .addStatement(" $T entity = response.getEntity()", HttpEntity.class)
+            .addCode(mapperResponseProvider)
             .addStatement("$T contentType = ContentType.getOrDefault(entity)",ContentType.class)
             .addStatement("String mimeType = contentType.getMimeType()") 
             .addStatement("System.out.println(\"Response MediaType: \"+mimeType)")
             .beginControlFlow("if (entity != null)")
-            .addStatement(" result_in = $T.toString(entity)",EntityUtils.class);
-       if(MD_C.getMediatype_response().equalsIgnoreCase("XML") && MD_P.getMediatype_response().equalsIgnoreCase("JSON")){
-           consumer.addStatement("result_out= $T.jsonToXml(result_in)",U.class);
-       }else if(MD_C.getMediatype_response().equalsIgnoreCase("JSON") && MD_P.getMediatype_response().equalsIgnoreCase("XML")){
-           consumer.addStatement("result_out= $T.xmlToJson(result_in)",U.class);
-       }else{
-            consumer.addStatement("result_out=result_in");
+            .addStatement(" result_in = $T.toString(entity)",EntityUtils.class)
+            .addStatement("$T responseObj=objMapperP.readValue(result_in,ResponseDTO_P0.class)",ResponseDTO_P0.class)
+            .addCode(mapperResponseConsumer)
+            .addStatement("result_out=objMapperC.writeValueAsString(responseObj)");
+            
+       Boolean Payload=true;
+       if(Payload==false){
+            if(MD_C.getMediatype_response().equalsIgnoreCase("XML") && MD_P.getMediatype_response().equalsIgnoreCase("JSON")){
+                 consumer.addStatement("result_out= $T.jsonToXml(result_in)",U.class);
+             }else if(MD_C.getMediatype_response().equalsIgnoreCase("JSON") && MD_P.getMediatype_response().equalsIgnoreCase("XML")){
+                  consumer.addStatement("result_out= $T.xmlToJson(result_in)",U.class);
+            }else{
+                  consumer.addStatement("result_out=result_in");
+            }
        }
+       
+      
             
             consumer.addStatement("System.out.println(\"Response In: \"+ result_in)")
             .addStatement("System.out.println(\"Response Out: \"+ result_out)")

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package generator.codgen;
+package eu.generator.codgen;
 
 import com.squareup.javapoet.MethodSpec;
 import eu.arrowhead.common.exception.ArrowheadException;

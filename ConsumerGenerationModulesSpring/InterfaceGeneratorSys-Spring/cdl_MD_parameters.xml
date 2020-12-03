@@ -63,16 +63,35 @@
 					<notation href="null"/> 
 				</format> 
 			<payload>				
-				<option value="/EquipmentInfo/manufacturer" >
+				
+				<option value="/GeneralPumpBlock/pressure_information" >
 					<complextype type="null"/> 					
-					<element name="value" type="String"/>
+					<complexelement name="pressure_information" type="single">
+						<element name="value" type="Double"/>
+						<element name="time_stamp" type="long"/>
+						<element name="physical_unit" type="String"/>
+					</complexelement>
 				</option>
-				<option value="/HydraulicPumpBlock/output_pressure" >
+                                <option value="/GeneralPumpBlock/rotation_speed" >
 					<complextype type="null"/> 					
-					<complexelement name="value" type="single">
-						<element name="value" type="Float"/>
-						<element name="timestamp" type="Double"/>
-						<element name="quality" type="Double"/>
+					<complexelement name="rotation_speed" type="single">
+						<element name="value" type="Double"/>
+						<element name="time_stamp" type="long"/>
+						<element name="description" type="String"/>
+					</complexelement>
+				</option>
+                                <option value="/GeneralPumpBlock/static_motor_information" >
+					<complextype type="null"/> 					
+					<complexelement name="static_motor_information" type="single">
+						<element name="manufacturer" type="String"/>
+						<element name="order_number" type="String"/>
+					</complexelement>
+				</option>
+                                <option value="/GeneralPumpBlock/dynamic_motor_information" >
+					<complextype type="null"/> 					
+					<complexelement name="dynamic_motor_information" type="single">
+						<element name="rotation_speed" type="Double"/>
+						<element name="electrical_current" type="Double"/>
 					</complexelement>
 				</option>
 
