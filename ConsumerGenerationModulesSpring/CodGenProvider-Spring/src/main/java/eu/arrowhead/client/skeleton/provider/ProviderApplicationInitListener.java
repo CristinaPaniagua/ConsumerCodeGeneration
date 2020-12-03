@@ -19,7 +19,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
-import Codgen_provider.CarProviderConstants;
+
 import eu.arrowhead.client.library.ArrowheadService;
 import eu.arrowhead.client.library.config.ApplicationInitListener;
 import eu.arrowhead.client.library.util.ClientCommonConstants;
@@ -80,22 +80,19 @@ public class ProviderApplicationInitListener extends ApplicationInitListener {
 		setTokenSecurityFilter();
 		
 		//Register services into ServiceRegistry
-		final ServiceRegistryRequestDTO createCarServiceRequest = createServiceRegistryRequest(CarProviderConstants.CREATE_CAR_SERVICE_DEFINITION, CarProviderConstants.CAR_URI, HttpMethod.POST);		
-		arrowheadService.forceRegisterServiceToServiceRegistry(createCarServiceRequest);
-		arrowheadService.forceRegisterServiceToServiceRegistry(createServiceRegistryRequest("test","/codgen",HttpMethod.GET));
-                  arrowheadService.forceRegisterServiceToServiceRegistry(createServiceRegistryRequest("generate","/codgen",HttpMethod.POST));
+		final ServiceRegistryRequestDTO createServiceRequest = createServiceRegistryRequest("generate","/codgen",HttpMethod.POST);		
+		arrowheadService.forceRegisterServiceToServiceRegistry(createServiceRequest);
                 
-		ServiceRegistryRequestDTO getCarServiceRequest = createServiceRegistryRequest(CarProviderConstants.GET_CAR_SERVICE_DEFINITION,  CarProviderConstants.CAR_URI, HttpMethod.GET);
-		getCarServiceRequest.getMetadata().put(CarProviderConstants.REQUEST_PARAM_KEY_BRAND, CarProviderConstants.REQUEST_PARAM_BRAND);
-		getCarServiceRequest.getMetadata().put(CarProviderConstants.REQUEST_PARAM_KEY_COLOR, CarProviderConstants.REQUEST_PARAM_COLOR);
-		arrowheadService.forceRegisterServiceToServiceRegistry(getCarServiceRequest);
+		arrowheadService.forceRegisterServiceToServiceRegistry(createServiceRegistryRequest("test","/codgen",HttpMethod.GET));
+                
+		
 	}
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
 	public void customDestroy() {
 		//Unregister service
-		arrowheadService.unregisterServiceFromServiceRegistry(CarProviderConstants.CREATE_CAR_SERVICE_DEFINITION);
+		//arrowheadService.unregisterServiceFromServiceRegistry(CarProviderConstants.CREATE_CAR_SERVICE_DEFINITION);
 	}
 	
 	//=================================================================================================
@@ -137,19 +134,19 @@ public class ProviderApplicationInitListener extends ApplicationInitListener {
 		if (tokenSecurityFilterEnabled) {
 			systemRequest.setAuthenticationInfo(Base64.getEncoder().encodeToString(arrowheadService.getMyPublicKey().getEncoded()));
 			serviceRegistryRequest.setSecure(ServiceSecurityType.TOKEN);
-			serviceRegistryRequest.setInterfaces(List.of(CarProviderConstants.INTERFACE_SECURE));
+			serviceRegistryRequest.setInterfaces(List.of("HTTPS-SECURE-JSON"));
 		} else if (sslEnabled) {
 			systemRequest.setAuthenticationInfo(Base64.getEncoder().encodeToString(arrowheadService.getMyPublicKey().getEncoded()));
 			serviceRegistryRequest.setSecure(ServiceSecurityType.CERTIFICATE);
-			serviceRegistryRequest.setInterfaces(List.of(CarProviderConstants.INTERFACE_SECURE));
+			serviceRegistryRequest.setInterfaces(List.of("HTTPS-SECURE-JSON"));
 		} else {
 			serviceRegistryRequest.setSecure(ServiceSecurityType.NOT_SECURE);
-			serviceRegistryRequest.setInterfaces(List.of(CarProviderConstants.INTERFACE_INSECURE));
+			serviceRegistryRequest.setInterfaces(List.of("HTTP-INSECURE-JSON"));
 		}
 		serviceRegistryRequest.setProviderSystem(systemRequest);
 		serviceRegistryRequest.setServiceUri(serviceUri);
 		serviceRegistryRequest.setMetadata(new HashMap<>());
-		serviceRegistryRequest.getMetadata().put(CarProviderConstants.HTTP_METHOD, httpMethod.name());
+		serviceRegistryRequest.getMetadata().put("http-method", httpMethod.name());
 		return serviceRegistryRequest;
 	}
 }
