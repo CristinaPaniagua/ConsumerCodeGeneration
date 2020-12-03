@@ -5,62 +5,21 @@
 		<keywords>Management Demo</keywords>
 	</context>
 
-
-
-	<interface protocol="HTTP" address="http://127.0.0.1/8888" >
-
-
-			<method name="POST" id="offer" path="/negotiation/session-data">
-
-			<request>
-				<format> 
-					<encode name="JSON" mediaType= "JSON" version="0"/>
-					<security name="null" version="0"/>
-					<qos name="null" version="0"/> 
-					<semantic name="null" version="0"/>
-					<notation href="null"/> 
-				</format> 
-				<payload>	
-					<complextype type="null"/> 					
-					<element name="SessionId" type="Integer"/>
-					<element name="OfferorName" type="String"/>
-					<element name="RecieverName" type="String"/>
-					<complexelement name="Contracts" type="single">
-						<element name="TemplatedID" type="String"/>
-						<complexelement name="Arguments" type="list">
-							<element name= "name" type="String"/>
-							<element name="value" type="String"/>
-					</complexelement>
-					</complexelement>
-
-					
-				</payload>
-			</request>
-			
-			
-	
-		</method>
-	
-	
-	
-	
-	
+	<interface protocol="HTTP" address="http://192.168.1.35/8888" >	
 	
 		<method name="GET" id="genericpumpblock" path="/data/{BlockInstance}/{DataEntry}">
 		
 		<param name="BlockInstance" required="true" style="template" type="String" />
 		<param name="DataEntry" required="true" style="template" type="String" />
 
-		
-			
-	
 			<response status="200">
 			<format> 
-					<encode name="JSON" mediaType= "JSON" version="0"/>
-					<security name="null" version="0"/>
-					<qos name="null" version="0"/> 
-					<semantic name="null" version="0"/>
-					<notation href="null"/> 
+					<encode name="JSON" mediatype="application/json" version="2.3.0” />
+					<security mode="not_secure"/>
+					<qos level="0"/> 
+					<semantic>
+						<notation ontology="demoCustomize" href="/demo"/> 
+					<semantic/>
 				</format> 
 			<payload>				
 				

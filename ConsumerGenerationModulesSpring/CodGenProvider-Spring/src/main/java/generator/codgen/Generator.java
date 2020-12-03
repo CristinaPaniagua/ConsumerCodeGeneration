@@ -145,7 +145,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
        ExecutorService executor = Executors.newSingleThreadExecutor();
         ProcessBuilder processBuilder = new ProcessBuilder();
 
-        processBuilder.command(("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerGenerationModulesSpring\\CodGenProvider-Spring\\config\\Init.bat"));
+        processBuilder.command(("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCodeGeneration\\ConsumerGenerationModulesSpring\\CodGenProvider-Spring\\config\\Init.bat"));
 
         try {
 
@@ -242,9 +242,10 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
     
     //CommandLineScann
     BconsumeService 
-    .addStatement(" final Scanner sc = new Scanner(System.in)")
+    .beginControlFlow("while(true)")
+    .addStatement("final Scanner sc = new Scanner(System.in)")
     .addStatement("String path=commandLineUI(sc)")
-    .addStatement("sc.close()");
+    ;
     
         
     
@@ -252,7 +253,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
    
      BconsumeService 
      .addStatement("$T httpMethod=HttpMethod.$N",HttpMethod.class,MD.getMethod())
-        
+      .addStatement(" String ServicePath=\"\"")
       .beginControlFlow("switch(path)");
     //System.out.println("Subpath size:"+ MD.subpaths.size()); 
     
@@ -262,7 +263,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
         CodeBlock optionCase=ServiceCode("OBJRequestDTO"+m,"OBJResponseDTO"+m,m);
         BconsumeService           
         .addCode("case \"$L\": \n",subpath)
-        .addStatement("serviceUri=serviceUri+\"$L\"",subpath)
+        .addStatement("ServicePath=serviceUri+\"$L\"",subpath)
         .addCode(optionCase)
         .addStatement("break");
     }
@@ -270,9 +271,8 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
     
      BconsumeService.addCode("default: \n")
      .addStatement("//TODO")
+     .endControlFlow()
      .endControlFlow();
-    
-    
     
  
     }else{
@@ -300,6 +300,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
      
     CodeBlock.Builder BconsumeService  = CodeBlock.builder()
             .addStatement ("//Import $T",ArrayList.class);
+           
     
      
     
@@ -330,7 +331,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
               
         
          
-            BconsumeService.addStatement("final ResponseDTO$L $L$L= arrowheadService.consumeServiceHTTP(ResponseDTO$L.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO$L,null,null)",index,MD.ID,index,index,index) 
+            BconsumeService.addStatement("final ResponseDTO$L $L$L= arrowheadService.consumeServiceHTTP(ResponseDTO$L.class,httpMethod,address,port,ServicePath,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO$L,null,null)",index,MD.ID,index,index,index) 
             .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L$L)))",Utilities.class,MD.ID,index);   
      
             //TODO: CHECK AND DEBUG THIS PART
@@ -338,14 +339,14 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
          
          String ctype=MD.getComplexType_response();
                   Type t=getComplexType(ctype);
-                  BconsumeService.addStatement("final $T $L$L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO$L,null,null)",t,MD.ID,index,t,index)
+                  BconsumeService.addStatement("final $T $L$L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,ServicePath,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO$L,null,null)",t,MD.ID,index,t,index)
                 .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L$L)))",Utilities.class,MD.ID,index);   
      
      }else if(!complextype_request.equals("null") && complextype_response.equals("null")){ //TODO: CHECK THIS CASE: PROBABLY IT DOES NOT WORK
          
          String ctype=MD.getComplexType_request();
                   Type t=getComplexType(ctype);
-                  BconsumeService.addStatement("final $T $L$L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO$L,null,null)",t,MD.ID,index,t,index)
+                  BconsumeService.addStatement("final $T $L$L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,ServicePath,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO$L,null,null)",t,MD.ID,index,t,index)
                 .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L$L)))",Utilities.class,MD.ID,index);   
      
      }else{
@@ -373,13 +374,13 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
           
           if(complextype==null){        
               
-            BconsumeService.addStatement("final String $L$L= arrowheadService.consumeServiceHTTP(String.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO$L,null,null)",MD.ID,index,index) 
+            BconsumeService.addStatement("final String $L$L= arrowheadService.consumeServiceHTTP(String.class,httpMethod,address,port,ServicePath,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO$L,null,null)",MD.ID,index,index) 
             .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L$L)))",Utilities.class,MD.ID,index);   
      
              }else{
                  String ctype=MD.getComplexType_request();
                   Type t=getComplexType(ctype);
-                  BconsumeService.addStatement("final $T $L$L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO$L,null,null)",t,MD.ID,index,t,index)
+                  BconsumeService.addStatement("final $T $L$L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,ServicePath,\"HTTP-INSECURE-JSON\",null,OBJRequestDTO$L,null,null)",t,MD.ID,index,t,index)
                 .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L$L)))",Utilities.class,MD.ID,index);   
                  }
          
@@ -396,13 +397,13 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
          
           if(complextype==null){        
               
-            BconsumeService.addStatement("final ResponseDTO$L $L$L= arrowheadService.consumeServiceHTTP(ResponseDTO$L.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,null,null,null)",index,MD.ID,index,index) 
+            BconsumeService.addStatement("final ResponseDTO$L $L$L= arrowheadService.consumeServiceHTTP(ResponseDTO$L.class,httpMethod,address,port,ServicePath,\"HTTP-INSECURE-JSON\",null,null,null,null)",index,MD.ID,index,index) 
             .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L$L)))",Utilities.class,MD.ID,index);   
      
              }else{
                  String ctype=MD.getComplexType_response();
                   Type t=getComplexType(ctype);
-                  BconsumeService.addStatement("final $T $L$L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,serviceUri,\"HTTP-INSECURE-JSON\",null,null,null,null)",t,MD.ID,index,t)
+                  BconsumeService.addStatement("final $T $L$L = arrowheadService.consumeServiceHTTP($T.class,httpMethod,address,port,ServicePath,\"HTTP-INSECURE-JSON\",null,null,null,null)",t,MD.ID,index,t)
                 .addStatement("System.out.println($T.toPrettyJson(Utilities.toJson($L$L)))",Utilities.class,MD.ID,index);   
                  }
          
@@ -412,7 +413,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
     }//else Single Case
     
    
-     
+   
     
 
     
@@ -644,7 +645,7 @@ private static ArrayList<String> classesResponse= new ArrayList<String>();
                 .addFileComment("Auto generated")
                 .build();
         try{
-            javaFile2.writeTo(Paths.get("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCodeGeneration\\ConsumerGenerationModulesSpring\\TesterSpring\\src\\main\\java"));
+            javaFile2.writeTo(Paths.get("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCodeGeneration\\ConsumerGenerationModulesSpring\\Generated_consumer\\src\\main\\java"));
         }catch (IOException ex){
             System.out.print("Exception:" + ex.getMessage());
         }

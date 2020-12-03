@@ -1,8 +1,7 @@
 
 cd ..
-cd TesterSpring
+cd Generated_consumer
 
 mvn clean install 
-PAUSE
-java -jar target\TesterSpring-4.1.3.1.jar
+java -jar target\Generated_consumer-4.1.3.1.jar
 PAUSE
