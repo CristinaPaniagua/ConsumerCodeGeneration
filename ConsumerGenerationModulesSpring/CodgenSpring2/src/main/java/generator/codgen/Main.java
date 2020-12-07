@@ -50,7 +50,7 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
       
              
      if(MD_Provider.getRequest()){
-           ClassGen Request=new ClassGen();
+           ClassGenSimple Request=new ClassGenSimple();
        
              for(int i=0; i<MD_Provider.elements_request.size();i++)
              {
@@ -64,7 +64,7 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
         
        
         if(MD_Provider.getResponse()){
-            ClassGen Response=new ClassGen();
+            ClassGenSimple Response=new ClassGenSimple();
       
                  for(int j=0; j<MD_Provider.elements_response.size();j++)
                  {
@@ -76,7 +76,7 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
         
         
          if(MD_Consumer.getRequest()){
-           ClassGen Request=new ClassGen();
+           ClassGenSimple Request=new ClassGenSimple();
        
              for(int i=0; i<MD_Consumer.elements_request.size();i++)
              {
@@ -90,7 +90,7 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
         
        
         if(MD_Consumer.getResponse()){
-            ClassGen Response=new ClassGen();
+            ClassGenSimple Response=new ClassGenSimple();
       
                  for(int j=0; j<MD_Consumer.elements_response.size();j++)
                  {

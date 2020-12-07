@@ -16,13 +16,14 @@ package generator.codgen;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.github.underscore.lodash.U;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import static generator.codgen.EncodingParser.createObjectMapper;
-import resources.RequestDTO_C0;
+import eu.generator.resources.RequestDTO_C0;
 import java.io.IOException;
 import java.nio.file.Paths;
 import javax.ws.rs.Path;
@@ -39,8 +40,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import eu.generator.resources.ResponseDTO_P0;
 public class ResourceLWGen {
     
     
@@ -78,6 +81,7 @@ public class ResourceLWGen {
     public static MethodSpec methodgen (InterfaceMetadata MD_C,InterfaceMetadata MD_P ){
  
     
+    String pathP=MD_P.getPathResource();
     
     
     
@@ -97,10 +101,15 @@ public class ResourceLWGen {
                  .builder(Produces.class)
                  .addMember("value", "$T.APPLICATION_XML", MediaType.class)
                  .build();
+    }else if(MD_C.getMediatype_response().equalsIgnoreCase("CBOR")){
+        produces= AnnotationSpec
+                 .builder(Produces.class)
+                 .addMember("value", "\"application/cbor\"")
+                 .build();
     }else{
           produces= AnnotationSpec
                  .builder(Produces.class)
-                 .addMember("value", "*/*", MediaType.class)
+                 .addMember("value", "\"*/*\"", MediaType.class)
                  .build();
     } 
      
@@ -145,7 +154,7 @@ public class ResourceLWGen {
          methodgen.addAnnotation(POST.class);
      }else if(MD_C.getMethod().equalsIgnoreCase("GET"))  methodgen.addAnnotation(GET.class);
      
-     CodeBlock mapperCode=createObjectMapper(MD_C.getMediatype_request());
+     CodeBlock mapperCode=createObjectMapper(MD_C.getMediatype_request(),"objMapper");
      
       methodgen.addAnnotation(path)
      .addAnnotation(produces)
@@ -162,7 +171,7 @@ public class ResourceLWGen {
      .beginControlFlow("try")
       .addStatement("payload=objMapper.readValue(receivedPayload, RequestDTO_C0.class)")
       .addStatement("System.out.println(payload.toString())")
-      .addStatement("response=consumeService(\"http://127.0.0.1:8889/demo/testTranslation\",payload)")
+      .addStatement("response=consumeService(\"http://127.0.0.1:8889/demo$L\",payload)",pathP)
      .endControlFlow()
      .beginControlFlow("catch ($T e)",Exception.class)      
      .addStatement(" e.printStackTrace()")
@@ -178,7 +187,7 @@ public class ResourceLWGen {
           return methodgen.build();
      }
     
-     public static MethodSpec consumeService (InterfaceMetadata MD_P){
+     public static MethodSpec consumeService (InterfaceMetadata MD_C, InterfaceMetadata MD_P){
          
      MethodSpec.Builder consumer = MethodSpec.methodBuilder("consumeService")
      .addModifiers(Modifier.PRIVATE)
@@ -191,7 +200,8 @@ public class ResourceLWGen {
      
       consumer
      .addStatement("$T httpClient = $T.createDefault()",CloseableHttpClient.class,HttpClients.class)
-     .addStatement(" String result = \"\"")   
+     .addStatement(" String result_in = \"\"") 
+     .addStatement(" String result_out = \"\"") 
      .beginControlFlow("try");
       //TODO: ADD THE REST OF THE METHODS (PUT AND DELETE)
      if(MD_P.getMethod().equalsIgnoreCase("POST")){
@@ -229,14 +239,39 @@ public class ResourceLWGen {
                 
        consumer.addStatement(" request.setEntity(new $T(createdPayload))",StringEntity.class);  
                
-               }
-       
+               } 
+
+            CodeBlock mapperResponseProvider=createObjectMapper(MD_P.getMediatype_response(),"objMapperP");
+            CodeBlock mapperResponseConsumer=createObjectMapper(MD_C.getMediatype_response(),"objMapperC");
+           
        consumer.addStatement(" $T response = httpClient.execute(request)",CloseableHttpResponse.class) 
        .beginControlFlow("try")  
             .addStatement(" $T entity = response.getEntity()", HttpEntity.class)
+            .addCode(mapperResponseProvider)
+            .addStatement("$T contentType = ContentType.getOrDefault(entity)",ContentType.class)
+            .addStatement("String mimeType = contentType.getMimeType()") 
+            .addStatement("System.out.println(\"Response MediaType: \"+mimeType)")
             .beginControlFlow("if (entity != null)")
-            .addStatement(" result = $T.toString(entity)",EntityUtils.class) 
-            .addStatement("System.out.println(\"Result: \"+ result)")
+            .addStatement(" result_in = $T.toString(entity)",EntityUtils.class)
+            .addStatement("$T responseObj=objMapperP.readValue(result_in,ResponseDTO_P0.class)",ResponseDTO_P0.class)
+            .addCode(mapperResponseConsumer)
+            .addStatement("result_out=objMapperC.writeValueAsString(responseObj)");
+            
+       Boolean Payload=true;
+       if(Payload==false){
+            if(MD_C.getMediatype_response().equalsIgnoreCase("XML") && MD_P.getMediatype_response().equalsIgnoreCase("JSON")){
+                 consumer.addStatement("result_out= $T.jsonToXml(result_in)",U.class);
+             }else if(MD_C.getMediatype_response().equalsIgnoreCase("JSON") && MD_P.getMediatype_response().equalsIgnoreCase("XML")){
+                  consumer.addStatement("result_out= $T.xmlToJson(result_in)",U.class);
+            }else{
+                  consumer.addStatement("result_out=result_in");
+            }
+       }
+       
+      
+            
+            consumer.addStatement("System.out.println(\"Response In: \"+ result_in)")
+            .addStatement("System.out.println(\"Response Out: \"+ result_out)")
             .endControlFlow() //TODO: ADD ELSE 
        .endControlFlow() 
        .beginControlFlow("finally")
@@ -246,7 +281,7 @@ public class ResourceLWGen {
       .beginControlFlow("finally")
         .addStatement("httpClient.close()")
       .endControlFlow() 
-      .addStatement("return result"); 
+      .addStatement("return result_out"); 
      
       
      
@@ -260,7 +295,7 @@ public class ResourceLWGen {
   
        MethodSpec testEcho=  testEcho();
        MethodSpec methodgen=methodgen(MD_C, MD_P);
-       MethodSpec consumeService =consumeService(MD_P); 
+       MethodSpec consumeService =consumeService(MD_C,MD_P); 
         
         
         
@@ -285,7 +320,7 @@ public class ResourceLWGen {
                
  
   
-        JavaFile javaFile2 = JavaFile.builder("resources",RclassGen)
+        JavaFile javaFile2 = JavaFile.builder("eu.generator.resources",RclassGen)
                 .addFileComment("Auto generated")
                 .build();
         try{
