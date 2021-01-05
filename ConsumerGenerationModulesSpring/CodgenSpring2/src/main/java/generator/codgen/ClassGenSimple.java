@@ -14,6 +14,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
+import eu.arrowhead.common.CodgenUtil;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -91,7 +92,7 @@ public class ClassGenSimple {
 
              
              
-               TypeName t= getTypeCom(name, type);
+               TypeName t= CodgenUtil.getTypeCom(name, type);
                  BFullConsructor
                     .addParameter(t,name)
                     .addStatement("this.$N = $N", name, name);
@@ -99,7 +100,7 @@ public class ClassGenSimple {
             else{  
     
                     BFullConsructor
-                    .addParameter(getType(type),name)
+                    .addParameter(CodgenUtil.getType(type),name)
                     .addStatement("this.$N = $N", name, name);
                     
               }
@@ -113,7 +114,7 @@ public class ClassGenSimple {
                 var.add(ele); 
                 //System.out.println(i+" "+ele[0]);
                    BFullConsructor
-                      .addParameter(getType(type),name)
+                      .addParameter(CodgenUtil.getType(type),name)
                      .addStatement("this.$N = $N", name, name);
                      
         }
@@ -140,11 +141,11 @@ public class ClassGenSimple {
      
       if(type.equalsIgnoreCase("single")||type.startsWith("List")){
                
-                get.returns(getTypeCom(name, type))
+                get.returns(CodgenUtil.getTypeCom(name, type))
                 .addStatement("return "+name);
                 
       }else {
-                get.returns(getType(type))
+                get.returns(CodgenUtil.getType(type))
                 .addStatement("return "+name);
                 
       }
@@ -193,11 +194,11 @@ public class ClassGenSimple {
      
       if(type.equalsIgnoreCase("single")||type.startsWith("List")){
                
-                set.addParameter(getTypeCom(name, type),name)
+                set.addParameter(CodgenUtil.getTypeCom(name, type),name)
                 .addStatement("this."+name+"="+name);
                 
       }else {
-     set.addParameter(getType(type),name)
+     set.addParameter(CodgenUtil.getType(type),name)
      .addStatement("this."+name+"="+name);
       }
      
@@ -254,7 +255,7 @@ public class ClassGenSimple {
              //System.out.println("type " +type+" name "+name);
             if(type.equalsIgnoreCase("single")||type.startsWith("List")){
 
-               TypeName t= getTypeCom(name, type);
+               TypeName t= CodgenUtil.getTypeCom(name, type);
                   BclassGen.addField(t, name, Modifier.PRIVATE)
                  .addMethod(methodget)
                  .addMethod(methodset);
@@ -263,7 +264,7 @@ public class ClassGenSimple {
             }
             else{  
             
-             Type T=getType(type);
+             Type T=CodgenUtil.getType(type);
             BclassGen.addField(T,name, Modifier.PRIVATE)
                  .addMethod(methodget)
                  .addMethod(methodset);
@@ -275,7 +276,7 @@ public class ClassGenSimple {
            
         MethodSpec methodget= get(name,type);
         MethodSpec methodset= set(name,type);
-        Type T=getType(type);
+        Type T=CodgenUtil.getType(type);
         BclassGen.addField(T, name, Modifier.PRIVATE)
                  .addMethod(methodget)
                  .addMethod(methodset);
@@ -350,51 +351,9 @@ public class ClassGenSimple {
         
      }
      
-     public  Type getType(String type){
-         Type t;
-         
-         if(type.equalsIgnoreCase("String")) t=String.class;
-         else if (type.equalsIgnoreCase("Boolean")) t=Boolean.class;
-         else if (type.equalsIgnoreCase("Integer")) t=Integer.class;
-         else if (type.equalsIgnoreCase("Byte")) t=Byte.class;
-         else if (type.equalsIgnoreCase("Double")) t=double.class;
-         else if (type.equalsIgnoreCase("Float")) t=Float.class;
-         else if (type.equalsIgnoreCase("Short")) t=Short.class;
-         else if (type.equalsIgnoreCase("Long")) t=Long.class;
-          else if (type.equalsIgnoreCase("Single")) t=Object.class;
-         else if (type.startsWith("List")){
-             //ParameterizedTypeName ListType =ParameterizedTypeName.get(List.class, Object.class);
-             t=List.class;
-         }
-         
-        
-         
-         //TODO: ADD MORE TYPES
-        
-         else t=Object.class;
-         return t;
-     }
      
-      public  TypeName getTypeCom(String name, String type){
-         TypeName t;
-         String Name = name.substring(0, 1).toUpperCase() + name.substring(1, name.length()); 
-         
-         if (type.equalsIgnoreCase("List"))   t = ParameterizedTypeName.get(ClassName.get(List.class),TypeVariableName.get(name) );
-         else if (type.equalsIgnoreCase("single"))  t =TypeVariableName.get(Name); 
-         else  t =TypeVariableName.get(Name);
-         
-         //TODO: ADD MORE COMPLEX TYPES
-             return t;
-             }
+     
       
-       public static void readList (ArrayList<String[]> elements){
-        
-        for (int i = 0; i < elements.size(); i++){ 
-            String[] ele=elements.get(i);
-            for (int j = 0; j < ele.length; j++){
-                System.out.println(i+"."+j+" :"+elements.get(i)[j]);
-            }
-            
-        }
-       }
+      
+ 
 }

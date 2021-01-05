@@ -12,6 +12,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
+import eu.arrowhead.common.CodgenUtil;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Paths;
@@ -147,20 +148,11 @@ public class ClassGenNested {
         classesDummy.add(CS); 
        // System.out.println("ADDTION TO CS:"+CS);
         //System.out.println(newclass.get(0)[0]+" , "+newclass.get(1)[0]);
-        //ClassGen1 c1=new ClassGen1();
         classGen(newclass,className);
         return j;
     }
     
-    public  MethodSpec  constructor (String name){
-        
-     MethodSpec consructor = MethodSpec.constructorBuilder()
-     .addModifiers(Modifier.PUBLIC)
-    .build();
-     
-    
-     return consructor;
-    }
+
     
         
     public  MethodSpec  fullConstructor ( ArrayList<String[]> elements,String className){
@@ -176,7 +168,7 @@ public class ClassGenNested {
         
             if(type.equalsIgnoreCase("single")||type.startsWith("List")){
 
-               TypeName t= getTypeCom(name, type);
+               TypeName t= CodgenUtil.getTypeCom(name, type);
                  BFullConsructor
                     .addParameter(t,name)
                     .addStatement("this.$N = $N", name, name);
@@ -184,7 +176,7 @@ public class ClassGenNested {
             else{  
     
                     BFullConsructor
-                    .addParameter(getType(type),name)
+                    .addParameter(CodgenUtil.getType(type),name)
                     .addStatement("this.$N = $N", name, name);
                     
               }
@@ -196,29 +188,9 @@ public class ClassGenNested {
       return FullConsructor;
     }
     
- public  MethodSpec  get (String name, String type){
-        
-     MethodSpec.Builder get = MethodSpec.methodBuilder("get"+name)
-     .addModifiers(Modifier.PUBLIC);
-     
-      if(type.equalsIgnoreCase("single")||type.startsWith("List")){
-               
-                get.returns(getTypeCom(name, type))
-                .addStatement("return "+name);
-                
-      }else {
-                get.returns(getType(type))
-                .addStatement("return "+name);
-                
-      }
 
-     
-     
-      
-     return get.build();
-    }
     
-    
+   /* 
     public  MethodSpec  toString (ArrayList<String[]> elements){
         
           String S="";
@@ -238,36 +210,18 @@ public class ClassGenNested {
       
      return toString;
     }
-    
-   public  MethodSpec  set (String name, String type){
-        
-     MethodSpec.Builder set  = MethodSpec.methodBuilder("set"+name)
-    .addModifiers(Modifier.PUBLIC);
-     
-      if(type.equalsIgnoreCase("single")||type.startsWith("List")){
-               
-                set.addParameter(getTypeCom(name, type),name)
-                .addStatement("this."+name+"="+name);
-                
-      }else {
-     set.addParameter(getType(type),name)
-     .addStatement("this."+name+"="+name);
-      }
-     
-     
-      
-     return set.build();
-    }
+    */
+
     
     
     public  void classGen ( ArrayList<String[]> elements , String className){
          
-        
+     ClassGenSimple cg=new ClassGenSimple();   
      String ClassName =className.substring(0, 1).toUpperCase() + className.substring(1,className.length()); 
      
-        MethodSpec constructor= constructor(ClassName);
+        MethodSpec constructor= cg.constructor(ClassName);
         MethodSpec fullConstructor=fullConstructor(elements,ClassName);
-        MethodSpec toString=toString(elements);
+        MethodSpec toString=cg.toString(elements);
       
      TypeSpec.Builder BclassGen =TypeSpec.classBuilder(ClassName)
               .addModifiers(Modifier.PUBLIC)
@@ -281,18 +235,18 @@ public class ClassGenNested {
  for (int i = 0; i < elements.size(); i++){ 
         String name=elements.get(i)[0];
         String type=elements.get(i)[1];
-        MethodSpec methodget= get(name,type);
-        MethodSpec methodset= set(name,type);
+        MethodSpec methodget= cg.get(name,type);
+        MethodSpec methodset= cg.set(name,type);
             if(type.equalsIgnoreCase("single")||type.startsWith("List")){
 
-               TypeName t= getTypeCom(name, type);
+               TypeName t= CodgenUtil.getTypeCom(name, type);
                   BclassGen.addField(t, name, Modifier.PRIVATE)
                  .addMethod(methodget)
                  .addMethod(methodset);
             }
             else{  
             
-             Type T=getType(type);
+             Type T=CodgenUtil.getType(type);
             BclassGen.addField(T,name, Modifier.PRIVATE)
                  .addMethod(methodget)
                  .addMethod(methodset);
@@ -322,47 +276,7 @@ public class ClassGenNested {
         
      }
      
-    public  Type getType(String type){
-         Type t;
-         
-         if(type.equalsIgnoreCase("String")) t=String.class;
-         else if (type.equalsIgnoreCase("Boolean")) t=Boolean.class;
-         else if (type.equalsIgnoreCase("Integer")) t=Integer.class;
-         else if (type.equalsIgnoreCase("Byte")) t=Byte.class;
-         else if (type.equalsIgnoreCase("Double")) t=Double.class;
-         else if (type.equalsIgnoreCase("Float")) t=Float.class;
-         else if (type.equalsIgnoreCase("Short")) t=Short.class;
-         else if (type.equalsIgnoreCase("Long")) t=Long.class;
-         
-         
+
         
-         
-         //TODO: ADD MORE TYPES
-        
-         else t=Object.class;
-         return t;
-     }
-     
-      public  TypeName getTypeCom(String name, String type){
-         TypeName t;
-         
-         
-         if (type.equalsIgnoreCase("List"))   t = ParameterizedTypeName.get(ClassName.get(List.class),TypeVariableName.get(name) );
-         else if (type.equalsIgnoreCase("single"))  t =TypeVariableName.get(name); 
-         else  t =TypeVariableName.get(name);
-         
-         //TODO: ADD MORE COMPLEX TYPES
-             return t;
-             }
-    public void readList (ArrayList<String[]> elements){
-        
-        for (int i = 0; i < elements.size(); i++){ 
-            String[] ele=elements.get(i);
-            for (int j = 0; j < ele.length; j++){
-                //System.out.println(i+"."+j+" :"+elements.get(i)[j]);
-            }
-            
-        }
-        
-    }
+    
 }

@@ -44,6 +44,17 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import eu.generator.resources.ResponseDTO_P0;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import org.eclipse.californium.core.CoapClient;
+import org.eclipse.californium.core.CoapResponse;
+import org.eclipse.californium.core.Utils;
+import org.eclipse.californium.core.coap.MediaTypeRegistry;
+import org.eclipse.californium.core.network.config.NetworkConfig;
+import org.eclipse.californium.core.network.config.NetworkConfigDefaultHandler;
+import org.eclipse.californium.elements.exception.ConnectorException;
 public class ResourceLWGen {
     
     
@@ -187,9 +198,12 @@ public class ResourceLWGen {
           return methodgen.build();
      }
     
+
+          
+    
      public static MethodSpec consumeService (InterfaceMetadata MD_C, InterfaceMetadata MD_P){
          
-     MethodSpec.Builder consumer = MethodSpec.methodBuilder("consumeService")
+      MethodSpec.Builder consumer = MethodSpec.methodBuilder("consumeService")
      .addModifiers(Modifier.PRIVATE)
      .addModifiers(Modifier.STATIC)
      .returns(String.class)
@@ -197,8 +211,74 @@ public class ResourceLWGen {
      .addParameter(RequestDTO_C0.class, "payload")
      .addException(IOException.class);
          
+           if(MD_P.getProtocol().equalsIgnoreCase("COAP")){ //CONSUMER SIZE is COAP
+               
+                consumer.addStatement("//Adding Import $T",NetworkConfig.class)
+                        .addStatement(" $T CONFIG_FILE = new File(\"Californium.properties\");\n" +
+"	 String CONFIG_HEADER = \"Californium CoAP Properties file for Fileclient\";\n" +
+"	 int DEFAULT_MAX_RESOURCE_SIZE = 2 * 1024 * 1024; // 2 MB\n" +
+"	 int DEFAULT_BLOCK_SIZE = 512;",File.class)
+         .addStatement(" $T DEFAULTS = new NetworkConfigDefaultHandler() {\n" +
+"\n" +
+"		@Override\n" +
+"		public void applyDefaults($T config) {\n" +
+"			config.setInt(NetworkConfig.Keys.MAX_RESOURCE_BODY_SIZE, DEFAULT_MAX_RESOURCE_SIZE);\n" +
+"			config.setInt(NetworkConfig.Keys.MAX_MESSAGE_SIZE, DEFAULT_BLOCK_SIZE);\n" +
+"			config.setInt(NetworkConfig.Keys.PREFERRED_BLOCK_SIZE, DEFAULT_BLOCK_SIZE);\n" +
+"		};}",NetworkConfigDefaultHandler.class,NetworkConfig.class)
+     .addStatement("$T config = $T.createWithFile(CONFIG_FILE, CONFIG_HEADER, DEFAULTS)", NetworkConfig.class,NetworkConfig.class)
+     .addStatement("NetworkConfig.setStandard(config)")
+     .addStatement("$T uri=null", URI.class)
+     .addStatement("String[] args={\"0\"}")
+     .beginControlFlow("try")
+     .addStatement("uri = new URI(\"coap://localhost:5683/publish\")")
+     .nextControlFlow("catch($T e)",URISyntaxException.class)
+     .addStatement("System.err.println(\"Invalid URI: \" + e.getMessage())")
+     .addStatement("System.exit(-1)")
+     .endControlFlow()
+     .addStatement("$T client= new $T(uri)",CoapClient.class,CoapClient.class)
+     .addStatement("$T response = null",CoapResponse.class)
+     .beginControlFlow("try");
      
-      consumer
+     if(MD_P.getMethod().equalsIgnoreCase("GET")){
+     consumer.addStatement("response = client.get()");
+             }
+     if(MD_P.getMethod().equalsIgnoreCase("POST")){
+     consumer.addStatement("String payloadS=args[0]")
+     .addStatement("response = client.put(payloadS, $T.TEXT_PLAIN)",MediaTypeRegistry.class);
+     }
+     if(MD_P.getMethod().equalsIgnoreCase("PUT")){
+     consumer.addStatement("String payload=\"\"")
+     .addStatement("response = client.put(payloadS,$T.TEXT_PLAIN)",MediaTypeRegistry.class);
+     }
+     
+     consumer.nextControlFlow("catch($T|$T e)",ConnectorException.class,IOException.class)
+     .addStatement("System.err.println(\"Got an error: \" + e)")
+     .endControlFlow()
+     .beginControlFlow("if(response!=null)")
+     .addStatement("System.out.println(response.getCode())")
+     .beginControlFlow("if (args.length > 1)")
+     .beginControlFlow("try ($T out = new $T(args[1]))",FileOutputStream.class,FileOutputStream.class)
+     .addStatement("out.write(response.getPayload())")
+     .nextControlFlow("catch ($T e)",IOException.class)
+     .addStatement("e.printStackTrace()")
+     .endControlFlow()   
+     .nextControlFlow("else")      
+     .addStatement("System.out.println(response.getResponseText())") 
+     .addStatement("System.out.println($T.prettyPrint(response))",Utils.class) 
+     .endControlFlow() 
+     .nextControlFlow("else")      
+     .addStatement("System.out.println(\"No response received.\")")
+     .endControlFlow() 
+     .addStatement("client.shutdown()")
+     .addStatement("return response.getResponseText()");
+
+  
+               
+               
+           
+       }else{ //HTTP is the protocol by default --> TODO: add the error if there is not a permited protocol
+            consumer
      .addStatement("$T httpClient = $T.createDefault()",CloseableHttpClient.class,HttpClients.class)
      .addStatement(" String result_in = \"\"") 
      .addStatement(" String result_out = \"\"") 
@@ -284,6 +364,12 @@ public class ResourceLWGen {
       .addStatement("return result_out"); 
      
       
+       }
+         
+    
+         
+     
+     
      
    
      
@@ -296,6 +382,9 @@ public class ResourceLWGen {
        MethodSpec testEcho=  testEcho();
        MethodSpec methodgen=methodgen(MD_C, MD_P);
        MethodSpec consumeService =consumeService(MD_C,MD_P); 
+       
+       
+      
         
         
         
