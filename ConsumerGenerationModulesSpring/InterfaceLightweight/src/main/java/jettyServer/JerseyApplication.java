@@ -19,7 +19,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
 
 import static org.eclipse.jetty.servlet.ServletContextHandler.NO_SESSIONS;
-import resources.RESTResources;
+import eu.generator.resources.RESTResources;
 
 public class JerseyApplication {
     public static void main(String[] args) throws Exception {
