@@ -217,7 +217,7 @@ public class ResourceLWGen {
                         .addStatement(" $T CONFIG_FILE = new File(\"Californium.properties\");\n" +
 "	 String CONFIG_HEADER = \"Californium CoAP Properties file for Fileclient\";\n" +
 "	 int DEFAULT_MAX_RESOURCE_SIZE = 2 * 1024 * 1024; // 2 MB\n" +
-"	 int DEFAULT_BLOCK_SIZE = 512;",File.class)
+"	 int DEFAULT_BLOCK_SIZE = 512",File.class)
          .addStatement(" $T DEFAULTS = new NetworkConfigDefaultHandler() {\n" +
 "\n" +
 "		@Override\n" +
@@ -229,7 +229,7 @@ public class ResourceLWGen {
      .addStatement("$T config = $T.createWithFile(CONFIG_FILE, CONFIG_HEADER, DEFAULTS)", NetworkConfig.class,NetworkConfig.class)
      .addStatement("NetworkConfig.setStandard(config)")
      .addStatement("$T uri=null", URI.class)
-     .addStatement("String[] args={\"0\"}")
+     .addStatement("String[] args={\"{\\\"name\\\":\\\"TemperatureService\\\"}\"}")
      .beginControlFlow("try")
      .addStatement("uri = new URI(\"coap://localhost:5683/publish\")")
      .nextControlFlow("catch($T e)",URISyntaxException.class)
@@ -245,7 +245,7 @@ public class ResourceLWGen {
              }
      if(MD_P.getMethod().equalsIgnoreCase("POST")){
      consumer.addStatement("String payloadS=args[0]")
-     .addStatement("response = client.put(payloadS, $T.TEXT_PLAIN)",MediaTypeRegistry.class);
+     .addStatement("response = client.post(payloadS,$T.APPLICATION_JSON)",MediaTypeRegistry.class);
      }
      if(MD_P.getMethod().equalsIgnoreCase("PUT")){
      consumer.addStatement("String payload=\"\"")
