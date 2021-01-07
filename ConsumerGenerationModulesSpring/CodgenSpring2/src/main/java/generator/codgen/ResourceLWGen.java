@@ -229,7 +229,7 @@ public class ResourceLWGen {
      .addStatement("$T config = $T.createWithFile(CONFIG_FILE, CONFIG_HEADER, DEFAULTS)", NetworkConfig.class,NetworkConfig.class)
      .addStatement("NetworkConfig.setStandard(config)")
      .addStatement("$T uri=null", URI.class)
-     .addStatement("String[] args={\"{\\\"name\\\":\\\"TemperatureService\\\"}\"}")
+     .addStatement("String[] args={\"0\"}")
      .beginControlFlow("try")
      .addStatement("uri = new URI(\"coap://localhost:5683/publish\")")
      .nextControlFlow("catch($T e)",URISyntaxException.class)
@@ -242,15 +242,46 @@ public class ResourceLWGen {
      
      if(MD_P.getMethod().equalsIgnoreCase("GET")){
      consumer.addStatement("response = client.get()");
-             }
-     if(MD_P.getMethod().equalsIgnoreCase("POST")){
-     consumer.addStatement("String payloadS=args[0]")
-     .addStatement("response = client.post(payloadS,$T.APPLICATION_JSON)",MediaTypeRegistry.class);
+     }else
+     { 
+         
+         
+         if(MD_P.getMediatype_request().equalsIgnoreCase("JSON"))
+         { 
+          consumer.addStatement("String payloadS=new $T().writeValueAsString(payload)",ObjectMapper.class)
+          .addStatement("System.out.println(\"Payload Sent: \" + payloadS)");
+          
+            if(MD_P.getMethod().equalsIgnoreCase("POST"))
+            {
+             consumer.addStatement("response = client.post(payloadS,$T.APPLICATION_JSON)",MediaTypeRegistry.class);
+              }
+            if(MD_P.getMethod().equalsIgnoreCase("PUT"))
+            {
+            consumer.addStatement("response = client.put(payloadS,$T.APPLICATION_JSON)",MediaTypeRegistry.class);
+              }
+         }
+         
+             if(MD_P.getMediatype_request().equalsIgnoreCase("XML"))
+         { 
+          consumer
+          .addStatement("$T xmlMapper = new XmlMapper()",XmlMapper.class)
+          .addStatement("String payloadS=xmlMapper.writeValueAsString(payload)")
+          .addStatement("System.out.println(\"Payload Sent: \" + payloadS)");
+             
+             
+            if(MD_P.getMethod().equalsIgnoreCase("POST"))
+            {
+             consumer.addStatement("response = client.post(payloadS,$T.APPLICATION_XML)",MediaTypeRegistry.class);
+              }
+            if(MD_P.getMethod().equalsIgnoreCase("PUT"))
+            {
+            consumer.addStatement("response = client.put(payloadS,$T.APPLICATION_XML)",MediaTypeRegistry.class);
+              }
+         }
+         
+         
      }
-     if(MD_P.getMethod().equalsIgnoreCase("PUT")){
-     consumer.addStatement("String payload=\"\"")
-     .addStatement("response = client.put(payloadS,$T.TEXT_PLAIN)",MediaTypeRegistry.class);
-     }
+    
      
      consumer.nextControlFlow("catch($T|$T e)",ConnectorException.class,IOException.class)
      .addStatement("System.err.println(\"Got an error: \" + e)")

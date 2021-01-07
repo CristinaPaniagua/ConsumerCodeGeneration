@@ -43,15 +43,15 @@ public class ConsumerResources {
   @ResponseBody
   public String offer(@RequestBody final RequestDTO DTO) {
    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        System.out.println(timestamp);
+       // System.out.println(timestamp);
         long tstart =timestamp.getTime();
-     System.out.println("Request Payload:"+Utilities.toJson(DTO));
-    String response=consumeService("127.0.0.1",8888, "/demo/negotiation/session-data",DTO);
+     //System.out.println("Request Payload:"+Utilities.toJson(DTO));
+    String response=consumeService("127.0.0.1",8889, "/demo/negotiation/session-data",DTO);
     if(response==null){
         return "ERROR: EMPTY RESPONSE";
     }else{
         Timestamp timestampEnd = new Timestamp(System.currentTimeMillis());
-        System.out.println(timestampEnd);
+        //System.out.println(timestampEnd);
         long tend = timestampEnd.getTime();
          
         System.out.println(tend-tstart);    
