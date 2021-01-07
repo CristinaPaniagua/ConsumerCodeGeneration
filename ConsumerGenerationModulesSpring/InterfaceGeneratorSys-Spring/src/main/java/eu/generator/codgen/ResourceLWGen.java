@@ -321,7 +321,7 @@ public class ResourceLWGen {
                
  
   
-        JavaFile javaFile2 = JavaFile.builder("resources",RclassGen)
+        JavaFile javaFile2 = JavaFile.builder("eu.generator.resources",RclassGen)
                 .addFileComment("Auto generated")
                 .build();
         try{

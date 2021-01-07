@@ -189,7 +189,7 @@ public class ClassGen1 {
                
  
   
-        JavaFile javaFile2 = JavaFile.builder("resources",classGen)
+        JavaFile javaFile2 = JavaFile.builder("eu.generator.resources",classGen)
                 .addFileComment("Auto generated")
                 .build();
         try{
