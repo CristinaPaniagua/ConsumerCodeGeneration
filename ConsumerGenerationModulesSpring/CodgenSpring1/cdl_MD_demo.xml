@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contract xmlns="http://cdl/2018/01" xmlns:xsd="http://www.w3.org/2001/XMLSchema" >
+	
+	<context xml:lang="EN">
+		<keywords>Management Demo</keywords>
+	</context>
+
+	<interface protocol="HTTP" address="http://192.168.1.35/8888" >	
+	
+		<method name="GET" id="getData" path="/data/{BlockInstance}/{DataEntry}">
+		
+		<param name="BlockInstance" required="true" style="template" type="String" />
+		<param name="DataEntry" required="true" style="template" type="String" />
+
+			<response status="200">
+			<format> 
+					<encode name="JSON" mediatype="application/json" version="2.3.0” />
+					<security mode="not_secure"/>
+					<qos level="0"/> 
+					<semantic>
+						<notation ontology="demoCustomize" href="/demo"/> 
+					<semantic/>
+				</format> 
+			<payload>				
+				
+				<option value="/GeneralPumpBlock/pressure_information" >
+					<complextype type="null"/> 					
+					<complexelement name="pressure_information" type="single">
+						<element name="value" type="Double"/>
+						<element name="time_stamp" type="long"/>
+						<element name="physical_unit" type="String"/>
+					</complexelement>
+				</option>
+                                <option value="/GeneralPumpBlock/rotation_speed" >
+					<complextype type="null"/> 					
+					<complexelement name="rotation_speed" type="single">
+						<element name="value" type="Double"/>
+						<element name="time_stamp" type="long"/>
+						<element name="description" type="String"/>
+					</complexelement>
+				</option>
+                                <option value="/GeneralPumpBlock/static_motor_information" >
+					<complextype type="null"/> 					
+					<complexelement name="static_motor_information" type="single">
+						<element name="manufacturer" type="String"/>
+						<element name="order_number" type="String"/>
+					</complexelement>
+				</option>
+                                <option value="/GeneralPumpBlock/dynamic_motor_information" >
+					<complextype type="null"/> 					
+					<complexelement name="dynamic_motor_information" type="single">
+						<element name="rotation_speed" type="Double"/>
+						<element name="electrical_current" type="Double"/>
+					</complexelement>
+				</option>
+
+			</payload>
+			
+			</response>
+			
+		
+		</method>
+	
+	
+	
+	
+		<method name="GET" id="getDataManufacturer" path="/data/EquipmentInfo/manufacturer">
+
+		<request>
+			<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+					<complextype type="null"/> 					
+					<element name="test" type="String"/>
+					<element name="test2" type="Integer"/>
+				</payload>
+			
+			</request>
+
+			<response status="200">
+				<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+					<complextype type="null"/> 					
+					<element name="manufacturer" type="String"/>
+				</payload>
+			
+			</response>	
+
+			
+	
+		</method>
+		
+		
+		
+		<method name="GET" id="getDataDevice_type" path="/data/EquipmentInfo/device_type">
+
+			
+			<response status="200">
+			<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+					<complextype type="null"/> 					
+					<element name="device_type" type="String"/>
+				</payload>
+			
+			</response>
+		</method>
+		
+			
+		<method name="GET" id="getDataSerial_number" path="/data/EquipmentInfo/serial_number">
+
+			
+			<response status="200">
+			<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+					<complextype type="null"/> 					
+					<element name="serial_number" type="String"/>
+				</payload>
+			
+			</response>
+	
+		</method>
+		
+		
+		
+		<method name="GET" id="getDataFluid_temperature" path="/data/HydraulicPumpBlock/fluid_temperature">
+
+			
+			<response status="200">
+			<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+					<complextype type="null"/> 					
+					<complexelement name="value" type="single">
+						<element name="value" type="Float"/>
+						<element name="timestamp" type="Integer"/>
+						<element name="quality" type="Integer"/>
+					</complexelement>
+				</payload>
+			
+			</response>
+			
+	
+			
+			
+		
+	
+		</method>
+		
+		
+		<method name="GET" id="getDataOutput_pressure" path="/data/HydaulicPumpBlock/output_pressure">
+
+			
+			<response status="200">
+			<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+					<complextype type="null"/> 					
+					<complexelement name="value" type="single">
+						<element name="value" type="Float"/>
+						<element name="timestamp" type="Integer"/>
+						<element name="quality" type="Integer"/>
+					
+					</complexelement>
+				</payload>
+			
+			</response>
+	
+		</method>
+		
+		
+		<method name="GET" id="getDataTemperature" path="/data/TemperatureSensorBlock/temperature">
+
+			
+			<response status="200">
+			<format> 
+					<encode name="JSON" mediaType= "JSON" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+				<payload>	
+					<complextype type="null"/> 					
+					<complexelement name="value" type="single">
+						<element name="value" type="Float"/>
+						<element name="timestamp" type="Integer"/>
+						<element name="quality" type="Integer"/>
+					
+					</complexelement>
+				</payload>
+			
+			</response>
+	
+		</method>
+		
+		
+
+	</interface>
+</contract>
