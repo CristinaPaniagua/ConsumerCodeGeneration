@@ -9,7 +9,7 @@
 
 	<interface protocol="COAP" address="http://127.0.0.1/8888" >
 	
-		<method name="POST" id="offer" path="/testTranslationB">
+		<method name="GET" id="offer" path="/testTranslationB">
 
 			<request>
 				<format> 

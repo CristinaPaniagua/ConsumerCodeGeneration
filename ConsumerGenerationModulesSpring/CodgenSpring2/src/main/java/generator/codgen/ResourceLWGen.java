@@ -100,6 +100,8 @@ public class ResourceLWGen {
     String pathP=MD_P.getPathResource();
     
     MethodSpec.Builder methodgen;
+    CodeBlock mapperCode=createObjectMapper(MD_C.getMediatype_request(),"objMapper");
+    
     
     if(MD_C.Protocol.equalsIgnoreCase("HTTP")){
     
@@ -172,7 +174,7 @@ public class ResourceLWGen {
          methodgen.addAnnotation(POST.class);
      }else if(MD_C.getMethod().equalsIgnoreCase("GET"))  methodgen.addAnnotation(GET.class);
      
-     CodeBlock mapperCode=createObjectMapper(MD_C.getMediatype_request(),"objMapper");
+     
      
       methodgen.addAnnotation(path)
      .addAnnotation(produces)
@@ -182,46 +184,61 @@ public class ResourceLWGen {
       }else{
            methodgen.addParameter(String.class,"receivedPayload");
       }
+      
+    } else{ //COAP
+        
+        if(MD_C.getMethod().equalsIgnoreCase("POST")){
+             methodgen = MethodSpec.methodBuilder("handlePOST")
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(CoapExchange.class,"exchange")
+            .addStatement("exchange.getRequestText()");
+          
+        }else 
+            {//if(MD_C.getMethod().equalsIgnoreCase("GET"))  
+             methodgen = MethodSpec.methodBuilder("handleGET")
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(CoapExchange.class,"exchange");
+       
+            }
+        
+        
+        methodgen.addStatement("System.out.println(exchange.getRequestText())")
+               .addStatement("String receivedPayload=exchange.getRequestText()");
+               
+        
+         }
        methodgen 
      .addStatement("RequestDTO_C0 payload=new RequestDTO_C0()")
      .addStatement(" String response=null")
-     .addCode(mapperCode)
+     //.addCode(mapperCode)
      .beginControlFlow("try")
-      .addStatement("payload=objMapper.readValue(receivedPayload, RequestDTO_C0.class)")
-      .addStatement("System.out.println(payload.toString())")
+     // .addStatement("payload=objMapper.readValue(receivedPayload, RequestDTO_C0.class)")
+      //.addStatement("System.out.println(payload.toString())")
       .addStatement("response=consumeService(\"http://127.0.0.1:8889/demo$L\",payload)",pathP)
      .endControlFlow()
      .beginControlFlow("catch ($T e)",Exception.class)      
      .addStatement(" e.printStackTrace()")
      .endControlFlow() 
-     .beginControlFlow("if(response==null)")
-     .addStatement("  return \"ERROR: EMPTY RESPONSE\"")
-     .endControlFlow() 
-     .beginControlFlow("else")
-     .addStatement("return response")
-     .endControlFlow() 
+     .beginControlFlow("if(response==null)");
+     
+     
+       if(MD_C.Protocol.equalsIgnoreCase("HTTP")){
+           methodgen.addStatement("  return \"ERROR: EMPTY RESPONSE\"")
+            .endControlFlow() 
+            .beginControlFlow("else")
+            .addStatement("return response");
+       }else{ //COAP
+         methodgen.addStatement("exchange.respond( \"ERROR: EMPTY RESPONSE\")")
+            .endControlFlow() 
+            .beginControlFlow("else")
+            .addStatement(" exchange.respond(response); ");
+    }
+      methodgen.endControlFlow() 
      ;
-    }else{
-        
-        if(MD_C.getMethod().equalsIgnoreCase("POST")){
-             methodgen = MethodSpec.methodBuilder("handlePOST")
-            .addModifiers(Modifier.PUBLIC)
-            .addParameter(CoapExchange.class,"exchange");
-          }   else 
-            {//if(MD_C.getMethod().equalsIgnoreCase("GET"))  
-             methodgen = MethodSpec.methodBuilder("handleGET")
-            .addModifiers(Modifier.PUBLIC)
-            .addParameter(CoapExchange.class,"exchange");
-            }
-        
-        
-        methodgen.addStatement("System.out.println(exchange.getRequestText())")
-                .addStatement(" exchange.respond(\"REQUEST_SUCCESS\"); ");
-        
-         }
+   
     
     
-;    
+  
            // exchange.respond(CoAP.ResponseCode.CONTENT, "{\"Response\":\"POST_REQUEST_SUCCESS\"}", 50);
     
     
@@ -272,7 +289,7 @@ public class ResourceLWGen {
      .addStatement("$T uri=null", URI.class)
      .addStatement("String[] args={\"0\"}")
      .beginControlFlow("try")
-     .addStatement("uri = new URI(\"coap://localhost:5683/publish\")")
+     .addStatement("uri = new URI(\"coap://localhost:5555/publish\")")
      .nextControlFlow("catch($T e)",URISyntaxException.class)
      .addStatement("System.err.println(\"Invalid URI: \" + e.getMessage())")
      .addStatement("System.exit(-1)")
