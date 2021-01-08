@@ -22,7 +22,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
-
+import eu.generator.resources.RESTResources;
 import static org.eclipse.jetty.servlet.ServletContextHandler.NO_SESSIONS;
 /**
  *
@@ -37,7 +37,9 @@ public class ServerGen {
     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
     .returns(void.class)
     .addParameter(String[].class, "args")
-    .addException(Exception.class);
+    .addException(Exception.class)
+    
+             ;
              
     mainHttp
             .addStatement("$T address = InetAddress.getByName(\"127.0.0.1\")",InetAddress.class )
@@ -46,6 +48,20 @@ public class ServerGen {
             .addStatement(" $T  servletContextHandler = new ServletContextHandler(NO_SESSIONS)", ServletContextHandler.class)
             .addStatement("servletContextHandler.setContextPath(\"/\")")
             .addStatement(" server.setHandler(servletContextHandler)")
+            .addStatement("$T servletHolder = servletContextHandler.addServlet($T.class, \"/*\")",ServletHolder.class,ServletContainer.class)
+            .addStatement("servletHolder.setInitOrder(0)")
+             .addStatement("servletHolder.setInitParameter ("+
+                 "\"jersey.config.server.provider.classnames\",\n" +
+"              $T.class.getCanonicalName())",  RESTResources.class)
+            .beginControlFlow("try")
+            .addStatement("server.start()")
+            .addStatement("server.join()")
+            .nextControlFlow("catch(Exception e)")
+            .addStatement("e.printStackTrace()")
+            .addStatement("server.stop()")
+            .addStatement("server.destroy()")
+            .endControlFlow()
+            
     ;
         
      MethodSpec main= mainHttp.build();
@@ -53,25 +69,31 @@ public class ServerGen {
         
   } 
 
- 
-     
-   
+
+
   
   //METHOD TO GENERATE THE MAIN AND CREATE THE MAINCLASS      
      public static void Server (InterfaceMetadata MD){
          
+    //Selection of the protocol based on the consumer CDL    
+         MethodSpec mainMethod;
+    if(MD.Protocol.equalsIgnoreCase("HTTP")){
+         mainMethod=httpServer();
+    }else{
+        mainMethod=httpServer();
+    }
     
-     MethodSpec httpMain=httpServer();
      
          
-   
+   //class
         TypeSpec ServerApplication = TypeSpec.classBuilder("ServerApplication")  
-                .addMethod(httpMain)
+                .addMethod(mainMethod)
                 .build();
  
-  
+  //Generation of the files
         JavaFile javaFile2 = JavaFile.builder("Server",ServerApplication)
                 .addFileComment("Auto generated")
+                .addStaticImport(ServletContextHandler.class,"NO_SESSIONS")
                 .build();
         try{
             javaFile2.writeTo(Paths.get("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCodeGeneration\\ConsumerGenerationModulesSpring\\InterfaceLightweight\\src\\main\\java"));
