@@ -76,7 +76,8 @@ public class ResourceLWGen {
        AnnotationSpec path= AnnotationSpec
                  .builder(Path.class)
                  .addMember("value", "$S", "/test")
-                 .build();
+                 .build(); 
+       
          
      MethodSpec.Builder methodgen = MethodSpec.methodBuilder("echo")
      .addModifiers(Modifier.PUBLIC)
@@ -288,16 +289,16 @@ public class ResourceLWGen {
      .endControlFlow()
      .beginControlFlow("if(response!=null)")
      .addStatement("System.out.println(response.getCode())")
-     .beginControlFlow("if (args.length > 1)")
-     .beginControlFlow("try ($T out = new $T(args[1]))",FileOutputStream.class,FileOutputStream.class)
-     .addStatement("out.write(response.getPayload())")
-     .nextControlFlow("catch ($T e)",IOException.class)
-     .addStatement("e.printStackTrace()")
-     .endControlFlow()   
-     .nextControlFlow("else")      
+    // .beginControlFlow("if (args.length > 1)")
+     // .beginControlFlow("try ($T out = new $T(args[1]))",FileOutputStream.class,FileOutputStream.class)
+     // .addStatement("out.write(response.getPayload())")
+     // .nextControlFlow("catch ($T e)",IOException.class)
+     // .addStatement("e.printStackTrace()")
+    //  .endControlFlow()   
+    //  .nextControlFlow("else")      
      .addStatement("System.out.println(response.getResponseText())") 
      .addStatement("System.out.println($T.prettyPrint(response))",Utils.class) 
-     .endControlFlow() 
+    //  .endControlFlow() 
      .nextControlFlow("else")      
      .addStatement("System.out.println(\"No response received.\")")
      .endControlFlow() 

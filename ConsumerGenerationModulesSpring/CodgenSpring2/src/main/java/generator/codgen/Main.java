@@ -108,6 +108,10 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
         
         ResourceLWGen.ResourcesLWGen(MD_Consumer, MD_Provider);
         
+        //Server generation.. Consumer Side
+        
+        
+        ServerGen.Server(MD_Consumer);
         
         
         
