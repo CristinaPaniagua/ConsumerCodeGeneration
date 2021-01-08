@@ -23,6 +23,14 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
 import eu.generator.resources.RESTResources;
+import java.net.SocketException;
+
+import org.eclipse.californium.core.CoapResource;
+import org.eclipse.californium.core.CoapServer;
+import org.eclipse.californium.core.coap.CoAP;
+import org.eclipse.californium.core.server.resources.CoapExchange;
+
+
 import static org.eclipse.jetty.servlet.ServletContextHandler.NO_SESSIONS;
 /**
  *
@@ -37,9 +45,7 @@ public class ServerGen {
     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
     .returns(void.class)
     .addParameter(String[].class, "args")
-    .addException(Exception.class)
-    
-             ;
+    .addException(Exception.class) ;
              
     mainHttp
             .addStatement("$T address = InetAddress.getByName(\"127.0.0.1\")",InetAddress.class )
@@ -60,9 +66,7 @@ public class ServerGen {
             .addStatement("e.printStackTrace()")
             .addStatement("server.stop()")
             .addStatement("server.destroy()")
-            .endControlFlow()
-            
-    ;
+            .endControlFlow() ;
         
      MethodSpec main= mainHttp.build();
         return main;
@@ -70,31 +74,109 @@ public class ServerGen {
   } 
 
 
+ public static MethodSpec  coapServer(){
+  
+    
+     MethodSpec.Builder mainCoap = MethodSpec.methodBuilder("main")
+    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+    .returns(void.class)
+    .addParameter(String[].class, "args");
+    
+             
+    mainCoap.beginControlFlow("try")
+            .addStatement("ServerApplication server = new ServerApplication()")
+            .addStatement("server.start()")
+            .nextControlFlow("catch($T e)",SocketException.class)
+            .addStatement("System.err.println(\"Failed to initialize server: \" + e.getMessage())")
+            .endControlFlow() ;
+        
+     MethodSpec main= mainCoap.build();
+        return main;
+        
+  } 
+ 
+  public static MethodSpec  CoapConstructor(){
+  
+     MethodSpec.Builder constCoap = MethodSpec.constructorBuilder()        
+    .addModifiers(Modifier.PUBLIC)
+    .addException(SocketException.class) 
+    .addStatement("add(new $T())",RESTResources.class );
+           
+     MethodSpec constructor= constCoap.build();
+        return constructor;      
+  } 
+ 
+  
+    public static MethodSpec  publishResourceConst(){
+  
+     MethodSpec.Builder constResource = MethodSpec.constructorBuilder()
+    .addModifiers(Modifier.PUBLIC)
+    .addStatement(" super(\"publish\");\n" +
 
+                    " getAttributes().setTitle(\"Publish Resource\")" );
+           
+     MethodSpec constructor= constResource.build();
+        return constructor;      
+  } 
   
   //METHOD TO GENERATE THE MAIN AND CREATE THE MAINCLASS      
      public static void Server (InterfaceMetadata MD){
          
-    //Selection of the protocol based on the consumer CDL    
-         MethodSpec mainMethod;
+     //class    
+      TypeSpec ServerApplication; 
+      JavaFile javaFile2;
+      
+    //Selection of the protocol based on the consumer CDL   
+    
+         
     if(MD.Protocol.equalsIgnoreCase("HTTP")){
-         mainMethod=httpServer();
-    }else{
-        mainMethod=httpServer();
+          MethodSpec mainMethod=httpServer();
+          
+           ServerApplication = TypeSpec.classBuilder("ServerApplication")  
+                .addMethod(mainMethod)
+                .build();
+           
+           
+     //Generation of the files
+         javaFile2 = JavaFile.builder("Server",ServerApplication)
+                .addFileComment("Auto generated")
+                .addStaticImport(ServletContextHandler.class,"NO_SESSIONS")
+                .build();       
+          
+    }else{ //COAP
+         MethodSpec mainMethod=coapServer();
+          MethodSpec constructor= CoapConstructor();
+         // MethodSpec publishResourceConst= publishResourceConst();
+       
+          // TypeSpec publishResource = TypeSpec.classBuilder("PublishResource")
+          //      .superclass(CoapResource.class)
+          //      .addMethod(publishResourceConst)
+          //      .build();
+          
+          
+           ServerApplication = TypeSpec.classBuilder("ServerApplication")
+                .superclass(CoapServer.class)
+                .addMethod(constructor)
+                .addMethod(mainMethod)
+               // .addType(publishResource)
+                .build();
+           
+          
+           
+           
+            //Generation of the files
+         javaFile2 = JavaFile.builder("Server",ServerApplication)
+                .addFileComment("Auto generated")
+                .build();
+           
     }
     
      
          
-   //class
-        TypeSpec ServerApplication = TypeSpec.classBuilder("ServerApplication")  
-                .addMethod(mainMethod)
-                .build();
+   
+     
  
-  //Generation of the files
-        JavaFile javaFile2 = JavaFile.builder("Server",ServerApplication)
-                .addFileComment("Auto generated")
-                .addStaticImport(ServletContextHandler.class,"NO_SESSIONS")
-                .build();
+ 
         try{
             javaFile2.writeTo(Paths.get("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCodeGeneration\\ConsumerGenerationModulesSpring\\InterfaceLightweight\\src\\main\\java"));
         }catch (IOException ex){

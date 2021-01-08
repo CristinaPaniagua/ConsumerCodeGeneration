@@ -49,11 +49,15 @@ import java.io.FileOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.eclipse.californium.core.CoapClient;
+import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapResponse;
+import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.Utils;
+import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.network.config.NetworkConfig;
 import org.eclipse.californium.core.network.config.NetworkConfigDefaultHandler;
+import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.eclipse.californium.elements.exception.ConnectorException;
 public class ResourceLWGen {
     
@@ -95,7 +99,9 @@ public class ResourceLWGen {
     
     String pathP=MD_P.getPathResource();
     
+    MethodSpec.Builder methodgen;
     
+    if(MD_C.Protocol.equalsIgnoreCase("HTTP")){
     
     
      AnnotationSpec produces;
@@ -157,7 +163,7 @@ public class ResourceLWGen {
                  .addMember("value", "$S", pathResource)
                  .build();
          
-     MethodSpec.Builder methodgen = MethodSpec.methodBuilder(MD_C.getID())
+    methodgen = MethodSpec.methodBuilder(MD_C.getID())
      .addModifiers(Modifier.PUBLIC)
      .returns(String.class);
      
@@ -195,11 +201,45 @@ public class ResourceLWGen {
      .addStatement("return response")
      .endControlFlow() 
      ;
-   
+    }else{
+        
+        if(MD_C.getMethod().equalsIgnoreCase("POST")){
+             methodgen = MethodSpec.methodBuilder("handlePOST")
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(CoapExchange.class,"exchange");
+          }   else 
+            {//if(MD_C.getMethod().equalsIgnoreCase("GET"))  
+             methodgen = MethodSpec.methodBuilder("handleGET")
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(CoapExchange.class,"exchange");
+            }
+        
+        
+        methodgen.addStatement("System.out.println(exchange.getRequestText())")
+                .addStatement(" exchange.respond(\"REQUEST_SUCCESS\"); ");
+        
+         }
+    
+    
+;    
+           // exchange.respond(CoAP.ResponseCode.CONTENT, "{\"Response\":\"POST_REQUEST_SUCCESS\"}", 50);
+    
+    
+    
           return methodgen.build();
      }
     
+ public static MethodSpec  publishResourceConst(){
+  
+     MethodSpec.Builder constResource = MethodSpec.constructorBuilder()
+    .addModifiers(Modifier.PUBLIC)
+    .addStatement(" super(\"publish\");\n" +
 
+                    " getAttributes().setTitle(\"Publish Resource\")" );
+           
+     MethodSpec constructor= constResource.build();
+        return constructor;      
+  } 
           
     
      public static MethodSpec consumeService (InterfaceMetadata MD_C, InterfaceMetadata MD_P){
@@ -414,7 +454,7 @@ public class ResourceLWGen {
        MethodSpec testEcho=  testEcho();
        MethodSpec methodgen=methodgen(MD_C, MD_P);
        MethodSpec consumeService =consumeService(MD_C,MD_P); 
-       
+       MethodSpec  constructor =publishResourceConst();
        
       
         
@@ -428,14 +468,20 @@ public class ResourceLWGen {
       
              
      TypeSpec.Builder classGen =TypeSpec.classBuilder("RESTResources")
-              .addAnnotation(path)
               .addModifiers(Modifier.PUBLIC)
-               .addMethod(testEcho)
+             //.addMethod(testEcho)
              .addMethod(methodgen)
              .addMethod(consumeService);
      
+     if(MD_C.Protocol.equalsIgnoreCase("COAP")){
+         classGen.superclass(CoapResource.class)
+                 .addMethod(constructor);
+     }
+        
      
-     
+     if(MD_C.Protocol.equalsIgnoreCase("HTTP")){
+         classGen.addAnnotation(path);
+     }
         TypeSpec RclassGen  = classGen.build();
 
                
