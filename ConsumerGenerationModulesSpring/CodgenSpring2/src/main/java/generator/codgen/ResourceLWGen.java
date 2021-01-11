@@ -210,11 +210,14 @@ public class ResourceLWGen {
        methodgen 
      .addStatement("RequestDTO_C0 payload=new RequestDTO_C0()")
      .addStatement(" String response=null")
-     //.addCode(mapperCode)
-     .beginControlFlow("try")
-     // .addStatement("payload=objMapper.readValue(receivedPayload, RequestDTO_C0.class)")
-      //.addStatement("System.out.println(payload.toString())")
-      .addStatement("response=consumeService(\"http://127.0.0.1:8889/demo$L\",payload)",pathP)
+     .addCode(mapperCode)
+     .beginControlFlow("try");
+       if(!MD_C.getMethod().equalsIgnoreCase("GET")){
+           methodgen.addStatement("payload=objMapper.readValue(receivedPayload, RequestDTO_C0.class)")
+             .addStatement("System.out.println(payload.toString())");
+       }
+     
+      methodgen.addStatement("response=consumeService(\"http://127.0.0.1:8889/demo$L\",payload)",pathP)
      .endControlFlow()
      .beginControlFlow("catch ($T e)",Exception.class)      
      .addStatement(" e.printStackTrace()")
