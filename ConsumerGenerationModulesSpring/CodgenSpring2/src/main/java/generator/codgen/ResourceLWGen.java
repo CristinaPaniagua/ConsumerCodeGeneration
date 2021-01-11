@@ -233,8 +233,13 @@ public class ResourceLWGen {
        }else{ //COAP
          methodgen.addStatement("exchange.respond( \"ERROR: EMPTY RESPONSE\")")
             .endControlFlow() 
-            .beginControlFlow("else")
-            .addStatement(" exchange.respond(response); ");
+            .beginControlFlow("else");
+        if(MD_C.getMediatype_request().equalsIgnoreCase("JSON")){
+            methodgen.addStatement(" exchange.respond($T.ResponseCode.CONTENT,response,50)",CoAP.class);
+        }else if(MD_C.getMediatype_request().equalsIgnoreCase("XML")){
+          methodgen.addStatement(" exchange.respond($T.ResponseCode.CONTENT,response,41)",CoAP.class);
+        }else
+             methodgen.addStatement(" exchange.respond(response) ");
     }
       methodgen.endControlFlow() 
      ;
