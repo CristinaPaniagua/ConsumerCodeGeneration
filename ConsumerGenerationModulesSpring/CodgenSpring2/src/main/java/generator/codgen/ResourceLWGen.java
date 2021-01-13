@@ -269,6 +269,14 @@ public class ResourceLWGen {
     
      public static MethodSpec consumeService (InterfaceMetadata MD_C, InterfaceMetadata MD_P){
          
+         
+     //TRANSLATION BLOCK OF THE RESPONSE TO THE APPROPIATE ENCODING 
+      CodeBlock mapperResponseProvider=createObjectMapper(MD_P.getMediatype_response(),"objMapperP");
+      CodeBlock mapperResponseConsumer=createObjectMapper(MD_C.getMediatype_response(),"objMapperC");    
+         
+         
+     
+         
       MethodSpec.Builder consumer = MethodSpec.methodBuilder("consumeService")
      .addModifiers(Modifier.PRIVATE)
      .addModifiers(Modifier.STATIC)
@@ -295,7 +303,8 @@ public class ResourceLWGen {
      .addStatement("$T config = $T.createWithFile(CONFIG_FILE, CONFIG_HEADER, DEFAULTS)", NetworkConfig.class,NetworkConfig.class)
      .addStatement("NetworkConfig.setStandard(config)")
      .addStatement("$T uri=null", URI.class)
-     .addStatement("String[] args={\"0\"}")
+     //.addStatement("String[] args={\"0\"}")
+     .addStatement("String responseText= \" \"")
      .beginControlFlow("try")
      .addStatement("uri = new URI(\"coap://localhost:5555/publish\")")
      .nextControlFlow("catch($T e)",URISyntaxException.class)
@@ -344,10 +353,11 @@ public class ResourceLWGen {
             consumer.addStatement("response = client.put(payloadS,$T.APPLICATION_XML)",MediaTypeRegistry.class);
               }
          }
-         
-         
+            
+            
      }
     
+      
      
      consumer.nextControlFlow("catch($T|$T e)",ConnectorException.class,IOException.class)
      .addStatement("System.err.println(\"Got an error: \" + e)")
@@ -361,17 +371,34 @@ public class ResourceLWGen {
      // .addStatement("e.printStackTrace()")
     //  .endControlFlow()   
     //  .nextControlFlow("else")      
-     .addStatement("System.out.println(response.getResponseText())") 
+     .addStatement("responseText= response.getResponseText()") 
      .addStatement("System.out.println($T.prettyPrint(response))",Utils.class) 
     //  .endControlFlow() 
      .nextControlFlow("else")      
      .addStatement("System.out.println(\"No response received.\")")
      .endControlFlow() 
      .addStatement("client.shutdown()")
-     .addStatement("return response.getResponseText()");
+     .addCode(mapperResponseProvider)
+     .addStatement("$T responseObj=objMapperP.readValue(responseText,ResponseDTO_P0.class)",ResponseDTO_P0.class)
+     .addStatement(" String result_out = \"\"") 
+     .addCode(mapperResponseConsumer);
+     
+     
+      Boolean Payload=true;
+       if(Payload==true){
+            if(MD_C.getMediatype_response().equalsIgnoreCase("XML") && MD_P.getMediatype_response().equalsIgnoreCase("JSON")){
+                 consumer.addStatement("result_out= $T.jsonToXml(responseText)",U.class);
+             }else if(MD_C.getMediatype_response().equalsIgnoreCase("JSON") && MD_P.getMediatype_response().equalsIgnoreCase("XML")){
+                  consumer.addStatement("result_out= $T.xmlToJson(responseText)",U.class);
+            }else{
+                  consumer.addStatement("result_out=responseText");
+            }
+     
+     
+      consumer.addStatement("return result_out");
 
   
-               
+       }        
                
            
        }else{ //HTTP is the protocol by default --> TODO: add the error if there is not a permited protocol
@@ -418,8 +445,8 @@ public class ResourceLWGen {
                
                } 
 
-            CodeBlock mapperResponseProvider=createObjectMapper(MD_P.getMediatype_response(),"objMapperP");
-            CodeBlock mapperResponseConsumer=createObjectMapper(MD_C.getMediatype_response(),"objMapperC");
+            //CodeBlock mapperResponseProvider=createObjectMapper(MD_P.getMediatype_response(),"objMapperP");
+            //CodeBlock mapperResponseConsumer=createObjectMapper(MD_C.getMediatype_response(),"objMapperC");
            
        consumer.addStatement(" $T response = httpClient.execute(request)",CloseableHttpResponse.class) 
        .beginControlFlow("try")  
@@ -434,8 +461,8 @@ public class ResourceLWGen {
             .addCode(mapperResponseConsumer)
             .addStatement("result_out=objMapperC.writeValueAsString(responseObj)");
             
-       Boolean Payload=true;
-       if(Payload==false){
+       Boolean PayloadH=true;// TODO look if there is payload and change the flag according
+       if(PayloadH==true){
             if(MD_C.getMediatype_response().equalsIgnoreCase("XML") && MD_P.getMediatype_response().equalsIgnoreCase("JSON")){
                  consumer.addStatement("result_out= $T.jsonToXml(result_in)",U.class);
              }else if(MD_C.getMediatype_response().equalsIgnoreCase("JSON") && MD_P.getMediatype_response().equalsIgnoreCase("XML")){
@@ -464,13 +491,8 @@ public class ResourceLWGen {
        }
          
     
-         
-     
-     
-     
-   
-     
-      return consumer.build();
+      
+                return consumer.build();
      }
     
      public static void ResourcesLWGen (InterfaceMetadata MD_C, InterfaceMetadata MD_P ){
