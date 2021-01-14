@@ -9,11 +9,11 @@
 
 	<interface protocol="HTTP" address="http://127.0.0.1/8888" >
 	
-		<method name="POST" id="offer" path="/testTranslationB">
+		<method name="POST" id="offer" path="/testTranslationA">
 
 			<request>
 				<format> 
-					<encode name="XML" mediaType= "--" version="0"/>
+					<encode name="JSON" mediaType= "--" version="0"/>
 					<security name="null" version="0"/>
 					<qos name="null" version="0"/> 
 					<semantic name="null" version="0"/>
@@ -34,7 +34,7 @@
 			
 			<response status="200">
                             <format> 
-					<encode name="XML" mediaType= "--" version="0"/>
+					<encode name="JSON" mediaType= "--" version="0"/>
 					<security name="null" version="0"/>
 					<qos name="null" version="0"/> 
 					<semantic name="null" version="0"/>
