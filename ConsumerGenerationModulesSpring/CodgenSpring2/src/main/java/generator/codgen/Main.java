@@ -36,18 +36,30 @@ private static ArrayList<ArrayList<String>> classesRequestP= new ArrayList<Array
 private static ArrayList<String> classesResponseP= new ArrayList<String>();
 private static ArrayList<ArrayList<String>> classesRequestC= new ArrayList<ArrayList<String>>();
 private static ArrayList<String> classesResponseC= new ArrayList<String>();
-    public static void main(String[] args) {
+    public static void main(String[] args) throws GenerationException 
+    {
         
         String service = request.getProperty("Service", "null");
         String system="providerTest";
         readCDL readConsumer = new readCDL();
         MD_Consumer= readConsumer.read("offer","consumer");
+        Boolean MD_ConsumerValid=metedataValidation(MD_Consumer);
         readCDL readProvider = new readCDL();
         MD_Provider = readProvider.read("offer","provider");
+        Boolean MD_ProviderValid=metedataValidation(MD_Provider);
+        
+        System.out.println(MD_ConsumerValid);
+        System.out.println(MD_ProviderValid);
+      
+        
+    if(MD_ConsumerValid && MD_ProviderValid){
+        
+    
+        
         System.out.println(MD_Provider.toString());
         System.out.println(MD_Consumer.toString());
       
-      
+     
              
      if(MD_Provider.getRequest()){
            ClassGenSimple Request=new ClassGenSimple();
@@ -57,8 +69,8 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
                 ArrayList<String[]> elements_requestP=MD_Provider.elements_request.get(i).getElements();
                classesRequestP.add(Request.classGen(elements_requestP,"RequestDTO_P"+i));
              }
-            for(int h=0;h<classesRequestP.size();h++)
-                System.out.println("..........."+classesRequestP.get(h));
+           // for(int h=0;h<classesRequestP.size();h++)
+             //   System.out.println("..........."+classesRequestP.get(h));
   
        }
         
@@ -83,8 +95,8 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
                 ArrayList<String[]> elements_requestC=MD_Consumer.elements_request.get(i).getElements();
                classesRequestC.add(Request.classGen(elements_requestC,"RequestDTO_C"+i));
              }
-            for(int h=0;h<classesRequestC.size();h++)
-                System.out.println("..........."+classesRequestC.get(h));
+           // for(int h=0;h<classesRequestC.size();h++)
+                //System.out.println("..........."+classesRequestC.get(h));
   
        }
         
@@ -124,7 +136,10 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
 	}
         
         
-        
+         } else {
+          System.out.println(" ERROR: GENERATION ABORTED -- ONE OR MORE CDLs ARE MALFORMED ");
+          // throw new GenerationException(" ONE OR MORE OF THE CDLs ARE MALFORMED ");
+    }   
        
     }
     
@@ -171,6 +186,30 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
         }
     }
    
+   
+public static Boolean metedataValidation (InterfaceMetadata MD){
+    Boolean validation= true;
+    if(MD.getProtocol().equals("")){
+        validation= false;
+    }else if(MD.getMethod().equals("")){
+        validation= false;
+    }else if(MD.getID()==null){
+        validation=false;
+        
+    }else if(MD.getPathResource().equals("")){
+         validation=false;
+        
+    } else if(MD.getRequest()){
+        
+        if(MD.getMediatype_request().equals("")){
+            validation= false;
+        }
+        if(MD.getElements_request().isEmpty()){  //IT IS POSIBLE A EMPTY REQUEST? 
+            validation= false;
+        }
+    }
+    return validation ;
+}
    
    
    

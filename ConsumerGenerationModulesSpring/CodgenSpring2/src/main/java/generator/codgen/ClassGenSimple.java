@@ -241,7 +241,7 @@ public class ClassGenSimple {
     for (int i = 0; i < elements.size(); i++){ 
         String name=elements.get(i)[0];
         String type=elements.get(i)[1];
-        System.out.println(type);
+        //System.out.println(type);
         
         if(name.equals("Newclass")){
             name=elements.get(i)[1];

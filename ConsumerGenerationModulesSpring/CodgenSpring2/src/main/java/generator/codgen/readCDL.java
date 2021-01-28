@@ -37,7 +37,7 @@ public class readCDL {
     public readCDL() {
     }
     
-public InterfaceMetadata read(String service,String System){
+public InterfaceMetadata read(String service,String System) throws GenerationException {
     String sec=null;
     String protocol=null;
     String path=null;
@@ -570,7 +570,9 @@ public InterfaceMetadata read(String service,String System){
        
            
                    
-       }//else{ System.out.println( "ERROR: Service interface not found");}
+       }else{ out.println( "ERROR: Service interface not found");
+       throw new GenerationException(" SERVICE INTERFACE NOT FOUND ");
+       }
       
        
        
@@ -667,6 +669,8 @@ public void Reset(){
    parameters.clear();
    subpaths.clear();
  }
+
+
 
     }
 

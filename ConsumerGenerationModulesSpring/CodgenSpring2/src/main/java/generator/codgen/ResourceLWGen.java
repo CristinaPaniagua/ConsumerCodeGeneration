@@ -98,6 +98,7 @@ public class ResourceLWGen {
  
     
     String pathP=MD_P.getPathResource();
+    //String addressP=MD_P.ge
     
     MethodSpec.Builder methodgen;
     CodeBlock mapperCode=createObjectMapper(MD_C.getMediatype_request(),"objMapper");
@@ -166,8 +167,12 @@ public class ResourceLWGen {
                  .build();
          
     methodgen = MethodSpec.methodBuilder(MD_C.getID())
-     .addModifiers(Modifier.PUBLIC)
-     .returns(String.class);
+     .addModifiers(Modifier.PUBLIC);
+     if(MD_C.getMediatype_response().equalsIgnoreCase("CBOR")){
+          methodgen.returns(byte[].class);
+      }else {
+          methodgen.returns(String.class);
+      }
      
      //TODO: ADD THE REST OF THE METHODS (PUT AND DELETE)
      if(MD_C.getMethod().equalsIgnoreCase("POST")){
@@ -208,9 +213,17 @@ public class ResourceLWGen {
         
          }
        methodgen 
-     .addStatement("RequestDTO_C0 payload=new RequestDTO_C0()")
-     .addStatement(" String response=null")
-     .addCode(mapperCode)
+     .addStatement("RequestDTO_C0 payload=new RequestDTO_C0()");
+       
+       if(MD_C.getMediatype_response().equalsIgnoreCase("CBOR")){
+           methodgen.addStatement(" byte[] response=null");
+      }else {
+          methodgen.addStatement(" String response=null");
+      }
+               
+       
+     
+     methodgen.addCode(mapperCode)
      .beginControlFlow("try");
        if(!MD_C.getMethod().equalsIgnoreCase("GET")){
            methodgen.addStatement("payload=objMapper.readValue(receivedPayload, RequestDTO_C0.class)")
@@ -226,7 +239,7 @@ public class ResourceLWGen {
      
      
        if(MD_C.Protocol.equalsIgnoreCase("HTTP")){
-           methodgen.addStatement("  return \"ERROR: EMPTY RESPONSE\"")
+           methodgen.addStatement("  return response")
             .endControlFlow() 
             .beginControlFlow("else")
             .addStatement("return response");
@@ -279,9 +292,15 @@ public class ResourceLWGen {
          
       MethodSpec.Builder consumer = MethodSpec.methodBuilder("consumeService")
      .addModifiers(Modifier.PRIVATE)
-     .addModifiers(Modifier.STATIC)
-     .returns(String.class)
-     .addParameter(String.class, "url")
+     .addModifiers(Modifier.STATIC);
+      if(MD_C.getMediatype_response().equalsIgnoreCase("CBOR")){
+          consumer.returns(byte[].class);
+      }else {
+          consumer.returns(String.class);
+      }
+     
+     
+     consumer.addParameter(String.class, "url")
      .addParameter(RequestDTO_C0.class, "payload")
      .addException(IOException.class);
          
@@ -352,6 +371,9 @@ public class ResourceLWGen {
             {
             consumer.addStatement("response = client.put(payloadS,$T.APPLICATION_XML)",MediaTypeRegistry.class);
               }
+         }if(MD_P.getMediatype_request().equalsIgnoreCase("CBOR"))
+         { 
+             
          }
             
             
@@ -380,17 +402,21 @@ public class ResourceLWGen {
      .addStatement("client.shutdown()")
      .addCode(mapperResponseProvider)
      .addStatement("$T responseObj=objMapperP.readValue(responseText,ResponseDTO_P0.class)",ResponseDTO_P0.class)
-     .addStatement(" String result_out = \"\"") 
      .addCode(mapperResponseConsumer);
      
      
       Boolean Payload=true;
        if(Payload==true){
             if(MD_C.getMediatype_response().equalsIgnoreCase("XML") && MD_P.getMediatype_response().equalsIgnoreCase("JSON")){
-                 consumer.addStatement("result_out= $T.jsonToXml(responseText)",U.class);
+                 consumer.addStatement(" String result_out = \"\"") 
+                         .addStatement("result_out= $T.jsonToXml(responseText)",U.class);
              }else if(MD_C.getMediatype_response().equalsIgnoreCase("JSON") && MD_P.getMediatype_response().equalsIgnoreCase("XML")){
-                  consumer.addStatement("result_out= $T.xmlToJson(responseText)",U.class);
-            }else{
+                  consumer.addStatement(" String result_out = \"\"")
+                          .addStatement("result_out= $T.xmlToJson(responseText)",U.class);
+             }else if(MD_C.getMediatype_response().equalsIgnoreCase("CBOR")){
+                  consumer.addStatement(" byte[] result_out")
+                          .addStatement("result_out=objMapperC.writeValueAsBytes(responseObj)");
+             }else{
                   consumer.addStatement("result_out=responseText");
             }
      
