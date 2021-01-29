@@ -24,6 +24,8 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import static generator.codgen.EncodingParser.createObjectMapper;
 import eu.generator.resources.RequestDTO_C0;
+import eu.generator.resources.RequestDTO_P0;
+import eu.generator.resources.ResponseDTO_C0;
 import java.io.IOException;
 import java.nio.file.Paths;
 import javax.ws.rs.Path;
@@ -45,13 +47,12 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import eu.generator.resources.ResponseDTO_P0;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapResponse;
-import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.Utils;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
@@ -302,7 +303,8 @@ public class ResourceLWGen {
      
      consumer.addParameter(String.class, "url")
      .addParameter(RequestDTO_C0.class, "payload")
-     .addException(IOException.class);
+     .addException(IOException.class)
+     .addStatement(" RequestDTO_P0 payloadP= requestAdaptor(payload)");
          
            if(MD_P.getProtocol().equalsIgnoreCase("COAP")){ //CONSUMER SIZE is COAP
                
@@ -342,7 +344,7 @@ public class ResourceLWGen {
          
          if(MD_P.getMediatype_request().equalsIgnoreCase("JSON"))
          { 
-          consumer.addStatement("String payloadS=new $T().writeValueAsString(payload)",ObjectMapper.class)
+          consumer.addStatement("String payloadS=new $T().writeValueAsString(payloadP)",ObjectMapper.class)
           .addStatement("System.out.println(\"Payload Sent: \" + payloadS)");
           
             if(MD_P.getMethod().equalsIgnoreCase("POST"))
@@ -442,20 +444,20 @@ public class ResourceLWGen {
      String Mediatype="";
       if(MD_P.getMediatype_request().equalsIgnoreCase("JSON")){
        consumer.addStatement(" request.addHeader(\"content-type\", \"application/json\")") 
-       .addStatement("String createdPayload=new $T().writeValueAsString(payload)",ObjectMapper.class);
+       .addStatement("String createdPayload=new $T().writeValueAsString(payloadP)",ObjectMapper.class);
        
         
     }else if(MD_P.getMediatype_request().equalsIgnoreCase("XML")){
         consumer.addStatement(" request.addHeader(\"content-type\", \"application/xml\")") 
        .addStatement("$T xmlMapper = new XmlMapper()",XmlMapper.class)
-       .addStatement("String createdPayload=xmlMapper.writeValueAsString(payload)",ObjectMapper.class);
+       .addStatement("String createdPayload=xmlMapper.writeValueAsString(payloadP)",ObjectMapper.class);
       
     
       }else if(MD_P.getMediatype_request().equalsIgnoreCase("CBOR")){
         consumer.addStatement(" request.addHeader(\"content-type\", \"pplication/cbor\")") 
        .addStatement("$T f = new CBORFactory()",CBORFactory.class)
        .addStatement("$T cborMapper = new ObjectMapper(f)",ObjectMapper.class)
-       .addStatement("byte[] createdPayload = cborMapper.writeValueAsBytes(payload)");
+       .addStatement("byte[] createdPayload = cborMapper.writeValueAsBytes(payloadP)");
       
     }
        
@@ -520,6 +522,141 @@ public class ResourceLWGen {
       
                 return consumer.build();
      }
+     
+     
+     
+    public static MethodSpec requestTransform(InterfaceMetadata MD_C, InterfaceMetadata MD_P){
+  
+    MethodSpec.Builder payload = MethodSpec.methodBuilder("requestAdaptor")
+    .addModifiers(Modifier.PUBLIC)
+    .addModifiers(Modifier.STATIC)
+    .returns(RequestDTO_P0.class)
+    .addParameter(RequestDTO_C0.class, "payload_C")
+    .addStatement(" RequestDTO_P0 payload_P = new RequestDTO_P0()");
+    
+     
+      ArrayList<String[]> elements_requestC=MD_C.elements_request.get(0).getElements();
+      ArrayList<String[]> elements_requestP=MD_P.elements_request.get(0).getElements();
+      Boolean NestedP=false;
+      Boolean NestedC=false;
+      String NewClassP=null;
+      String NewClassC=null;
+     for (int i = 0; i < elements_requestC.size()-1; i++){ 
+        String nameC=elements_requestC.get(i)[0];
+        String typeC=elements_requestC.get(i)[1];
+       
+        
+       if(nameC.equals("Newclass")){
+               NewClassC= typeC;
+               NestedC=true;
+               
+       }else{
+           
+           
+         
+           if(nameC.equals("child")){
+                     nameC=elements_requestP.get(i)[1];
+                     typeC=elements_requestP.get(i)[2];
+           }else NestedC=false;
+        
+        
+       System.out.println("consumer: " +nameC +" - "+ typeC);
+        
+            for (int j = 0; j < elements_requestP.size()-1; j++){ 
+                 String nameP=elements_requestP.get(j)[0];
+                 String typeP=elements_requestP.get(j)[1];
+                 
+                 
+                if(nameP.equals("Newclass")){
+                    NewClassP= typeP;
+                    if(NestedP==false) payload.addStatement("$L $L = new $L ()", Capitalize(NewClassP), NewClassP, Capitalize(NewClassP));
+                        NestedP=true;
+                        
+                 }else{
+                        if(nameP.equals("child")){
+                        nameP=elements_requestP.get(j)[1];
+                        typeP=elements_requestP.get(j)[2];
+                    }//else NestedP=false;
+                        
+                 
+                 
+                 System.out.println("Provider: " +nameP +" - "+ typeP);
+                 
+                System.out.println("NestedC: " +NestedC +", NestedP: "+ NestedP);
+                 
+                 if(nameC.equals(nameP)){
+                     
+                    if( NestedP && NestedC){
+                        if(typeC.equalsIgnoreCase(typeP)){
+                         payload.addStatement("$L.set$L(payload_C.get$L().get$L() )",NewClassP, nameP,NewClassC,nameC)
+                                 .addStatement("payload_P.set$L($L)",NewClassP,NewClassP);
+                         j= elements_requestP.size();
+                        }
+                    }else if( !NestedP && NestedC){
+                         if(typeC.equalsIgnoreCase(typeP)){
+                         payload.addStatement("payload_P.set$L(payload_C.get$L().get$L())",nameP,NewClassC,nameC) ;
+                         j= elements_requestP.size();
+                        }
+                        
+                    }else if( NestedP && !NestedC){
+                         if(typeC.equalsIgnoreCase(typeP)){
+                          payload.addStatement("$L.set$L(payload_C.get$L() )",NewClassP,nameP,nameC)
+                                 .addStatement("payload_P.set$L($L)",NewClassP,NewClassP);
+                         j= elements_requestP.size();
+                        }
+                        
+                    }else{
+                         if(typeC.equalsIgnoreCase(typeP)){
+                         payload.addStatement("payload_P.set$L(payload_C.get$L() )",nameP,nameC);
+                         j= elements_requestP.size();
+                            } 
+                    }
+                        
+                       
+                     
+                     
+                     
+                
+                     
+                    
+                      
+                        }
+                    
+                     
+                 }
+            }
+          }
+    }
+        
+     
+     
+     payload.addStatement("return payload_P");
+           
+     MethodSpec payloadTrans=payload.build();
+        return payloadTrans;      
+  } 
+    
+      public static MethodSpec responseTransform(InterfaceMetadata MD_C, InterfaceMetadata MD_P){
+  
+     MethodSpec.Builder payload = MethodSpec.methodBuilder("responseAdaptor")
+    .addModifiers(Modifier.PUBLIC)
+    .returns(ResponseDTO_C0.class)
+    .addParameter(ResponseDTO_P0.class, "payload_P")
+    .addStatement(" ResponseDTO_C0 payload_C;")
+    .addStatement("return payload_C");
+     
+   
+           
+     MethodSpec payloadTrans=payload.build();
+        return payloadTrans;      
+  } 
+     
+      public static String Capitalize( String name){
+          name =name.substring(0, 1).toUpperCase() + name.substring(1,name.length()); 
+          return name;
+      }
+     
+     
     
      public static void ResourcesLWGen (InterfaceMetadata MD_C, InterfaceMetadata MD_P ){
          
@@ -529,7 +666,8 @@ public class ResourceLWGen {
        MethodSpec consumeService =consumeService(MD_C,MD_P); 
        MethodSpec  constructor =publishResourceConst();
        
-      
+      MethodSpec  requestAdaptor = requestTransform(MD_C,MD_P);
+      MethodSpec  responseAdaptor = responseTransform(MD_C,MD_P);
         
         
         
@@ -544,6 +682,7 @@ public class ResourceLWGen {
               .addModifiers(Modifier.PUBLIC)
              //.addMethod(testEcho)
              .addMethod(methodgen)
+             .addMethod(requestAdaptor)
              .addMethod(consumeService);
      
      if(MD_C.Protocol.equalsIgnoreCase("COAP")){

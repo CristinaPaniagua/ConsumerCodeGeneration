@@ -28,6 +28,7 @@ public class readCDL {
     public   ArrayList<ElementsPayload> elements_response = new ArrayList<ElementsPayload>();
     public   ArrayList<String[]> payload_request = new ArrayList<String[]>(); 
     public   ArrayList<String[]> payload_response = new ArrayList<String[]>();
+    
     public  boolean request;
     public  boolean response;
     public  boolean param;
