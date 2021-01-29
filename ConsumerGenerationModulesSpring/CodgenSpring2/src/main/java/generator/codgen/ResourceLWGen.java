@@ -50,6 +50,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapResponse;
@@ -587,26 +588,26 @@ public class ResourceLWGen {
                  if(nameC.equals(nameP)){
                      
                     if( NestedP && NestedC){
-                        if(typeC.equalsIgnoreCase(typeP)){
+                        if(typeC.equalsIgnoreCase(typeP)|| (numberTypeDef(typeP)>numberTypeDef(typeC))){
                          payload.addStatement("$L.set$L(payload_C.get$L().get$L() )",NewClassP, nameP,NewClassC,nameC)
                                  .addStatement("payload_P.set$L($L)",NewClassP,NewClassP);
                          j= elements_requestP.size();
                         }
                     }else if( !NestedP && NestedC){
-                         if(typeC.equalsIgnoreCase(typeP)){
+                          if(typeC.equalsIgnoreCase(typeP)|| (numberTypeDef(typeP)>numberTypeDef(typeC))){
                          payload.addStatement("payload_P.set$L(payload_C.get$L().get$L())",nameP,NewClassC,nameC) ;
                          j= elements_requestP.size();
                         }
                         
                     }else if( NestedP && !NestedC){
-                         if(typeC.equalsIgnoreCase(typeP)){
+                         if(typeC.equalsIgnoreCase(typeP)|| (numberTypeDef(typeP)>numberTypeDef(typeC))){
                           payload.addStatement("$L.set$L(payload_C.get$L() )",NewClassP,nameP,nameC)
                                  .addStatement("payload_P.set$L($L)",NewClassP,NewClassP);
                          j= elements_requestP.size();
                         }
                         
                     }else{
-                         if(typeC.equalsIgnoreCase(typeP)){
+                          if(typeC.equalsIgnoreCase(typeP)|| (numberTypeDef(typeP)>numberTypeDef(typeC))){
                          payload.addStatement("payload_P.set$L(payload_C.get$L() )",nameP,nameC);
                          j= elements_requestP.size();
                             } 
@@ -657,6 +658,25 @@ public class ResourceLWGen {
       }
      
      
+      public static int numberTypeDef( String type){
+          int typeNumber;
+          
+          
+          if(type.equalsIgnoreCase("String")) typeNumber=-1;
+         else if (type.equalsIgnoreCase("Boolean")) typeNumber=-2;
+         else if (type.equalsIgnoreCase("Integer")) typeNumber=2;
+         else if (type.equalsIgnoreCase("Byte")) typeNumber=0;
+         else if (type.equalsIgnoreCase("Double")) typeNumber=5;
+         else if (type.equalsIgnoreCase("Float")) typeNumber=4;
+         else if (type.equalsIgnoreCase("Short")) typeNumber=1;
+         else if (type.equalsIgnoreCase("Long"))typeNumber=3;
+         else typeNumber=-100;
+          
+          return typeNumber;
+      }
+      
+      
+      
     
      public static void ResourcesLWGen (InterfaceMetadata MD_C, InterfaceMetadata MD_P ){
          
