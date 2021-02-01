@@ -3,19 +3,20 @@ package eu.generator.resources;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
+import eu.generator.consumer.RequestDTO_C0;
+import eu.generator.provider.RequestDTO_P0;
+import eu.generator.provider.ResponseDTO_P0;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.Exception;
 import java.lang.String;
 import java.net.URI;
 import java.net.URISyntaxException;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapResponse;
 import org.eclipse.californium.core.Utils;
@@ -26,39 +27,45 @@ import org.eclipse.californium.elements.exception.ConnectorException;
 
 @Path("/demo")
 public class RESTResources {
-  @GET
-  @Path("/test")
-  @Produces(MediaType.TEXT_PLAIN)
-  public String echo() {
-    return "Ready to go";
-  }
-
   @POST
   @Path("/testTranslation")
-  @Produces(MediaType.APPLICATION_JSON)
-  @Consumes(MediaType.APPLICATION_JSON)
-  public String offer(String receivedPayload) {
+  @Produces("application/cbor")
+  @Consumes("application/cbor")
+  public byte[] offer(byte[] receivedPayload) {
     RequestDTO_C0 payload=new RequestDTO_C0();
-     String response=null;
-    JsonFactory jsonFactory_objMapper = new JsonFactory();
-    ObjectMapper objMapper=new ObjectMapper(jsonFactory_objMapper);
+     byte[] response=null;
+    CBORFactory cborFactory = new CBORFactory();
+    ObjectMapper objMapper=new ObjectMapper(cborFactory);
     try {
       payload=objMapper.readValue(receivedPayload, RequestDTO_C0.class);
       System.out.println(payload.toString());
-      response=consumeService("http://127.0.0.1:8889/demo/testTranslationB",payload);
+      response=consumeService("http://127.0.0.1:8889/demo/testTranslation",payload);
     }
     catch (Exception e) {
        e.printStackTrace();
     }
     if(response==null) {
-        return "ERROR: EMPTY RESPONSE";
+        return response;
     }
     else {
       return response;
     }
   }
 
-  private static String consumeService(String url, RequestDTO_C0 payload) throws IOException {
+  public static RequestDTO_P0 requestAdaptor(RequestDTO_C0 payload_C) {
+     RequestDTO_P0 payload_P = new RequestDTO_P0();
+    payload_P.setname(payload_C.getname() );
+    payload_P.setlocalization(payload_C.getlocalization() );
+     eu.generator.provider.Value value = new  eu.generator.provider.Value ();
+     value.settemp(payload_C.getvalue().gettemp() );
+    payload_P.setvalue(value);
+     value.setunit(payload_C.getvalue().getunit() );
+    payload_P.setvalue(value);
+    return payload_P;
+  }
+
+  private static byte[] consumeService(String url, RequestDTO_C0 payload) throws IOException {
+     RequestDTO_P0 payloadP= requestAdaptor(payload);
     //Adding Import NetworkConfig;
      File CONFIG_FILE = new File("Californium.properties");
         	 String CONFIG_HEADER = "Californium CoAP Properties file for Fileclient";
@@ -75,9 +82,9 @@ public class RESTResources {
     NetworkConfig config = NetworkConfig.createWithFile(CONFIG_FILE, CONFIG_HEADER, DEFAULTS);
     NetworkConfig.setStandard(config);
     URI uri=null;
-    String[] args={"0"};
+    String responseText= " ";
     try {
-      uri = new URI("coap://localhost:5683/publish");
+      uri = new URI("coap://localhost:5555/publish");
     } catch(URISyntaxException e) {
       System.err.println("Invalid URI: " + e.getMessage());
       System.exit(-1);
@@ -85,7 +92,7 @@ public class RESTResources {
     CoapClient client= new CoapClient(uri);
     CoapResponse response = null;
     try {
-      String payloadS=new ObjectMapper().writeValueAsString(payload);
+      String payloadS=new ObjectMapper().writeValueAsString(payloadP);
       System.out.println("Payload Sent: " + payloadS);
       response = client.post(payloadS,MediaTypeRegistry.APPLICATION_JSON);
     } catch(ConnectorException|IOException e) {
@@ -93,20 +100,19 @@ public class RESTResources {
     }
     if(response!=null) {
       System.out.println(response.getCode());
-      if (args.length > 1) {
-        try (FileOutputStream out = new FileOutputStream(args[1])) {
-          out.write(response.getPayload());
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      } else {
-        System.out.println(response.getResponseText());
-        System.out.println(Utils.prettyPrint(response));
-      }
+      responseText= response.getResponseText();
+      System.out.println(Utils.prettyPrint(response));
     } else {
       System.out.println("No response received.");
     }
     client.shutdown();
-    return response.getResponseText();
+    JsonFactory jsonFactory_objMapperP = new JsonFactory();
+    ObjectMapper objMapperP=new ObjectMapper(jsonFactory_objMapperP);
+    ResponseDTO_P0 responseObj=objMapperP.readValue(responseText,ResponseDTO_P0.class);
+    CBORFactory cborFactory = new CBORFactory();
+    ObjectMapper objMapperC=new ObjectMapper(cborFactory);
+     byte[] result_out;
+    result_out=objMapperC.writeValueAsBytes(responseObj);
+    return result_out;
   }
 }

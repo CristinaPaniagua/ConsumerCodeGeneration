@@ -1,5 +1,5 @@
 // Auto generated
-package eu.generator.resources;
+package eu.generator.consumer;
 
 import java.lang.Integer;
 import java.lang.Override;

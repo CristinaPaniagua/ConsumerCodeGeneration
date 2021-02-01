@@ -1,5 +1,5 @@
 // Auto generated
-package eu.generator.resources;
+package eu.generator.provider;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.lang.Override;
