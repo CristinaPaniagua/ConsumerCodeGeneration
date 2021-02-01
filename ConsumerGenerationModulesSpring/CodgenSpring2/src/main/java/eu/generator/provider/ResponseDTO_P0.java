@@ -1,5 +1,5 @@
 // Auto generated
-package eu.generator.resources;
+package eu.generator.provider;
 
 
 public class ResponseDTO_P0 {

@@ -1,5 +1,5 @@
 // Auto generated
-package eu.generator.resources;
+package eu.generator.consumer;
 
 
 

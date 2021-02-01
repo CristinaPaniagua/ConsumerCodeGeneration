@@ -66,7 +66,7 @@ public class ClassGenSimple {
        
         //readList(elements);
         ClassGenNested  cc = new ClassGenNested();
-        ListofDeclarations=cc.complexelement(elements);
+        ListofDeclarations=cc.complexelement(elements,className);
         //readList(elements);
       ArrayList<String[]> var= new ArrayList<>();
        
@@ -290,10 +290,14 @@ public class ClassGenSimple {
    
         TypeSpec classGen  = BclassGen.build();
 
-               
+          String packageName="eu.generator.resources";    
  
-  
-        JavaFile javaFile2 = JavaFile.builder("eu.generator.resources",classGen)
+        if(className.contains("_P")){
+            packageName="eu.generator.provider";
+        }else if(className.contains("_C")){
+            packageName="eu.generator.consumer";
+        }
+        JavaFile javaFile2 = JavaFile.builder(packageName,classGen)
                 .addFileComment("Auto generated")
                 .build();
         try{

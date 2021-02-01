@@ -24,7 +24,7 @@
 					<element name="name" type="String"/>
 					<element name="localization" type="String"/>
                                         <complexelement name="value" type="single">
-                                            <element name="temp" type="Float" variation="temperature" unit="Celsius"/>
+                                            <element name="temp" type="Integer" variation="temperature" unit="Celsius"/>
                                             <element name="unit" type="String"/>
                                         </complexelement>
 				

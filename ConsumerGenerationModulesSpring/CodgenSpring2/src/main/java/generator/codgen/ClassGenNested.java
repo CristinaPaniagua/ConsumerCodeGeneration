@@ -41,7 +41,7 @@ public class ClassGenNested {
    
    
     
-    public ArrayList<String> complexelement (ArrayList<String[]> elements){
+    public ArrayList<String> complexelement (ArrayList<String[]> elements, String parentClass){
         boolean boo=false;
       // System.out.println("\n\nARRAYLIST SIZE:"+elements.size());
        for (int i = 0; i < elements.size(); i++){ 
@@ -54,7 +54,7 @@ public class ClassGenNested {
              if(("StopClass".equals(elements.get(i+1)[0]))){
                  i=elements.size()+1;
              }else{
-               i=genClomplex (elements,i);  
+               i=genClomplex (elements,i,parentClass);  
              }
              boo=true;
             
@@ -68,7 +68,7 @@ public class ClassGenNested {
     }
     
     
-    public  int genClomplex (ArrayList<String[]> elements, int i){
+    public  int genClomplex (ArrayList<String[]> elements, int i, String parentClass){
         //ArrayList<String[]> var= new ArrayList<String[]>();
         ArrayList<String[]> newclass = new ArrayList<String[]>();
         boolean out=false;
@@ -87,7 +87,7 @@ public class ClassGenNested {
                   
                //System.out.println(elements.get(j)[0]);
               if("child:Newclass".equals(elements.get(j)[0])){
-                  int current_j=genClomplex (elements,j);
+                  int current_j=genClomplex (elements,j,parentClass);
                   //System.out.println("Clase creada vuelvo "+current_j);
                   String[] ele=new String[2];
                   if("single".equals(elements.get(j)[2])){
@@ -148,7 +148,7 @@ public class ClassGenNested {
         classesDummy.add(CS); 
        // System.out.println("ADDTION TO CS:"+CS);
         //System.out.println(newclass.get(0)[0]+" , "+newclass.get(1)[0]);
-        classGen(newclass,className);
+        classGen(newclass,className,parentClass);
         return j;
     }
     
@@ -214,7 +214,7 @@ public class ClassGenNested {
 
     
     
-    public  void classGen ( ArrayList<String[]> elements , String className){
+    public  void classGen ( ArrayList<String[]> elements , String className, String parentClass){
          
      ClassGenSimple cg=new ClassGenSimple();   
      String ClassName =className.substring(0, 1).toUpperCase() + className.substring(1,className.length()); 
@@ -261,11 +261,17 @@ public class ClassGenNested {
         TypeSpec classGen  = BclassGen.build();
         
      
-              
+             
                
  
-  
-        JavaFile javaFile2 = JavaFile.builder("eu.generator.resources",classGen)
+            String packageName="eu.generator.resources";    
+ 
+        if( parentClass.contains("_P")){
+            packageName="eu.generator.provider";
+        }else if( parentClass.contains("_C")){
+            packageName="eu.generator.consumer";
+        }
+        JavaFile javaFile2 = JavaFile.builder(packageName,classGen)
                 .addFileComment("Auto generated")
                 .build();
         try{
