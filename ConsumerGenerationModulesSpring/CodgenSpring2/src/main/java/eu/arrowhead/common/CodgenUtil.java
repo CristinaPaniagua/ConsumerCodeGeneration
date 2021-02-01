@@ -202,12 +202,12 @@ public final class CodgenUtil {
          
          if(type.equalsIgnoreCase("String")) t=String.class;
          else if (type.equalsIgnoreCase("Boolean")) t=Boolean.class;
-         else if (type.equalsIgnoreCase("Integer")) t=Integer.class;
+         else if (type.equalsIgnoreCase("Integer")) t=int.class;
          else if (type.equalsIgnoreCase("Byte")) t=Byte.class;
          else if (type.equalsIgnoreCase("Double")) t=double.class;
-         else if (type.equalsIgnoreCase("Float")) t=Float.class;
-         else if (type.equalsIgnoreCase("Short")) t=Short.class;
-         else if (type.equalsIgnoreCase("Long")) t=Long.class;
+         else if (type.equalsIgnoreCase("Float")) t=float.class;
+         else if (type.equalsIgnoreCase("Short")) t=short.class;
+         else if (type.equalsIgnoreCase("Long")) t=long.class;
           else if (type.equalsIgnoreCase("Single")) t=Object.class;
          else if (type.startsWith("List")){
              //ParameterizedTypeName ListType =ParameterizedTypeName.get(List.class, Object.class);

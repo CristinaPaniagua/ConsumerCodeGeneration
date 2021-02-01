@@ -22,6 +22,7 @@ import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
+import eu.arrowhead.common.CodgenUtil;
 import static generator.codgen.EncodingParser.createObjectMapper;
 import eu.generator.consumer.RequestDTO_C0;
 import eu.generator.provider.RequestDTO_P0;
@@ -555,8 +556,8 @@ public class ResourceLWGen {
            
          
            if(nameC.equals("child")){
-                     nameC=elements_requestP.get(i)[1];
-                     typeC=elements_requestP.get(i)[2];
+                     nameC=elements_requestC.get(i)[1];
+                     typeC=elements_requestC.get(i)[2];
            }else NestedC=false;
         
         
@@ -586,6 +587,54 @@ public class ResourceLWGen {
                  
                  if(nameC.equals(nameP)){
                      
+                     
+                     if(NestedC){
+                         payload.addStatement("$T $L=payload_C.get$L().get$L() ",CodgenUtil.getType(typeC), nameC,NewClassC,nameC);
+                     } else {
+                         payload.addStatement("$T $L=payload_C.get$L() ",CodgenUtil.getType(typeC), nameC,nameC);
+                     }
+                     
+                     if(!typeC.equalsIgnoreCase(typeP)){
+                         
+                         if(typeC.equalsIgnoreCase("String")){
+                             if(typeP.equalsIgnoreCase("Integer"))  payload.addStatement("$T $L_P= Integer.parseInt($L)",CodgenUtil.getType(typeP),nameC, nameC);
+                             //if(typeP.equalsIgnoreCase("Long"))  payload.addStatement("$T $L_P= Long.parseLong($L)",CodgenUtil.getType(typeP),nameC, nameC);
+                             //if(typeP.equalsIgnoreCase("Float"))  payload.addStatement("$T $L_P= Float.parseFloat($L)",CodgenUtil.getType(typeP),nameC, nameC);
+                             else payload.addStatement("$T $L_P= $L.parse$L($L)",CodgenUtil.getType(typeP),nameC,Capitalize(typeP), Capitalize(typeP), nameC);
+                         }else if(typeP.equalsIgnoreCase("String")){
+                             
+                           
+                              payload.addStatement("$T $L_P= $L +\"\"",CodgenUtil.getType(typeP),nameC, nameC);
+                             
+                         } else{
+                             
+                             
+                         
+                             if((numberTypeDef(typeP)>numberTypeDef(typeC))){
+                             
+                                 payload.addStatement("$T $L_P= $L",CodgenUtil.getType(typeP),nameC, nameC);
+                             
+                              }else if((numberTypeDef(typeP)<numberTypeDef(typeC))){
+                                 payload.addStatement("$T $L_P=($T)$L",CodgenUtil.getType(typeP),nameC,CodgenUtil.getType(typeP), nameC);
+                                 }
+                         }
+                         
+                          
+                     }else {
+                          payload.addStatement(" $T $L_P=$L", CodgenUtil.getType(typeP),nameC, nameC);
+                     }
+                     
+                     
+                     
+                     
+                       if(NestedP){
+                         payload.addStatement(" $L.set$L($L_P)",NewClassP, nameP, nameC)
+                                 .addStatement("payload_P.set$L($L)",NewClassP,NewClassP);
+                     } else {
+                         payload.addStatement("payload_P.set$L($L_P)",nameP,nameC);
+                     }
+                     j= elements_requestP.size();
+              /*      
                     if( NestedP && NestedC){
                         if(typeC.equalsIgnoreCase(typeP)|| (numberTypeDef(typeP)>numberTypeDef(typeC))){
                          payload.addStatement(" $L.set$L(payload_C.get$L().get$L() )",NewClassP, nameP,NewClassC,nameC)
@@ -612,7 +661,7 @@ public class ResourceLWGen {
                             } 
                     }
                         
-                       
+                 */      
                      
                      
                      
@@ -661,9 +710,10 @@ public class ResourceLWGen {
           int typeNumber;
           
           
-          if(type.equalsIgnoreCase("String")) typeNumber=-1;
-         else if (type.equalsIgnoreCase("Boolean")) typeNumber=-2;
-         else if (type.equalsIgnoreCase("Integer")) typeNumber=2;
+          //if(type.equalsIgnoreCase("String")) typeNumber=-1;
+         //else if (type.equalsIgnoreCase("Boolean")) typeNumber=-2;
+         //else
+         if (type.equalsIgnoreCase("Integer")||type.equalsIgnoreCase("int")) typeNumber=2;
          else if (type.equalsIgnoreCase("Byte")) typeNumber=0;
          else if (type.equalsIgnoreCase("Double")) typeNumber=5;
          else if (type.equalsIgnoreCase("Float")) typeNumber=4;

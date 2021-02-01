@@ -24,7 +24,7 @@
 					<element name="name" type="String"/>
 					<element name="localization" type="String" variation="country"/>
                                         <complexelement name="value" type="single">
-                                            <element name="temp" type="Integer" variation="temperature" unit="Celsius" max="40" />
+                                            <element name="temp" type="String" variation="temperature" unit="Celsius" max="40" />
                                             <element name="unit" type="String" />
                                         </complexelement>
 				
