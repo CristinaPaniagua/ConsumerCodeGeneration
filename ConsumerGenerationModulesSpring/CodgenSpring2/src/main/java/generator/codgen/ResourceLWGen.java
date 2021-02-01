@@ -597,16 +597,42 @@ public class ResourceLWGen {
                      if(!typeC.equalsIgnoreCase(typeP)){
                          
                          if(typeC.equalsIgnoreCase("String")){
-                             if(typeP.equalsIgnoreCase("Integer"))  payload.addStatement("$T $L_P= Integer.parseInt($L)",CodgenUtil.getType(typeP),nameC, nameC);
-                             //if(typeP.equalsIgnoreCase("Long"))  payload.addStatement("$T $L_P= Long.parseLong($L)",CodgenUtil.getType(typeP),nameC, nameC);
-                             //if(typeP.equalsIgnoreCase("Float"))  payload.addStatement("$T $L_P= Float.parseFloat($L)",CodgenUtil.getType(typeP),nameC, nameC);
-                             else payload.addStatement("$T $L_P= $L.parse$L($L)",CodgenUtil.getType(typeP),nameC,Capitalize(typeP), Capitalize(typeP), nameC);
-                         }else if(typeP.equalsIgnoreCase("String")){
-                             
+                             if(typeP.equalsIgnoreCase("Boolean")){
+                              
+                                      payload.addStatement("$T $L_P",CodgenUtil.getType(typeP),nameC)
+                                     .beginControlFlow("if($L)",nameC)
+                                       .addStatement("$L_P= true",nameC)
+                                       .endControlFlow()
+                                     .beginControlFlow("else")
+                                        .addStatement("$L_P= false",nameC)
+                                     .endControlFlow();
                            
-                              payload.addStatement("$T $L_P= $L +\"\"",CodgenUtil.getType(typeP),nameC, nameC);
+                             }else payload.addStatement("$T $L_P= $L.parse$L($L)",CodgenUtil.getType(typeP),nameC,Capitalize(typeP), Capitalize(typeP), nameC);
+                         
+                         }else if(typeP.equalsIgnoreCase("String")){
+                             if(typeP.equalsIgnoreCase("Boolean")){
+                              
+                                     payload.addStatement("$T $L_P",CodgenUtil.getType(typeP),nameC)
+                                     .beginControlFlow("if($L.equalsIgnoreCase(\"true\"))",nameC)
+                                       .addStatement("$L_P= \"true\"",nameC)
+                                       .endControlFlow()
+                                     .beginControlFlow("else")
+                                        .addStatement("$L_P= \"false\"",nameC)
+                                     .endControlFlow();
+                             }else payload.addStatement("$T $L_P= $L +\"\"",CodgenUtil.getType(typeP),nameC, nameC);
                              
-                         } else{
+                             
+                            
+                         }else if(typeC.equalsIgnoreCase("Boolean")){
+                          
+                             payload.addStatement("$T $L_P",CodgenUtil.getType(typeP),nameC)
+                                     .beginControlFlow("if($L)",nameC)
+                                       .addStatement("$L_P= 1",nameC)
+                                       .endControlFlow()
+                                     .beginControlFlow("else")
+                                        .addStatement("$L_P= 0",nameC)
+                                     .endControlFlow();
+                         }else{
                              
                              
                          
