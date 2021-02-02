@@ -13,7 +13,7 @@
 
 			<request>
 				<format> 
-					<encode name="CBOR" mediaType= "--" version="0"/>
+					<encode name="XML" mediaType= "--" version="0"/>
 					<security name="null" version="0"/>
 					<qos name="null" version="0"/> 
 					<semantic name="null" version="0"/>
@@ -21,10 +21,10 @@
 				</format> 
 			<payload>	
 					<complextype type="null"/> 					
-					<element name="name" type="String"/>
+					<element name="name" type="String" variation="id"/>
 					<element name="localization" type="String" variation="country"/>
                                         <complexelement name="value" type="single">
-                                            <element name="temp" type="Boolean" variation="temperature" unit="Celsius" max="40" />
+                                            <element name="temp" type="Float" variation="temperature" unit="Celsius" max="40" />
                                             <element name="unit" type="String" />
                                         </complexelement>
 				
@@ -34,7 +34,7 @@
 			
 			<response status="200">
                             <format> 
-					<encode name="CBOR" mediaType= "--" version="0"/>
+					<encode name="XML" mediaType= "--" version="0"/>
 					<security name="null" version="0"/>
 					<qos name="null" version="0"/> 
 					<semantic name="null" version="0"/>

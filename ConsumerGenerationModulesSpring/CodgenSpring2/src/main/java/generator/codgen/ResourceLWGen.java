@@ -535,22 +535,30 @@ public class ResourceLWGen {
     .addParameter(RequestDTO_C0.class, "payload_C")
     .addStatement(" $T payload_P = new RequestDTO_P0()",RequestDTO_P0.class);
     
-     
+     Boolean match =false;
       ArrayList<String[]> elements_requestC=MD_C.elements_request.get(0).getElements();
       ArrayList<String[]> elements_requestP=MD_P.elements_request.get(0).getElements();
+      ArrayList<String[]> metadata_requestC=MD_C.elements_request.get(0).getMetadata();
+      ArrayList<String[]> metadata_requestP=MD_P.elements_request.get(0).getMetadata();
       Boolean NestedP=false;
       Boolean NestedC=false;
       String NewClassP=null;
       String NewClassC=null;
+      String nameP="";
+      String typeP="";
+      String nameC="";
+      String typeC="";
+      int newClasses=0;
+       CodgenUtil.readList(metadata_requestC);
      for (int i = 0; i < elements_requestC.size()-1; i++){ 
-        String nameC=elements_requestC.get(i)[0];
-        String typeC=elements_requestC.get(i)[1];
-       
+       nameC=elements_requestC.get(i)[0];
+       typeC=elements_requestC.get(i)[1];
+       match=false;
         
        if(nameC.equals("Newclass")){
                NewClassC= typeC;
                NestedC=true;
-               
+               newClasses++;
        }else{
            
            
@@ -561,11 +569,11 @@ public class ResourceLWGen {
            }else NestedC=false;
         
         
-       System.out.println("consumer: " +nameC +" - "+ typeC);
+      System.out.println("consumer: " +nameC +" - "+ typeC);
         
             for (int j = 0; j < elements_requestP.size()-1; j++){ 
-                 String nameP=elements_requestP.get(j)[0];
-                 String typeP=elements_requestP.get(j)[1];
+               nameP=elements_requestP.get(j)[0];
+               typeP=elements_requestP.get(j)[1];
                  
                  
                 if(nameP.equals("Newclass")){
@@ -581,14 +589,45 @@ public class ResourceLWGen {
                         
                  
                  
-                 System.out.println("Provider: " +nameP +" - "+ typeP);
+                System.out.println("Provider: " +nameP +" - "+ typeP);
                  
-                System.out.println("NestedC: " +NestedC +", NestedP: "+ NestedP);
+               System.out.println("NestedC: " +NestedC +", NestedP: "+ NestedP);
                  
                  if(nameC.equals(nameP)){
+                     match=true;
+                
+                     j= elements_requestP.size();
+                    }// end if equal names
                      
-                     
-                     if(NestedC){
+                 }
+            }
+            
+             if(match==false){ //No name identified
+                 String variantC= metadata_requestC.get(i-newClasses)[2]; 
+                      for (int j = 0; j < metadata_requestP.size()-1; j++){ 
+                            String variantP=metadata_requestP.get(j)[2];
+                            System.out.println("Variant: " +variantP);
+                            if(nameC.equalsIgnoreCase(variantP)&& !variantP.equals(" ")){
+                                nameP=metadata_requestP.get(j)[0];
+                                typeP=metadata_requestP.get(j)[1];
+                               match=true;
+                               j=metadata_requestP.size();
+                            } else if(variantC.equalsIgnoreCase(variantP)&& !variantP.equals(" ")&& !variantC.equals(" ")){
+                                nameP=metadata_requestP.get(j)[0];
+                                typeP=metadata_requestP.get(j)[1];
+                               match=true;
+                               j=metadata_requestP.size();
+                            }
+                      }
+                 }
+          
+            
+            
+            
+          }
+           System.out.println("Provider: " +nameP +" - Consumer: " +nameC); 
+          if(match){
+              if(NestedC){
                          payload.addStatement("$T $L=payload_C.get$L().get$L() ",CodgenUtil.getType(typeC), nameC,NewClassC,nameC);
                      } else {
                          payload.addStatement("$T $L=payload_C.get$L() ",CodgenUtil.getType(typeC), nameC,nameC);
@@ -658,49 +697,10 @@ public class ResourceLWGen {
                                  .addStatement("payload_P.set$L($L)",NewClassP,NewClassP);
                      } else {
                          payload.addStatement("payload_P.set$L($L_P)",nameP,nameC);
-                     }
-                     j= elements_requestP.size();
-              /*      
-                    if( NestedP && NestedC){
-                        if(typeC.equalsIgnoreCase(typeP)|| (numberTypeDef(typeP)>numberTypeDef(typeC))){
-                         payload.addStatement(" $L.set$L(payload_C.get$L().get$L() )",NewClassP, nameP,NewClassC,nameC)
-                                 .addStatement("payload_P.set$L($L)",NewClassP,NewClassP);
-                         j= elements_requestP.size();
-                        }
-                    }else if( !NestedP && NestedC){
-                          if(typeC.equalsIgnoreCase(typeP)|| (numberTypeDef(typeP)>numberTypeDef(typeC))){
-                         payload.addStatement("payload_P.set$L(payload_C.get$L().get$L())",nameP,NewClassC,nameC) ;
-                         j= elements_requestP.size();
-                        }
-                        
-                    }else if( NestedP && !NestedC){
-                         if(typeC.equalsIgnoreCase(typeP)|| (numberTypeDef(typeP)>numberTypeDef(typeC))){
-                          payload.addStatement("$L.set$L(payload_C.get$L() )",NewClassP,nameP,nameC)
-                                 .addStatement("payload_P.set$L($L)",NewClassP,NewClassP);
-                         j= elements_requestP.size();
-                        }
-                        
-                    }else{
-                          if(typeC.equalsIgnoreCase(typeP)|| (numberTypeDef(typeP)>numberTypeDef(typeC))){
-                         payload.addStatement("payload_P.set$L(payload_C.get$L() )",nameP,nameC);
-                         j= elements_requestP.size();
-                            } 
-                    }
-                        
-                 */      
-                     
-                     
-                     
-                
-                     
-                    
-                      
-                        }
-                    
-                     
-                 }
-            }
-          }
+                     } 
+          } 
+           
+          
     }
         
      

@@ -240,7 +240,7 @@ public final class CodgenUtil {
         for (int i = 0; i < elements.size(); i++){ 
             String[] ele=elements.get(i);
             for (int j = 0; j < ele.length; j++){
-                //System.out.println(i+"."+j+" :"+elements.get(i)[j]);
+                System.out.println(i+"."+j+" :"+elements.get(i)[j]);
             }
             
         }

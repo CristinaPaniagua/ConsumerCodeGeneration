@@ -21,14 +21,11 @@
 				</format> 
 			<payload>	
 					<complextype type="null"/> 					
-					<element name="name" type="String"/>
-					<element name="localization" type="String"/>
-                                        <complexelement name="value" type="single">
-                                            <element name="temp" type="Float" variation="temperature" unit="Celsius"/>
-                                            <element name="unit" type="String"/>
-                                        </complexelement>
-				
-					
+					<element name="n" type="String" variation="name"/>
+				        <element name="v" type="Integer" variation="temperature" unit="Celsius"/>
+                                         <element name="u" type="String" variation="unit"/>
+                                         <element name="t" type="Double" variation="time" unit="microseconds"/>
+                            		
                         </payload>
 			</request>
 			
