@@ -3,7 +3,8 @@ package eu.generator.resources;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.github.underscore.lodash.U;
 import eu.generator.consumer.RequestDTO_C0;
 import eu.generator.provider.RequestDTO_P0;
 import eu.generator.provider.ResponseDTO_P0;
@@ -17,6 +18,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapResponse;
 import org.eclipse.californium.core.Utils;
@@ -29,13 +31,12 @@ import org.eclipse.californium.elements.exception.ConnectorException;
 public class RESTResources {
   @POST
   @Path("/testTranslation")
-  @Produces("application/cbor")
-  @Consumes("application/cbor")
-  public byte[] offer(byte[] receivedPayload) {
+  @Produces(MediaType.APPLICATION_XML)
+  @Consumes(MediaType.APPLICATION_XML)
+  public String offer(String receivedPayload) {
     RequestDTO_C0 payload=new RequestDTO_C0();
-     byte[] response=null;
-    CBORFactory cborFactory = new CBORFactory();
-    ObjectMapper objMapper=new ObjectMapper(cborFactory);
+     String response=null;
+    ObjectMapper objMapper=new XmlMapper();
     try {
       payload=objMapper.readValue(receivedPayload, RequestDTO_C0.class);
       System.out.println(payload.toString());
@@ -54,17 +55,19 @@ public class RESTResources {
 
   public static RequestDTO_P0 requestAdaptor(RequestDTO_C0 payload_C) {
      RequestDTO_P0 payload_P = new RequestDTO_P0();
-    payload_P.setname(payload_C.getname() );
-    payload_P.setlocalization(payload_C.getlocalization() );
-     eu.generator.provider.Value value = new  eu.generator.provider.Value ();
-     value.settemp(payload_C.getvalue().gettemp() );
-    payload_P.setvalue(value);
-     value.setunit(payload_C.getvalue().getunit() );
-    payload_P.setvalue(value);
+    String name=payload_C.getname() ;
+     String name_P=name;
+    payload_P.setn(name_P);
+    float temp=payload_C.getvalue().gettemp() ;
+    int temp_P=(int)temp;
+    payload_P.setv(temp_P);
+    String unit=payload_C.getvalue().getunit() ;
+     String unit_P=unit;
+    payload_P.setu(unit_P);
     return payload_P;
   }
 
-  private static byte[] consumeService(String url, RequestDTO_C0 payload) throws IOException {
+  private static String consumeService(String url, RequestDTO_C0 payload) throws IOException {
      RequestDTO_P0 payloadP= requestAdaptor(payload);
     //Adding Import NetworkConfig;
      File CONFIG_FILE = new File("Californium.properties");
@@ -109,10 +112,9 @@ public class RESTResources {
     JsonFactory jsonFactory_objMapperP = new JsonFactory();
     ObjectMapper objMapperP=new ObjectMapper(jsonFactory_objMapperP);
     ResponseDTO_P0 responseObj=objMapperP.readValue(responseText,ResponseDTO_P0.class);
-    CBORFactory cborFactory = new CBORFactory();
-    ObjectMapper objMapperC=new ObjectMapper(cborFactory);
-     byte[] result_out;
-    result_out=objMapperC.writeValueAsBytes(responseObj);
+    ObjectMapper objMapperC=new XmlMapper();
+     String result_out = "";
+    result_out= U.jsonToXml(responseText);
     return result_out;
   }
 }

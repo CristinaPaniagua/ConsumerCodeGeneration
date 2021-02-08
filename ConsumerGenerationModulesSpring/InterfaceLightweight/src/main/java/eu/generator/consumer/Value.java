@@ -1,19 +1,18 @@
 // Auto generated
 package eu.generator.consumer;
 
-import java.lang.Integer;
 import java.lang.Override;
 import java.lang.String;
 
 public class Value {
-  private Integer temp;
+  private float temp;
 
   private String unit;
 
   public Value() {
   }
 
-  public Value(Integer temp, String unit) {
+  public Value(float temp, String unit) {
     this.temp = temp;
     this.unit = unit;
   }
@@ -23,11 +22,11 @@ public class Value {
     return "ProviderPayload{" + "temp=" + temp+ ",  "+ "unit=" + unit+ ",  " +"}";
   }
 
-  public Integer gettemp() {
+  public float gettemp() {
     return temp;
   }
 
-  public void settemp(Integer temp) {
+  public void settemp(float temp) {
     this.temp=temp;
   }
 

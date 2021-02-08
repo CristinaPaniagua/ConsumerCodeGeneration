@@ -9,47 +9,58 @@ import java.lang.String;
     ignoreUnknown = true
 )
 public class RequestDTO_P0 {
-  private String name;
+  private String n;
 
-  private String localization;
+  private int v;
 
-  private Value value;
+  private String u;
+
+  private double t;
 
   public RequestDTO_P0() {
   }
 
-  public RequestDTO_P0(String name, String localization, Value value) {
-    this.name = name;
-    this.localization = localization;
-    this.value = value;
+  public RequestDTO_P0(String n, int v, String u, double t) {
+    this.n = n;
+    this.v = v;
+    this.u = u;
+    this.t = t;
   }
 
   @Override
   public String toString() {
-    return "ProviderPayload{" + "name=" + name+ ",  "+ "localization=" + localization+ ",  "+ "value=" + value +"}";
+    return "ProviderPayload{" + "n=" + n+ ",  "+ "v=" + v+ ",  "+ "u=" + u+ ",  "+ "t=" + t+ ",  " +"}";
   }
 
-  public String getname() {
-    return name;
+  public String getn() {
+    return n;
   }
 
-  public void setname(String name) {
-    this.name=name;
+  public void setn(String n) {
+    this.n=n;
   }
 
-  public String getlocalization() {
-    return localization;
+  public int getv() {
+    return v;
   }
 
-  public void setlocalization(String localization) {
-    this.localization=localization;
+  public void setv(int v) {
+    this.v=v;
   }
 
-  public Value getvalue() {
-    return value;
+  public String getu() {
+    return u;
   }
 
-  public void setvalue(Value value) {
-    this.value=value;
+  public void setu(String u) {
+    this.u=u;
+  }
+
+  public double gett() {
+    return t;
+  }
+
+  public void sett(double t) {
+    this.t=t;
   }
 }
