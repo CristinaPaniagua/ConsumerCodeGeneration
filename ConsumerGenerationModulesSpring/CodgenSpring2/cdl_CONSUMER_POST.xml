@@ -9,18 +9,17 @@
 
 	<interface protocol="HTTP" address="http://127.0.0.1/8888" >
 	
-		<method name="GET" id="offer" path="/testTranslation">
+		<method name="POST" id="offer" path="/testTranslation">
 
-	
-			<response status="200">
-                            <format> 
+			<request>
+				<format> 
 					<encode name="XML" mediaType= "--" version="0"/>
 					<security name="null" version="0"/>
 					<qos name="null" version="0"/> 
 					<semantic name="null" version="0"/>
 					<notation href="null"/> 
 				</format> 
-                             <payload>	
+			<payload>	
 					<complextype type="null"/> 					
 					<element name="name" type="String" variation="id"/>
 					<element name="localization" type="String" variation="country"/>
@@ -30,7 +29,22 @@
                                         </complexelement>
 				
 					
-                             </payload>
+                        </payload>
+			</request>
+			
+			<response status="200">
+                            <format> 
+					<encode name="XML" mediaType= "--" version="0"/>
+					<security name="null" version="0"/>
+					<qos name="null" version="0"/> 
+					<semantic name="null" version="0"/>
+					<notation href="null"/> 
+				</format> 
+                              <payload>	
+					<complextype type="null"/> 					
+					<element name="response" type="String"/>	
+                              </payload>     
+                                
                          </response>
 		</method>
 

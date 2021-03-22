@@ -103,7 +103,9 @@ public class ResourceLWGen {
     //String addressP=MD_P.ge
     
     MethodSpec.Builder methodgen;
-    CodeBlock mapperCode=createObjectMapper(MD_C.getMediatype_request(),"objMapper");
+    
+  
+    
     
     
     if(MD_C.Protocol.equalsIgnoreCase("HTTP")){
@@ -167,14 +169,25 @@ public class ResourceLWGen {
                  .builder(Path.class)
                  .addMember("value", "$S", pathResource)
                  .build();
+       
+       
+       
+       //'''''''''''''''''''''''START REAL METHOD''''''''''''''''''''''//
          
     methodgen = MethodSpec.methodBuilder(MD_C.getID())
      .addModifiers(Modifier.PUBLIC);
-     if(MD_C.getMediatype_response().equalsIgnoreCase("CBOR")){
+    //if(MD_C.getResponse()){
+        methodgen.returns(ResponseDTO_C0.class);
+   // }else{
+        if(MD_C.getMediatype_request().equalsIgnoreCase("CBOR")){
           methodgen.returns(byte[].class);
       }else {
           methodgen.returns(String.class);
-      }
+      } 
+    //}
+    
+    methodgen.addException(IOException.class);
+    
      
      //TODO: ADD THE REST OF THE METHODS (PUT AND DELETE)
      if(MD_C.getMethod().equalsIgnoreCase("POST")){
@@ -214,22 +227,41 @@ public class ResourceLWGen {
                
         
          }
-       methodgen 
-     .addStatement("RequestDTO_C0 payload=new RequestDTO_C0()");
+    
+    
+    
+   
+    
+       
+       if (MD_C.getRequest() && MD_P.getRequest()){
+            CodeBlock mapperCode_request=createObjectMapper(MD_C.getMediatype_request(),"objMapper");
+             methodgen.addStatement("RequestDTO_C0 payload=new RequestDTO_C0()")
+                      .addCode(mapperCode_request);
+         } 
+       
+       
+       
        
        if(MD_C.getMediatype_response().equalsIgnoreCase("CBOR")){
-           methodgen.addStatement(" byte[] response=null");
+           methodgen.addStatement(" byte[] response_out=null");
       }else {
-          methodgen.addStatement(" String response=null");
+          methodgen.addStatement(" String response_out=\" \"");
       }
                
-       
+         if(MD_P.getResponse() && MD_C.getResponse()){
+               CodeBlock mapperCode_response=createObjectMapper(MD_P.getMediatype_response(),"objMapper");
+               methodgen.addStatement("ResponseDTO_P0 response=new ResponseDTO_P0()");
+                       //.addCode(mapperCode_response);
+           }  
+            
+         
      
-     methodgen.addCode(mapperCode)
-     .beginControlFlow("try");
+     methodgen.beginControlFlow("try");
        if(!MD_C.getMethod().equalsIgnoreCase("GET")){
            methodgen.addStatement("payload=objMapper.readValue(receivedPayload, RequestDTO_C0.class)")
              .addStatement("System.out.println(payload.toString())");
+       }else{
+             methodgen.addStatement("String payload=null");
        }
      
       methodgen.addStatement("response=consumeService(\"http://127.0.0.1:8889/demo$L\",payload)",pathP)
@@ -237,16 +269,43 @@ public class ResourceLWGen {
      .beginControlFlow("catch ($T e)",Exception.class)      
      .addStatement(" e.printStackTrace()")
      .endControlFlow() 
-     .beginControlFlow("if(response==null)");
+     ;
      
+      if (MD_P.getResponse() && MD_C.getResponse() ){
+         methodgen.addStatement("ResponseDTO_C0 response_C=new ResponseDTO_C0()")
+                 .addStatement(" response_C= responseAdaptor(response)");
+         
+        if(MD_C.Protocol.equalsIgnoreCase("HTTP")){
+           methodgen.beginControlFlow("if(response==null)")
+                   .addStatement("  return response_out")
+            .endControlFlow() 
+            .beginControlFlow("else")
+             .addStatement("response_out= objMapper.writeValueAsString(response_C)")
+            .addStatement("return response_out");
+       }else{ //COAP
+         methodgen.beginControlFlow("if(response==null)")
+                 .addStatement("exchange.respond( \"ERROR: EMPTY RESPONSE\")")
+            .endControlFlow() 
+            .beginControlFlow("else");
+        if(MD_C.getMediatype_request().equalsIgnoreCase("JSON")){
+            methodgen.addStatement(" exchange.respond($T.ResponseCode.CONTENT,response_C,50)",CoAP.class);
+        }else if(MD_C.getMediatype_request().equalsIgnoreCase("XML")){
+          methodgen.addStatement(" exchange.respond($T.ResponseCode.CONTENT,response_C,41)",CoAP.class);
+        }else
+             methodgen.addStatement(" exchange.respond(response_C) ");
+    }
+
+      }else{
      
        if(MD_C.Protocol.equalsIgnoreCase("HTTP")){
-           methodgen.addStatement("  return response")
+           methodgen.beginControlFlow("if(response==null)")
+                   .addStatement("  return response")
             .endControlFlow() 
             .beginControlFlow("else")
             .addStatement("return response");
        }else{ //COAP
-         methodgen.addStatement("exchange.respond( \"ERROR: EMPTY RESPONSE\")")
+         methodgen.beginControlFlow("if(response==null)")
+                 .addStatement("exchange.respond( \"ERROR: EMPTY RESPONSE\")")
             .endControlFlow() 
             .beginControlFlow("else");
         if(MD_C.getMediatype_request().equalsIgnoreCase("JSON")){
@@ -256,6 +315,7 @@ public class ResourceLWGen {
         }else
              methodgen.addStatement(" exchange.respond(response) ");
     }
+      }
       methodgen.endControlFlow() 
      ;
    
@@ -295,17 +355,35 @@ public class ResourceLWGen {
       MethodSpec.Builder consumer = MethodSpec.methodBuilder("consumeService")
      .addModifiers(Modifier.PRIVATE)
      .addModifiers(Modifier.STATIC);
-      if(MD_C.getMediatype_response().equalsIgnoreCase("CBOR")){
+       if(MD_P.getResponse()){
+        consumer.returns(ResponseDTO_P0.class);
+    }else{
+        if(MD_P.getMediatype_request().equalsIgnoreCase("CBOR")){
           consumer.returns(byte[].class);
       }else {
           consumer.returns(String.class);
-      }
+      } 
+    }
      
      
-     consumer.addParameter(String.class, "url")
-     .addParameter(RequestDTO_C0.class, "payload")
-     .addException(IOException.class)
-     .addStatement(" RequestDTO_P0 payloadP= requestAdaptor(payload)");
+     consumer.addParameter(String.class, "url");
+     if(MD_C.getRequest()){
+        consumer.addParameter(RequestDTO_C0.class, "payload");
+     }else{
+         consumer.addParameter(String.class, "payload");
+     }
+     
+     
+    
+     consumer.addException(IOException.class);
+     
+     if(MD_P.getRequest() && MD_C.getRequest()){
+         consumer.addStatement(" RequestDTO_P0 payloadP= requestAdaptor(payload)");
+     }else{
+           consumer.addStatement(" String payloadP=payload");
+     }
+     
+     
          
            if(MD_P.getProtocol().equalsIgnoreCase("COAP")){ //CONSUMER SIZE is COAP
                
@@ -423,8 +501,12 @@ public class ResourceLWGen {
                   consumer.addStatement("result_out=responseText");
             }
      
-     
-      consumer.addStatement("return result_out");
+     if(MD_P.getResponse()){
+        consumer.addStatement("return responseObj");
+     }else{
+           consumer.addStatement("return result_out");
+     }
+      
 
   
        }        
@@ -513,8 +595,16 @@ public class ResourceLWGen {
       .endControlFlow() 
       .beginControlFlow("finally")
         .addStatement("httpClient.close()")
-      .endControlFlow() 
-      .addStatement("return result_out"); 
+      .endControlFlow();
+            
+             if(MD_P.getResponse()){
+        consumer.addStatement("return responseObj");
+     }else{
+           consumer.addStatement("return result_out");
+     }
+            
+     
+             
      
       
        }
@@ -649,7 +739,7 @@ public class ResourceLWGen {
                              }else payload.addStatement("$T $L_P= $L.parse$L($L)",CodgenUtil.getType(typeP),nameC,Capitalize(typeP), Capitalize(typeP), nameC);
                          
                          }else if(typeP.equalsIgnoreCase("String")){
-                             if(typeP.equalsIgnoreCase("Boolean")){
+                             if(typeC.equalsIgnoreCase("Boolean")){
                               
                                      payload.addStatement("$T $L_P",CodgenUtil.getType(typeP),nameC)
                                      .beginControlFlow("if($L.equalsIgnoreCase(\"true\"))",nameC)
@@ -715,13 +805,187 @@ public class ResourceLWGen {
   
      MethodSpec.Builder payload = MethodSpec.methodBuilder("responseAdaptor")
     .addModifiers(Modifier.PUBLIC)
+    .addModifiers(Modifier.STATIC)
     .returns(ResponseDTO_C0.class)
     .addParameter(ResponseDTO_P0.class, "payload_P")
-    .addStatement(" $T payload_C;",ResponseDTO_C0.class)
-    .addStatement("return payload_C");
-     
-   
+    .addStatement(" $T payload_C= new ResponseDTO_C0()",ResponseDTO_C0.class);
+  
+    
+     Boolean match =false;
+      ArrayList<String[]> elements_responseC=MD_C.elements_response.get(0).getElements();
+      ArrayList<String[]> elements_responseP=MD_P.elements_response.get(0).getElements();
+      ArrayList<String[]> metadata_responseC=MD_C.elements_response.get(0).getMetadata();
+      ArrayList<String[]> metadata_responseP=MD_P.elements_response.get(0).getMetadata();
+      Boolean NestedP=false;
+      Boolean NestedC=false;
+      String NewClassP=null;
+      String NewClassC=null;
+      String nameP="";
+      String typeP="";
+      String nameC="";
+      String typeC="";
+      int newClasses=0;
+      System.out.println("LIST OF RESPONSE ELEMENTS:");
+       CodgenUtil.readList(metadata_responseP);
+       
+     for (int i = 0; i < elements_responseP.size(); i++){ 
+       nameP=elements_responseP.get(i)[0];
+       typeP=elements_responseP.get(i)[1];
+       match=false;
+        
+       if(nameP.equals("Newclass")){
+               NewClassP= typeP;
+               NestedP=true;
+               newClasses++;
+       }else{
            
+           
+         
+           if(nameP.equals("child")){
+                     nameP=elements_responseP.get(i)[1];
+                     typeP=elements_responseP.get(i)[2];
+           }else NestedC=false;
+        
+        
+      System.out.println("Provider reponse: " +nameP +" - "+ typeP);
+        
+            for (int j = 0; j < elements_responseC.size(); j++){ 
+               nameC=elements_responseC.get(j)[0];
+               typeC=elements_responseC.get(j)[1];
+                 
+                 
+                if(nameC.equals("Newclass")){
+                    NewClassC= typeC;
+                    if(NestedC==false) payload.addStatement(" eu.generator.consumer.$L $L = new  eu.generator.consumer.$L ()", Capitalize(NewClassC), NewClassC, Capitalize(NewClassC));
+                        NestedC=true;
+                        
+                 }else{
+                        if(nameC.equals("child")){
+                        nameC=elements_responseC.get(j)[1];
+                        typeC=elements_responseC.get(j)[2];
+                    }//else NestedP=false;
+                        
+                 
+                 
+                System.out.println("Consumer Response: " +nameC +" - "+ typeC);
+                 
+               System.out.println("NestedP: " +NestedP +", NestedC: "+ NestedC);
+                 
+                 if(nameP.equals(nameC)){
+                     match=true;
+                
+                     j= elements_responseC.size();
+                    }// end if equal names
+                     
+                 }
+            }
+            
+             if(match==false){ //No name identified
+                 String variantP= metadata_responseP.get(i-newClasses)[2]; 
+                      for (int j = 0; j < metadata_responseC.size()-1; j++){ 
+                            String variantC=metadata_responseC.get(j)[2];
+                            System.out.println("Variant: " +variantC);
+                            if(nameP.equalsIgnoreCase(variantC)&& !variantC.equals(" ")){
+                                nameC=metadata_responseC.get(j)[0];
+                                typeC=metadata_responseC.get(j)[1];
+                               match=true;
+                               j=metadata_responseC.size();
+                            } else if(variantP.equalsIgnoreCase(variantC)&& !variantC.equals(" ")&& !variantP.equals(" ")){
+                                nameC=metadata_responseC.get(j)[0];
+                                typeC=metadata_responseC.get(j)[1];
+                               match=true;
+                               j=metadata_responseC.size();
+                            }
+                      }
+                 }
+          
+            
+            
+           
+          }
+           System.out.println("Provider: " +nameP +" - Consumer: " +nameC); 
+          if(match){
+              if(NestedP){
+                         payload.addStatement("$T $L=payload_P.get$L().get$L() ",CodgenUtil.getType(typeP), nameP,NewClassP,nameP);
+                     } else {
+                         payload.addStatement("$T $L=payload_P.get$L() ",CodgenUtil.getType(typeP), nameP,nameP);
+                     }
+                     
+                     if(!typeP.equalsIgnoreCase(typeC)){
+                         
+                         if(typeP.equalsIgnoreCase("String")){
+                             if(typeC.equalsIgnoreCase("Boolean")){
+                              
+                                      payload.addStatement("$T $L_C",CodgenUtil.getType(typeC),nameP)
+                                     .beginControlFlow("if($L)",nameP)
+                                       .addStatement("$L_C= true",nameP)
+                                       .endControlFlow()
+                                     .beginControlFlow("else")
+                                        .addStatement("$L_C= false",nameP)
+                                     .endControlFlow();
+                           
+                             }else payload.addStatement("$T $L_C= $L.parse$L($L)",CodgenUtil.getType(typeC),nameP,Capitalize(typeC), Capitalize(typeC), nameP);
+                         
+                         }else if(typeC.equalsIgnoreCase("String")){
+                             if(typeP.equalsIgnoreCase("Boolean")){
+                              
+                                     payload.addStatement("$T $L_C",CodgenUtil.getType(typeC),nameP)
+                                     .beginControlFlow("if($L.equalsIgnoreCase(\"true\"))",nameP)
+                                       .addStatement("$L_C= \"true\"",nameP)
+                                       .endControlFlow()
+                                     .beginControlFlow("else")
+                                        .addStatement("$L_C= \"false\"",nameP)
+                                     .endControlFlow();
+                             }else payload.addStatement("$T $L_C= $L +\"\"",CodgenUtil.getType(typeC),nameP, nameP);
+                             
+                             
+                            
+                         }else if(typeP.equalsIgnoreCase("Boolean")){
+                          
+                             payload.addStatement("$T $L_C",CodgenUtil.getType(typeC),nameP)
+                                     .beginControlFlow("if($L)",nameP)
+                                       .addStatement("$L_C= 1",nameP)
+                                       .endControlFlow()
+                                     .beginControlFlow("else")
+                                        .addStatement("$L_C= 0",nameP)
+                                     .endControlFlow();
+                         }else{
+                             
+                             
+                         
+                             if((numberTypeDef(typeC)>numberTypeDef(typeP))){
+                             
+                                 payload.addStatement("$T $L_C= $L",CodgenUtil.getType(typeC),nameP, nameP);
+                             
+                              }else if((numberTypeDef(typeC)<numberTypeDef(typeP))){
+                                 payload.addStatement("$T $L_C=($T)$L",CodgenUtil.getType(typeC),nameP,CodgenUtil.getType(typeC), nameP);
+                                 }
+                         }
+                         
+                          
+                     }else {
+                          payload.addStatement(" $T $L_C=$L", CodgenUtil.getType(typeC),nameP, nameP);
+                     }
+                     
+                     
+                     
+                     
+                       if(NestedC){
+                         payload.addStatement(" $L.set$L($L_C)",NewClassC, nameC, nameP)
+                                 .addStatement("payload_C.set$L($L)",NewClassC,NewClassC);
+                     } else {
+                         payload.addStatement("payload_C.set$L($L_C)",nameC,nameP);
+                     } 
+          } 
+           
+          
+    }
+        
+     
+     
+     payload.addStatement("return payload_C");
+           
+         
      MethodSpec payloadTrans=payload.build();
         return payloadTrans;      
   } 
@@ -760,9 +1024,18 @@ public class ResourceLWGen {
        MethodSpec methodgen=methodgen(MD_C, MD_P);
        MethodSpec consumeService =consumeService(MD_C,MD_P); 
        MethodSpec  constructor =publishResourceConst();
+       MethodSpec  requestAdaptor=null;
+       MethodSpec  responseAdaptor=null;
        
-      MethodSpec  requestAdaptor = requestTransform(MD_C,MD_P);
-      MethodSpec  responseAdaptor = responseTransform(MD_C,MD_P);
+          if(MD_P.getResponse() && MD_C.getResponse()){
+               responseAdaptor = responseTransform(MD_C,MD_P);
+           }  
+            
+         if (MD_C.getRequest() && MD_P.getRequest()){
+            requestAdaptor = requestTransform(MD_C,MD_P);
+             
+         }
+     
         
         
         
@@ -776,10 +1049,21 @@ public class ResourceLWGen {
      TypeSpec.Builder classGen =TypeSpec.classBuilder("RESTResources")
               .addModifiers(Modifier.PUBLIC)
              //.addMethod(testEcho)
-             .addMethod(methodgen)
+             .addMethod(methodgen);
+     
+     if(!MD_C.getResponse() && !MD_P.getResponse()){
+          classGen.addMethod(requestAdaptor);
+            
+        }else if (!MD_C.getRequest() && !MD_P.getRequest()){
+            classGen.addMethod(responseAdaptor);
+            
+         }else{
+             classGen.addMethod(requestAdaptor)
+             .addMethod(responseAdaptor);
+           
+        }
              
-             .addMethod(requestAdaptor)
-             .addMethod(consumeService);
+             classGen.addMethod(consumeService);
      
      if(MD_C.Protocol.equalsIgnoreCase("COAP")){
          classGen.superclass(CoapResource.class)

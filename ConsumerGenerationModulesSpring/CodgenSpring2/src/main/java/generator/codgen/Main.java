@@ -117,8 +117,12 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
         
         //if(MD_Provider.getProtocol().equalsIgnoreCase("COAP"))
         //oapGenerator.coap(MD_Provider);
+    
+         
         
-        ResourceLWGen.ResourcesLWGen(MD_Consumer, MD_Provider);
+            ResourceLWGen.ResourcesLWGen(MD_Consumer, MD_Provider);
+       
+        System.out.println(MD_Consumer.getRequest() +"___" + MD_Provider.getRequest());
         
         //Server generation.. Consumer Side
         

@@ -54,8 +54,8 @@ public InterfaceMetadata read(String service,String System) throws GenerationExc
     Reset();
     
     Map<String,String> CDLstorage= new HashMap<>();
-    CDLstorage.put("provider","cdl_PROVIDER.xml");
-    CDLstorage.put("consumer","cdl_CONSUMER.xml");
+    CDLstorage.put("provider","cdl_PROVIDER_POST.xml");
+    CDLstorage.put("consumer","cdl_CONSUMER_POST.xml");
     
     
     String CDLName=CDLstorage.get(System);
@@ -623,9 +623,13 @@ public InterfaceMetadata read(String service,String System) throws GenerationExc
     if(!response && request){
         mediatype_response=mediatype_request;
     }
+    if(response && !request){
+        mediatype_request=mediatype_response;
+    }
+    
  //out.println("elemtents: ");
  //printElements(elements_request.get(0).getElements());
-  CodgenUtil.readList(metadata_request); 
+  //CodgenUtil.readList(metadata_request); 
  InterfaceMetadata MD = new InterfaceMetadata(protocol,path,method,mediatype_request, mediatype_response,ID,complexType_request,complexType_response,elements_request, elements_response, request,response,param,parameters,subpaths);  
     return MD;
     
