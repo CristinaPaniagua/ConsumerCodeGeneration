@@ -42,10 +42,10 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
         String service = request.getProperty("Service", "null");
         String system="providerTest";
         readCDL readConsumer = new readCDL();
-        MD_Consumer= readConsumer.read("offer","consumer");
+        MD_Consumer= readConsumer.read("indoortemperature","consumer");
         Boolean MD_ConsumerValid=metedataValidation(MD_Consumer);
         readCDL readProvider = new readCDL();
-        MD_Provider = readProvider.read("offer","provider");
+        MD_Provider = readProvider.read("indoortemperature","provider");
         Boolean MD_ProviderValid=metedataValidation(MD_Provider);
         
         System.out.println(MD_ConsumerValid);
