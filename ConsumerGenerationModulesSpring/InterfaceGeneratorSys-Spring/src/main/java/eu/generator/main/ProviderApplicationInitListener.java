@@ -1,4 +1,4 @@
-package eu.generator.provider;
+package eu.generator.main;
 
 import eu.arrowhead.client.skeleton.provider.*;
 import java.io.IOException;

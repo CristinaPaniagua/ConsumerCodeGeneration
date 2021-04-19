@@ -75,38 +75,49 @@ private static ArrayList<String> classesResponseP= new ArrayList<String>();
 private static ArrayList<ArrayList<String>> classesRequestC= new ArrayList<ArrayList<String>>();
 private static ArrayList<String> classesResponseC= new ArrayList<String>();
 
-   public static void startGeneration(RequestForm rf){
+   public static void startGeneration(RequestForm rf)throws GenerationException{
      System.out.print("CODGEGEN START********************************************************* \n");   
         
      
      
-        String service = request.getProperty("Service", "null");
+         String service = request.getProperty("Service", "null");
         String system="providerTest";
         readCDL readConsumer = new readCDL();
         MD_Consumer= readConsumer.read("offer","consumer");
+        Boolean MD_ConsumerValid=metedataValidation(MD_Consumer);
         readCDL readProvider = new readCDL();
         MD_Provider = readProvider.read("offer","provider");
+        Boolean MD_ProviderValid=metedataValidation(MD_Provider);
+        
+        System.out.println(MD_ConsumerValid);
+        System.out.println(MD_ProviderValid);
+      
+      
+      if(MD_ConsumerValid && MD_ProviderValid){
+        
+    
+        
         System.out.println(MD_Provider.toString());
         System.out.println(MD_Consumer.toString());
       
-      
+     
              
      if(MD_Provider.getRequest()){
-           ClassGen Request=new ClassGen();
+           ClassGenSimple Request=new ClassGenSimple();
        
              for(int i=0; i<MD_Provider.elements_request.size();i++)
              {
                 ArrayList<String[]> elements_requestP=MD_Provider.elements_request.get(i).getElements();
                classesRequestP.add(Request.classGen(elements_requestP,"RequestDTO_P"+i));
              }
-            for(int h=0;h<classesRequestP.size();h++)
-                System.out.println("..........."+classesRequestP.get(h));
+           // for(int h=0;h<classesRequestP.size();h++)
+             //   System.out.println("..........."+classesRequestP.get(h));
   
        }
         
        
         if(MD_Provider.getResponse()){
-            ClassGen Response=new ClassGen();
+            ClassGenSimple Response=new ClassGenSimple();
       
                  for(int j=0; j<MD_Provider.elements_response.size();j++)
                  {
@@ -118,21 +129,21 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
         
         
          if(MD_Consumer.getRequest()){
-           ClassGen Request=new ClassGen();
+           ClassGenSimple Request=new ClassGenSimple();
        
              for(int i=0; i<MD_Consumer.elements_request.size();i++)
              {
                 ArrayList<String[]> elements_requestC=MD_Consumer.elements_request.get(i).getElements();
                classesRequestC.add(Request.classGen(elements_requestC,"RequestDTO_C"+i));
              }
-            for(int h=0;h<classesRequestC.size();h++)
-                System.out.println("..........."+classesRequestC.get(h));
+           // for(int h=0;h<classesRequestC.size();h++)
+                //System.out.println("..........."+classesRequestC.get(h));
   
        }
         
        
         if(MD_Consumer.getResponse()){
-            ClassGen Response=new ClassGen();
+            ClassGenSimple Response=new ClassGenSimple();
       
                  for(int j=0; j<MD_Consumer.elements_response.size();j++)
                  {
@@ -150,6 +161,10 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
         
         ResourceLWGen.ResourcesLWGen(MD_Consumer, MD_Provider);
         
+        //Server generation.. Consumer Side
+        
+        
+        ServerGen.Server(MD_Consumer);
         
         
         
@@ -160,6 +175,12 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
 	} catch (InterruptedException e) {
 		e.printStackTrace();
 	}
+        
+        
+         } else {
+          System.out.println(" ERROR: GENERATION ABORTED -- ONE OR MORE CDLs ARE MALFORMED ");
+          // throw new GenerationException(" ONE OR MORE OF THE CDLs ARE MALFORMED ");
+    }   
         
         
     }
@@ -209,7 +230,29 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
     }
    
    
-   
+   public static Boolean metedataValidation (InterfaceMetadata MD){
+    Boolean validation= true;
+    if(MD.getProtocol().equals("")){
+        validation= false;
+    }else if(MD.getMethod().equals("")){
+        validation= false;
+    }else if(MD.getID()==null){
+        validation=false;
+        
+    }else if(MD.getPathResource().equals("")){
+         validation=false;
+        
+    } else if(MD.getRequest()){
+        
+        if(MD.getMediatype_request().equals("")){
+            validation= false;
+        }
+        if(MD.getElements_request().isEmpty()){  //IT IS POSIBLE A EMPTY REQUEST? 
+            validation= false;
+        }
+    }
+    return validation ;
+}
         
         
          

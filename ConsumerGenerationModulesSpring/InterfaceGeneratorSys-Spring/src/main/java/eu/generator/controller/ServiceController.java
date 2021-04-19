@@ -22,6 +22,8 @@ import com.aitia.demo.dto.CarResponseDTO;
 
 import eu.arrowhead.common.exception.BadPayloadException;
 import eu.generator.codgen.Generator;
+import static eu.generator.codgen.Generator.execute;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/codgen")
@@ -50,9 +52,13 @@ public class ServiceController {
 	
             @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
 	@ResponseBody public String generate(@RequestBody final RequestForm RF) {
-		
-	Generator.startGeneration(RF);
+	 try{
+        Generator.startGeneration(RF);
 		return "Generation complete";
+        } catch (Exception e) {
+		e.printStackTrace();	
+                return "Generation aborted. ERROR";
+                }
 	}
          //-------------------------------------------------------------------------------------------------   
 }

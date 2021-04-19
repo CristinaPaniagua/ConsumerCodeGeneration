@@ -9,6 +9,7 @@ package eu.generator.codgen;
  * @author Cristina Paniagua
  */
 
+import eu.arrowhead.common.CodgenUtil;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
@@ -28,6 +29,8 @@ public class readCDL {
     public   ArrayList<ElementsPayload> elements_response = new ArrayList<ElementsPayload>();
     public   ArrayList<String[]> payload_request = new ArrayList<String[]>(); 
     public   ArrayList<String[]> payload_response = new ArrayList<String[]>();
+    public   ArrayList<String[]>  metadata_request = new ArrayList<String[]>();
+    public   ArrayList<String[]> metadata_response = new ArrayList<String[]>();
     public  boolean request;
     public  boolean response;
     public  boolean param;
@@ -37,7 +40,7 @@ public class readCDL {
     public readCDL() {
     }
     
-public InterfaceMetadata read(String service,String System){
+public InterfaceMetadata read(String service,String System) throws GenerationException {
     String sec=null;
     String protocol=null;
     String path=null;
@@ -182,7 +185,7 @@ public InterfaceMetadata read(String service,String System){
                                    //String[] ele;
                                    String[] ele=new String[2];
                                    String tagname= e.getTagName();
-
+                                   String[] metadata;
                                     if("complexelement".equals(tagname)){
     
                                         complexelFunction ("REQUEST",e,"Newclass");
@@ -193,16 +196,27 @@ public InterfaceMetadata read(String service,String System){
                                     ele[0]=e.getAttribute("name");
                                    ele[1]=e.getAttribute("type");
                                    //out.println(ele[0]+" - "+ele[1]);
-                                   if(!ele[1].equals("null"))
+                                   
+                                    metadata=new String[4];
+                                    metadata[2]= e.getAttribute("variation");
+                                    metadata[3]= e.getAttribute("unit");
+                                    metadata[0]=ele[0];
+                                    metadata[1]=ele[1];
+                                    //out.println(metadata[0]+" - "+metadata[1]+" - "+ metadata[2]);
+                                   if(!ele[1].equals("null")){
                                        payload_request.add(ele);
+                                       metadata_request.add(metadata); 
                                    }
+                                      
+                                   }
+                                    
                                     
                                }
                               
                              }
                              
                             
-                                 ElementsPayload payloadRequest=new ElementsPayload(payload_request);
+                                 ElementsPayload payloadRequest=new ElementsPayload(payload_request, metadata_request);
                                  elements_request.add(payloadRequest);
                       
                                    
@@ -211,7 +225,10 @@ public InterfaceMetadata read(String service,String System){
                                
                          
         } //close else    
+                        // CodgenUtil.readList(metadata_request); 
+                         
            //RESPONSE    
+           
                 NodeList  lRR=eMethod.getElementsByTagName("response");
                             
                          if(lRR.getLength()==0){
@@ -264,7 +281,7 @@ public InterfaceMetadata read(String service,String System){
                                     if (childNode.getNodeType() == Node.ELEMENT_NODE) {    
                                    Element e =(Element) childNode;
                                    String[] ele;
-                                   
+                                 
                                    String tagname= e.getTagName();
 
                                     if("complexelement".equals(tagname)){
@@ -277,23 +294,31 @@ public InterfaceMetadata read(String service,String System){
                                    ele=new String[2];
                                    ele[0]=e.getAttribute("name");
                                    ele[1]=e.getAttribute("type");
-                                   
-                                   if(!ele[1].equals("null"))
-                                   payload_response.add(ele);
+                                     String[] metadata;
+                                    metadata=new String[4];
+                                    metadata[2]= e.getAttribute("variation");
+                                    metadata[3]= e.getAttribute("unit");
+                                    metadata[0]=ele[0];
+                                    metadata[1]=ele[1];
+                                   if(!ele[1].equals("null")){
+                                       payload_response.add(ele);
+                                       metadata_response.add(metadata); 
                                    }
-                                    //elements_response.add(ele);
+                                      
+                                   }
                                }
                               
                              }
-                             ElementsPayload payloadResponse=new ElementsPayload(payload_response);
+                             ElementsPayload payloadResponse=new ElementsPayload(payload_response,metadata_response);
                               elements_response.add(payloadResponse);
 
                                    
                            }//Payload not null
                      }
                      }//close else RESPONSE=TRUE
-                            
+                         
         }//END:NO parameters
+           
            
  //********************************************************************************************************************************************************
           
@@ -392,7 +417,7 @@ public InterfaceMetadata read(String service,String System){
                                       
                                    Element e =(Element) childNode;
                                    String[] ele;
-                                   
+                                   String[] metadata;
                                    String tagname= e.getTagName();
                                   // out.println(tagname);
 
@@ -406,10 +431,19 @@ public InterfaceMetadata read(String service,String System){
                                    ele=new String[2];
                                    ele[0]=e.getAttribute("name");
                                    ele[1]=e.getAttribute("type");
+                                   
+                                   
+                                   
+                                    metadata=new String[4];
+                                    metadata[2]= e.getAttribute("variation");
+                                    metadata[3]= e.getAttribute("unit");
+                                    metadata[0]=ele[0];
+                                    metadata[1]=ele[1];
                                    if(!ele[1].equals("null")){
-                                    arrayPayload.add(ele);
-                                   //out.println("option: "+k+": "+arrayPayload.get(0)[0]);
+                                       arrayPayload.add(ele);
+                                       metadata_request.add(metadata); 
                                    }
+                                   
                                    
                                    }
                                    
@@ -417,7 +451,7 @@ public InterfaceMetadata read(String service,String System){
                               
                              } //END WHILE NODES In the payload
                              
-                             ElementsPayload payloadRequest =new ElementsPayload(arrayPayload);
+                             ElementsPayload payloadRequest =new ElementsPayload(arrayPayload,metadata_request);
                              
                              elements_request.add(payloadRequest);
                              
@@ -511,7 +545,7 @@ public InterfaceMetadata read(String service,String System){
                                        
                                    Element e =(Element) childNode;
                                    String[] ele;
-                                   
+                                   String [] metadata;
                                    String tagname= e.getTagName();
                                    //out.println(tagname);
                                     if("complexelement".equals(tagname)){
@@ -524,9 +558,15 @@ public InterfaceMetadata read(String service,String System){
                                    ele=new String[2];
                                    ele[0]=e.getAttribute("name");
                                    ele[1]=e.getAttribute("type");
+                                     
+                                     metadata=new String[4];
+                                    metadata[2]= e.getAttribute("variation");
+                                    metadata[3]= e.getAttribute("unit");
+                                    metadata[0]=ele[0];
+                                    metadata[1]=ele[1];
                                    if(!ele[1].equals("null")){
-                                    //out.println(ele[0]+"  - "+ele[1]);
-                                   arrayPayloadR.add(ele);
+                                       arrayPayloadR.add(ele);
+                                       metadata_response.add(metadata); 
                                    }
                                    
                                    }
@@ -536,7 +576,7 @@ public InterfaceMetadata read(String service,String System){
                              } //END WHILE NODES In the payload
                              
                              
-                                ElementsPayload  payloadResponse =new ElementsPayload(arrayPayloadR);
+                                ElementsPayload  payloadResponse =new ElementsPayload(arrayPayloadR,metadata_response);
                              
                              elements_response.add(payloadResponse);
                              
@@ -570,7 +610,9 @@ public InterfaceMetadata read(String service,String System){
        
            
                    
-       }//else{ System.out.println( "ERROR: Service interface not found");}
+       }else{ out.println( "ERROR: Service interface not found");
+       throw new GenerationException(" SERVICE INTERFACE NOT FOUND ");
+       }
       
        
        
@@ -583,7 +625,7 @@ public InterfaceMetadata read(String service,String System){
     }
  //out.println("elemtents: ");
  //printElements(elements_request.get(0).getElements());
- 
+  CodgenUtil.readList(metadata_request); 
  InterfaceMetadata MD = new InterfaceMetadata(protocol,path,method,mediatype_request, mediatype_response,ID,complexType_request,complexType_response,elements_request, elements_response, request,response,param,parameters,subpaths);  
     return MD;
     
@@ -620,10 +662,18 @@ while(elechild.getNextSibling()!=null){
                            f[1]=e2.getAttribute("name");
                            f[2]=e2.getAttribute("type");
                           // out.println(f[0]+f[1]+f[2]);
-                                             
-                           if (r.equalsIgnoreCase("REQUEST"))
-                            payload_request.add(f);
-                             else payload_response.add(f);
+                            String [] metadata=new String[4];
+                                    metadata[2]= e2.getAttribute("variation");
+                                    metadata[3]= e2.getAttribute("unit");
+                                    metadata[0]=f[1];
+                                    metadata[1]=f[2];         
+                           if (r.equalsIgnoreCase("REQUEST")){
+                               payload_request.add(f);
+                               metadata_request.add(metadata);
+                           }else {
+                               payload_response.add(f);
+                                metadata_response.add(metadata);
+                           }
                              
                            complexPayload.add(f);
  
@@ -653,7 +703,7 @@ while(elechild.getNextSibling()!=null){
         for(int i=0; i>elements.size();i++){
             String[] list=elements.get(i);
             for(int j=0; j>list.length;j++){
-                out.println(list[j]);
+                out.println("   :"+list[j]);
             }
             
         }
@@ -667,6 +717,8 @@ public void Reset(){
    parameters.clear();
    subpaths.clear();
  }
+
+
 
     }
 

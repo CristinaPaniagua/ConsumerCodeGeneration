@@ -10,6 +10,10 @@
 package eu.arrowhead.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeVariableName;
 import eu.arrowhead.common.exception.ArrowheadException;
 
 import java.io.BufferedReader;
@@ -20,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -179,7 +184,7 @@ public final class CodgenUtil {
     return prop;
   }
 
-  static void checkProperties(Set<String> propertyNames, List<String> mandatoryProperties) {
+  public static void checkProperties(Set<String> propertyNames, List<String> mandatoryProperties) {
     if (mandatoryProperties == null || mandatoryProperties.isEmpty()) {
       return;
     }
@@ -191,4 +196,54 @@ public final class CodgenUtil {
     }
   }
 
+  
+    public static  Type getType(String type){
+         Type t;
+         
+         if(type.equalsIgnoreCase("String")) t=String.class;
+         else if (type.equalsIgnoreCase("Boolean")) t=Boolean.class;
+         else if (type.equalsIgnoreCase("Integer")) t=int.class;
+         else if (type.equalsIgnoreCase("Byte")) t=Byte.class;
+         else if (type.equalsIgnoreCase("Double")) t=double.class;
+         else if (type.equalsIgnoreCase("Float")) t=float.class;
+         else if (type.equalsIgnoreCase("Short")) t=short.class;
+         else if (type.equalsIgnoreCase("Long")) t=long.class;
+          else if (type.equalsIgnoreCase("Single")) t=Object.class;
+         else if (type.startsWith("List")){
+             //ParameterizedTypeName ListType =ParameterizedTypeName.get(List.class, Object.class);
+             t=List.class;
+         }
+         
+        
+         
+         //TODO: ADD MORE TYPES
+        
+         else t=Object.class;
+         return t;
+     }
+     
+    public static TypeName getTypeCom(String name, String type){
+         TypeName t;
+         String Name = name.substring(0, 1).toUpperCase() + name.substring(1, name.length()); 
+         
+         if (type.equalsIgnoreCase("List"))   t = ParameterizedTypeName.get(ClassName.get(List.class),TypeVariableName.get(name) );
+         else if (type.equalsIgnoreCase("single"))  t =TypeVariableName.get(Name); 
+         else  t =TypeVariableName.get(Name);
+         
+         //TODO: ADD MORE COMPLEX TYPES
+             return t;
+             }
+    
+    
+   public static void readList (ArrayList<String[]> elements){
+        
+        for (int i = 0; i < elements.size(); i++){ 
+            String[] ele=elements.get(i);
+            for (int j = 0; j < ele.length; j++){
+                System.out.println(i+"."+j+" :"+elements.get(i)[j]);
+            }
+            
+        }
+    }
+  
 }
