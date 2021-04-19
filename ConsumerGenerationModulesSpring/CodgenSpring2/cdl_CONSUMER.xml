@@ -7,7 +7,7 @@
 
 
 
-	<interface protocol="HTTP" address="http://127.0.0.1/8888" >
+	<interface protocol="CoAP" address="http://127.0.0.1/8888" >
 	
 		<method name="GET" id="offer" path="/testTranslation">
 

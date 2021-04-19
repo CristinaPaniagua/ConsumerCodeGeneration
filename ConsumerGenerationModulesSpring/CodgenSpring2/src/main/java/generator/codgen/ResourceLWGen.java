@@ -197,13 +197,16 @@ public class ResourceLWGen {
      
      
       methodgen.addAnnotation(path)
-     .addAnnotation(produces)
-     .addAnnotation(consumes);
-      if(MD_C.getMediatype_request().equalsIgnoreCase("CBOR")){
+     .addAnnotation(produces);
+      
+       if(!MD_C.getMethod().equalsIgnoreCase("GET")){
+       methodgen.addAnnotation(consumes);
+             if(MD_C.getMediatype_request().equalsIgnoreCase("CBOR")){
           methodgen.addParameter(byte[].class,"receivedPayload");
-      }else{
+            }else{
            methodgen.addParameter(String.class,"receivedPayload");
-      }
+            }
+       }
       
     } else{ //COAP
         
@@ -406,7 +409,7 @@ public class ResourceLWGen {
      //.addStatement("String[] args={\"0\"}")
      .addStatement("String responseText= \" \"")
      .beginControlFlow("try")
-     .addStatement("uri = new URI(\"coap://localhost:5555/weatherstation/indoortemperature\")")
+     .addStatement("uri = new URI(\"coap://192.168.1.35:5555/weatherstation/indoortemperature\")")
      .nextControlFlow("catch($T e)",URISyntaxException.class)
      .addStatement("System.err.println(\"Invalid URI: \" + e.getMessage())")
      .addStatement("System.exit(-1)")

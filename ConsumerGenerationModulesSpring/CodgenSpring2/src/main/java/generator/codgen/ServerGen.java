@@ -48,7 +48,9 @@ public class ServerGen {
     .addException(Exception.class) ;
              
     mainHttp
-            .addStatement("$T address = InetAddress.getByName(\"127.0.0.1\")",InetAddress.class )
+            .addStatement("$T address = InetAddress.getByAddress(new byte[] {(byte)192,(byte)168,(byte)1,(byte)36})",InetAddress.class )
+           .addStatement("System.out.println(\"IP address: \" + address.getHostAddress());\n" +
+"      System.out.println(\"Computer Name:\"+address.getHostName());")
             .addStatement("$T socketAddress = new InetSocketAddress(address, 8088)",InetSocketAddress.class )
             .addStatement(" $T server = new Server(socketAddress)", Server.class)
             .addStatement(" $T  servletContextHandler = new ServletContextHandler(NO_SESSIONS)", ServletContextHandler.class)
