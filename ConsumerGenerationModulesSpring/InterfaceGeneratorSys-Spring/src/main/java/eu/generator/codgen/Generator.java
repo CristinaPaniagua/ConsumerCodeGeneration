@@ -80,20 +80,24 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
         
      
      
-         String service = request.getProperty("Service", "null");
+ String service = request.getProperty("Service", "null");
         String system="providerTest";
         readCDL readConsumer = new readCDL();
-        MD_Consumer= readConsumer.read("offer","consumer");
+        MD_Consumer= readConsumer.read("indoortemperature","consumer");
         Boolean MD_ConsumerValid=metedataValidation(MD_Consumer);
         readCDL readProvider = new readCDL();
-        MD_Provider = readProvider.read("offer","provider");
+        MD_Provider = readProvider.read("indoortemperature","provider");
         Boolean MD_ProviderValid=metedataValidation(MD_Provider);
         
         System.out.println(MD_ConsumerValid);
         System.out.println(MD_ProviderValid);
       
       
-      if(MD_ConsumerValid && MD_ProviderValid){
+ 
+      
+     
+       
+    if(MD_ConsumerValid && MD_ProviderValid){
         
     
         
@@ -158,15 +162,19 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
         
         //if(MD_Provider.getProtocol().equalsIgnoreCase("COAP"))
         //oapGenerator.coap(MD_Provider);
+    
+         
         
-        ResourceLWGen.ResourcesLWGen(MD_Consumer, MD_Provider);
+            ResourceLWGen.ResourcesLWGen(MD_Consumer, MD_Provider);
+       
+        System.out.println(MD_Consumer.getRequest() +"___" + MD_Provider.getRequest());
         
         //Server generation.. Consumer Side
         
         
         ServerGen.Server(MD_Consumer);
         
-        
+
         
          try{
         execute();

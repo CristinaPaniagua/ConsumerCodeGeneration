@@ -54,8 +54,8 @@ public InterfaceMetadata read(String service,String System) throws GenerationExc
     Reset();
     
     Map<String,String> CDLstorage= new HashMap<>();
-    CDLstorage.put("provider","cdl_PROVIDER.xml");
-    CDLstorage.put("consumer","cdl_CONSUMER.xml");
+    CDLstorage.put("provider","cdl_PROVIDER_WS.xml");
+    CDLstorage.put("consumer","cdl_CONSUMER_WS.xml");
     
     
     String CDLName=CDLstorage.get(System);
@@ -265,14 +265,12 @@ public InterfaceMetadata read(String service,String System) throws GenerationExc
                              Element epayload1=(Element) npayload1;
                              
                              NodeList complex2=epayload1.getElementsByTagName("complextype");
-                             if(!complex2.equals(null)){
-                               complexType_response=null;
-                              }else{ 
-                                  Node ncomplex1=complex2.item(0); 
-                                  Element ecomplex= (Element)ncomplex1;
+                             
+                                  Node ncomplex2=complex2.item(0); 
+                                  Element ecomplex= (Element)ncomplex2;
                               complexType_response=ecomplex.getAttribute("type");   
                             
-                             }
+                             
                    
                              Node childNode=epayload1.getFirstChild();
 
@@ -623,9 +621,13 @@ public InterfaceMetadata read(String service,String System) throws GenerationExc
     if(!response && request){
         mediatype_response=mediatype_request;
     }
+    if(response && !request){
+        mediatype_request=mediatype_response;
+    }
+    
  //out.println("elemtents: ");
  //printElements(elements_request.get(0).getElements());
-  CodgenUtil.readList(metadata_request); 
+  //CodgenUtil.readList(metadata_request); 
  InterfaceMetadata MD = new InterfaceMetadata(protocol,path,method,mediatype_request, mediatype_response,ID,complexType_request,complexType_response,elements_request, elements_response, request,response,param,parameters,subpaths);  
     return MD;
     
@@ -638,8 +640,14 @@ public ArrayList<String[]> complexelFunction ( String r, Element e, String level
  String classname=e.getAttribute("name");
   c[1]=classname;
   c[2]=e.getAttribute("type");
-     if (r.equalsIgnoreCase("REQUEST"))  payload_request.add(c);
-     else payload_response.add(c);
+     if (r.equalsIgnoreCase("REQUEST")){
+         payload_request.add(c);
+         metadata_request.add(c);
+     }
+     else{
+         payload_response.add(c);
+         metadata_response.add(c);
+     }
      complexPayload.add(c);
      Node elechild=e.getFirstChild();
 
@@ -687,9 +695,13 @@ while(elechild.getNextSibling()!=null){
                                      String [] StopClass=new String[2];
                                      StopClass[0]="StopClass"; 
                                      
-                                      if (r.equalsIgnoreCase("REQUEST"))
-                                    payload_request.add(StopClass);
-                                     else payload_response.add(StopClass);
+                                      if (r.equalsIgnoreCase("REQUEST")){
+                                        payload_request.add(StopClass);
+                                     metadata_request.add(StopClass);   
+                                      }else{
+                                          payload_response.add(StopClass);
+                                          metadata_response.add(StopClass);
+                                      }
                                      complexPayload.add(StopClass);
                                      
            //if(r.equalsIgnoreCase("REQUEST")) return payload_request;
