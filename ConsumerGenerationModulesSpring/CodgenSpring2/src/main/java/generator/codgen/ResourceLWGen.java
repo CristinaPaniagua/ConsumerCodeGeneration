@@ -267,36 +267,52 @@ public class ResourceLWGen {
              methodgen.addStatement("String payload=null");
        }
      
-      methodgen.addStatement("response=consumeService(\"http://127.0.0.1:8889/demo$L\",payload)",pathP)
-     .endControlFlow()
-     .beginControlFlow("catch ($T e)",Exception.class)      
-     .addStatement(" e.printStackTrace()")
-     .endControlFlow() 
-     ;
+      methodgen.addStatement("response=consumeService(\"http://127.0.0.1:8889/demo$L\",payload)",pathP);
      
       if (MD_P.getResponse() && MD_C.getResponse() ){
-         methodgen.addStatement("ResponseDTO_C0 response_C=new ResponseDTO_C0()")
-                 .addStatement(" response_C= responseAdaptor(response)");
-         
+  //HTTP
         if(MD_C.Protocol.equalsIgnoreCase("HTTP")){
+            
+            methodgen.endControlFlow()
+             .beginControlFlow("catch ($T e)",Exception.class)      
+              .addStatement(" e.printStackTrace()")
+              .endControlFlow()
+              .addStatement("ResponseDTO_C0 response_C=new ResponseDTO_C0()")
+              .addStatement(" response_C= responseAdaptor(response)"); 
+            
            methodgen.beginControlFlow("if(response==null)")
                    .addStatement("  return response_out")
             .endControlFlow() 
             .beginControlFlow("else")
              .addStatement("response_out= objMapper_Response.writeValueAsString(response_C)")
-            .addStatement("return response_out");
-       }else{ //COAP
-         methodgen.beginControlFlow("if(response==null)")
+            .addStatement("return response_out")
+                       .endControlFlow();
+           
+       }else{
+            
+//COAP
+         methodgen.addStatement("ResponseDTO_C0 response_C=new ResponseDTO_C0()")
+                 .addStatement(" response_C= responseAdaptor(response)")
+                 .beginControlFlow("if(response==null)")
                  .addStatement("exchange.respond( \"ERROR: EMPTY RESPONSE\")")
             .endControlFlow() 
-            .beginControlFlow("else");
+            .beginControlFlow("else")
+            .addStatement("response_out= objMapper_Response.writeValueAsString(response_C)");
         if(MD_C.getMediatype_request().equalsIgnoreCase("JSON")){
-            methodgen.addStatement(" exchange.respond($T.ResponseCode.CONTENT,response_C,50)",CoAP.class);
+            methodgen.addStatement(" exchange.respond($T.ResponseCode.CONTENT,response_out,50)",CoAP.class);
         }else if(MD_C.getMediatype_request().equalsIgnoreCase("XML")){
-          methodgen.addStatement(" exchange.respond($T.ResponseCode.CONTENT,response_C,41)",CoAP.class);
-        }else
-             methodgen.addStatement(" exchange.respond(response_C) ");
+          methodgen.addStatement(" exchange.respond($T.ResponseCode.CONTENT,response_out,41)",CoAP.class);
+        }else{
+           methodgen.addStatement(" exchange.respond(response_C) "); 
+        }   
+        
+           methodgen.endControlFlow()
+             .endControlFlow()
+             .beginControlFlow("catch ($T e)",Exception.class)      
+              .addStatement(" e.printStackTrace()")
+              .endControlFlow(); 
     }
+      
 
       }else{
      
@@ -318,9 +334,10 @@ public class ResourceLWGen {
         }else
              methodgen.addStatement(" exchange.respond(response) ");
     }
+       
+        methodgen.endControlFlow();
       }
-      methodgen.endControlFlow() 
-     ;
+     
    
     
     
@@ -520,12 +537,35 @@ public class ResourceLWGen {
      .addStatement("$T httpClient = $T.createDefault()",CloseableHttpClient.class,HttpClients.class)
      .addStatement(" String result_in = \"\"") 
      .addStatement(" String result_out = \"\"") 
+     .addStatement("$T responseObj=null",ResponseDTO_P0.class)
      .beginControlFlow("try");
       //TODO: ADD THE REST OF THE METHODS (PUT AND DELETE)
-     if(MD_P.getMethod().equalsIgnoreCase("POST")){
-         consumer.addStatement(" $T request = new $T(url)",HttpPost.class,HttpPost.class);
-     }else if(MD_P.getMethod().equalsIgnoreCase("GET"))
+     
+      
+      if(MD_P.getMethod().equalsIgnoreCase("GET")){
        consumer.addStatement(" $T request = new $T(url)",HttpGet.class,HttpGet.class);
+       
+       
+         String Mediatype="";
+      if(MD_P.getMediatype_request().equalsIgnoreCase("JSON")){
+       consumer.addStatement(" request.addHeader(\"content-type\", \"application/json\")"); 
+       
+       
+        
+    }else if(MD_P.getMediatype_request().equalsIgnoreCase("XML")){
+        consumer.addStatement(" request.addHeader(\"content-type\", \"application/xml\")") 
+       
+     ;
+      
+    
+      }else if(MD_P.getMediatype_request().equalsIgnoreCase("CBOR")){
+        consumer.addStatement(" request.addHeader(\"content-type\", \"pplication/cbor\")") 
+     ;
+      
+    }
+      
+     }else if(MD_P.getMethod().equalsIgnoreCase("POST")){
+         consumer.addStatement(" $T request = new $T(url)",HttpPost.class,HttpPost.class);
      
      String Mediatype="";
       if(MD_P.getMediatype_request().equalsIgnoreCase("JSON")){
@@ -558,7 +598,7 @@ public class ResourceLWGen {
        consumer.addStatement(" request.setEntity(new $T(createdPayload))",StringEntity.class);  
                
                } 
-
+     }
             //CodeBlock mapperResponseProvider=createObjectMapper(MD_P.getMediatype_response(),"objMapperP");
             //CodeBlock mapperResponseConsumer=createObjectMapper(MD_C.getMediatype_response(),"objMapperC");
            
@@ -571,7 +611,7 @@ public class ResourceLWGen {
             .addStatement("System.out.println(\"Response MediaType: \"+mimeType)")
             .beginControlFlow("if (entity != null)")
             .addStatement(" result_in = $T.toString(entity)",EntityUtils.class)
-            .addStatement("$T responseObj=objMapperP.readValue(result_in,ResponseDTO_P0.class)",ResponseDTO_P0.class)
+            .addStatement("responseObj=objMapperP.readValue(result_in,ResponseDTO_P0.class)",ResponseDTO_P0.class)
             .addCode(mapperResponseConsumer)
             .addStatement("result_out=objMapperC.writeValueAsString(responseObj)");
             
