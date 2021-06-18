@@ -76,7 +76,7 @@ private static ArrayList<ArrayList<String>> classesRequestC= new ArrayList<Array
 private static ArrayList<String> classesResponseC= new ArrayList<String>();
 
    public static void startGeneration(RequestForm rf)throws GenerationException{
-     System.out.print("CODGEGEN START********************************************************* \n");   
+   //  System.out.print("CODGEGEN START********************************************************* \n");   
         
      
      
@@ -89,8 +89,8 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
         MD_Provider = readProvider.read("indoortemperature","provider");
         Boolean MD_ProviderValid=metedataValidation(MD_Provider);
         
-        System.out.println(MD_ConsumerValid);
-        System.out.println(MD_ProviderValid);
+       // System.out.println(MD_ConsumerValid);
+        //System.out.println(MD_ProviderValid);
       
       
  
@@ -101,8 +101,8 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
         
     
         
-        System.out.println(MD_Provider.toString());
-        System.out.println(MD_Consumer.toString());
+       // System.out.println(MD_Provider.toString());
+        //System.out.println(MD_Consumer.toString());
       
      
              
@@ -167,7 +167,7 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
         
             ResourceLWGen.ResourcesLWGen(MD_Consumer, MD_Provider);
        
-        System.out.println(MD_Consumer.getRequest() +"___" + MD_Provider.getRequest());
+        //System.out.println(MD_Consumer.getRequest() +"___" + MD_Provider.getRequest());
         
         //Server generation.. Consumer Side
         
@@ -177,8 +177,8 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
 
         
          try{
-        execute();
-        } catch (IOException e) {
+       execute();
+       } catch (IOException e) {
 		e.printStackTrace();
 	} catch (InterruptedException e) {
 		e.printStackTrace();
@@ -203,7 +203,7 @@ private static ArrayList<String> classesResponseC= new ArrayList<String>();
         ProcessBuilder processBuilder = new ProcessBuilder();
 
         processBuilder.command(("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCodeGeneration\\ConsumerGenerationModulesSpring\\InterfaceGeneratorSys-Spring\\config\\Init.bat"));
-
+        //processBuilder.command(("C:\\Users\\cripan\\Desktop\\Code_generation\\ConsumerCodeGeneration\\ConsumerGenerationModulesSpring\\InterfaceGeneratorSys-Spring\\config\\clean.bat"));
         try {
 
             Process process = processBuilder.start();

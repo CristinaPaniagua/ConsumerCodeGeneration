@@ -519,7 +519,8 @@ public class ResourceLWGen {
             consumer
      .addStatement("$T httpClient = $T.createDefault()",CloseableHttpClient.class,HttpClients.class)
      .addStatement(" String result_in = \"\"") 
-     .addStatement(" String result_out = \"\"") 
+     .addStatement(" String result_out = \"\"")
+     .addStatement("$T responseObj=null",ResponseDTO_P0.class)             
      .beginControlFlow("try");
       //TODO: ADD THE REST OF THE METHODS (PUT AND DELETE)
      if(MD_P.getMethod().equalsIgnoreCase("POST")){
@@ -571,7 +572,7 @@ public class ResourceLWGen {
             .addStatement("System.out.println(\"Response MediaType: \"+mimeType)")
             .beginControlFlow("if (entity != null)")
             .addStatement(" result_in = $T.toString(entity)",EntityUtils.class)
-            .addStatement("$T responseObj=objMapperP.readValue(result_in,ResponseDTO_P0.class)",ResponseDTO_P0.class)
+            .addStatement("responseObj=objMapperP.readValue(result_in,ResponseDTO_P0.class)",ResponseDTO_P0.class)
             .addCode(mapperResponseConsumer)
             .addStatement("result_out=objMapperC.writeValueAsString(responseObj)");
             
@@ -644,14 +645,14 @@ public class ResourceLWGen {
      int childNumberP=0;
       int childNumberC=0;
       
-      System.out.println("LIST OF RESPONSE ELEMENTS P:");
-       CodgenUtil.readList(metadata_requestP);
-        System.out.println("LIST OF RESPONSE ELEMENTS P:");
-       CodgenUtil.readList(elements_requestP);
-       System.out.println("LIST OF RESPONSE ELEMENTS C:");
-       CodgenUtil.readList(metadata_requestC);
-        System.out.println("LIST OF RESPONSE ELEMENTS P:");
-       CodgenUtil.readList(elements_requestC);
+      //System.out.println("LIST OF RESPONSE ELEMENTS P:");
+      // CodgenUtil.readList(metadata_requestP);
+        //System.out.println("LIST OF RESPONSE ELEMENTS P:");
+       //CodgenUtil.readList(elements_requestP);
+      // System.out.println("LIST OF RESPONSE ELEMENTS C:");
+      // CodgenUtil.readList(metadata_requestC);
+       // System.out.println("LIST OF RESPONSE ELEMENTS P:");
+       //CodgenUtil.readList(elements_requestC);
        
      for (int i = 0; i < elements_requestC.size()-1; i++){ 
        nameC=elements_requestC.get(i)[0];
@@ -676,7 +677,7 @@ public class ResourceLWGen {
            }
         
         
-      System.out.println("Consumer reponse: " +nameC +" - "+ typeC);
+     // System.out.println("Consumer reponse: " +nameC +" - "+ typeC);
        // match=false;
         
             for (int j = 0; j < elements_requestP.size(); j++){ 
@@ -704,41 +705,41 @@ public class ResourceLWGen {
                         
                  
                  
-                System.out.println("Provider Response: " +nameP +" - "+ typeP);
+              //  System.out.println("Provider Response: " +nameP +" - "+ typeP);
                  
-               System.out.println("NestedP: " +NestedP +", NestedC: "+ NestedC);
+              // System.out.println("NestedP: " +NestedP +", NestedC: "+ NestedC);
                  
                  if(nameC.equals(nameP)){
                      match=true;
-                System.out.println("NAME MATCH '''''''''''''''''''''''");
+               // System.out.println("NAME MATCH '''''''''''''''''''''''");
                      j= elements_requestP.size()+1;
                     } else{
                           String variantC= metadata_requestC.get(i)[2]; 
                           
-                         System.out.println(j); 
+                       //  System.out.println(j); 
                             String variantP=metadata_requestP.get(j)[2];
                             nameP=metadata_requestP.get(j)[0];
-                            System.out.println("Variant: " +variantP);
+                           // System.out.println("Variant: " +variantP);
                             if(nameC.equalsIgnoreCase(variantP)&& !variantP.equals(" ")){
-                                System.out.println("VARIANT-NAME MATCH '''''''''''''''''''''''");
+                                //System.out.println("VARIANT-NAME MATCH '''''''''''''''''''''''");
                                 //nameC=metadata_responseC.get(j)[0];
                                 typeP=metadata_requestP.get(j)[1];
-                                System.out.println("Provider Response_variant: "+variantP+" -" +nameP +" - "+ typeP);
+                              //  System.out.println("Provider Response_variant: "+variantP+" -" +nameP +" - "+ typeP);
                                match=true;
                                
                             }else if(nameP.equalsIgnoreCase(variantC)&& !variantC.equals(" ")){
-                                System.out.println("NAME-VARIANT MATCH '''''''''''''''''''''''");
+                            //    System.out.println("NAME-VARIANT MATCH '''''''''''''''''''''''");
                                /// nameC=metadata_responseP.get(j)[0];
                                 typeP=metadata_requestP.get(j)[1];
-                                System.out.println("Consumer Response_variant: "+variantC+" -" +nameC +" - "+ typeC);
+                              //  System.out.println("Consumer Response_variant: "+variantC+" -" +nameC +" - "+ typeC);
                                match=true;
                               
                             } else if(variantC.equalsIgnoreCase(variantP)&& !variantP.equals(" ")&& !variantC.equals(" ")){
-                                System.out.println("VARIANT-VARIANT MATCH '''''''''''''''''''''''");
+                              //  System.out.println("VARIANT-VARIANT MATCH '''''''''''''''''''''''");
                                 //nameC=metadata_responseC.get(j)[0];
                                 typeP=metadata_requestP.get(j)[1];
-                                 System.out.println("Consumer Response_variant: "+variantC+" -"  +nameC +" - "+ typeC);
-                                 System.out.println("Provider reponse_variant: " +variantP+" -" +nameP +" - "+ typeP);
+                               //  System.out.println("Consumer Response_variant: "+variantC+" -"  +nameC +" - "+ typeC);
+                                // System.out.println("Provider reponse_variant: " +variantP+" -" +nameP +" - "+ typeP);
                                match=true;
                                
                             }
@@ -751,7 +752,7 @@ public class ResourceLWGen {
                 
                
           if(match){
-              System.out.println("MATCH --- Provider: " +nameP +" - Consumer: " +nameC);
+             // System.out.println("MATCH --- Provider: " +nameP +" - Consumer: " +nameC);
          
               if(NestedC){
                          payload.addStatement("$T $L=payload_C.get$L().get$L() ",CodgenUtil.getType(typeC), nameC,NewClassC,nameC);
@@ -831,7 +832,7 @@ public class ResourceLWGen {
                         match=false;
                 j=elements_requestP.size()+1;
                        
-   } else System.out.println("NO MATCH--Provider: " +nameP +" - Consumer: " +nameC); 
+   } //else System.out.println("NO MATCH--Provider: " +nameP +" - Consumer: " +nameC); 
                 
                 
                 
@@ -885,14 +886,14 @@ public class ResourceLWGen {
       int childNumberP=0;
       int childNumberC=0;
       
-      System.out.println("LIST OF RESPONSE ELEMENTS P:");
-       CodgenUtil.readList(metadata_responseP);
-        System.out.println("LIST OF RESPONSE ELEMENTS P:");
-       CodgenUtil.readList(elements_responseP);
-       System.out.println("LIST OF RESPONSE ELEMENTS C:");
-       CodgenUtil.readList(metadata_responseC);
-        System.out.println("LIST OF RESPONSE ELEMENTS P:");
-       CodgenUtil.readList(elements_responseC);
+    //  System.out.println("LIST OF RESPONSE ELEMENTS P:");
+     //  CodgenUtil.readList(metadata_responseP);
+      //  System.out.println("LIST OF RESPONSE ELEMENTS P:");
+      // CodgenUtil.readList(elements_responseP);
+      // System.out.println("LIST OF RESPONSE ELEMENTS C:");
+      // CodgenUtil.readList(metadata_responseC);
+      //  System.out.println("LIST OF RESPONSE ELEMENTS P:");
+       // CodgenUtil.readList(elements_responseC);
        
      for (int i = 0; i < elements_responseC.size(); i++){ 
        nameC=elements_responseC.get(i)[0];
@@ -917,7 +918,7 @@ public class ResourceLWGen {
            }
         
         
-      System.out.println("Consumer reponse: " +nameC +" - "+ typeC);
+    //  System.out.println("Consumer reponse: " +nameC +" - "+ typeC);
        // match=false;
         
             for (int j = 0; j < elements_responseP.size(); j++){ 
@@ -943,41 +944,41 @@ public class ResourceLWGen {
                         
                  
                  
-                System.out.println("Provider Response: " +nameP +" - "+ typeP);
+         //       System.out.println("Provider Response: " +nameP +" - "+ typeP);
                  
-               System.out.println("NestedP: " +NestedP +", NestedC: "+ NestedC);
+           //    System.out.println("NestedP: " +NestedP +", NestedC: "+ NestedC);
                  
                  if(nameC.equals(nameP)){
                      match=true;
-                System.out.println("NAME MATCH '''''''''''''''''''''''");
+            //    System.out.println("NAME MATCH '''''''''''''''''''''''");
                      j= elements_responseP.size()+1;
                     } else{
                           String variantC= metadata_responseC.get(i)[2]; 
                           int m=j;
-                         System.out.println(j); 
+                 //        System.out.println(j); 
                             String variantP=metadata_responseP.get(m)[2];
                             nameP=metadata_responseP.get(m)[0];
-                            System.out.println("Variant: " +variantP);
+                   //         System.out.println("Variant: " +variantP);
                             if(nameC.equalsIgnoreCase(variantP)&& !variantP.equals(" ")){
-                                System.out.println("NAME-VARIANT MATCH '''''''''''''''''''''''");
+                     //           System.out.println("NAME-VARIANT MATCH '''''''''''''''''''''''");
                                 //nameC=metadata_responseC.get(j)[0];
                                 typeP=metadata_responseP.get(m)[1];
-                                System.out.println("Provider Response_variant: "+variantP+" -" +nameP +" - "+ typeP);
+                       //         System.out.println("Provider Response_variant: "+variantP+" -" +nameP +" - "+ typeP);
                                match=true;
                                
                             }else if(nameP.equalsIgnoreCase(variantC)&& !variantC.equals(" ")){
-                                System.out.println("VARIANT-NAME MATCH '''''''''''''''''''''''");
+                           //     System.out.println("VARIANT-NAME MATCH '''''''''''''''''''''''");
                                /// nameC=metadata_responseP.get(j)[0];
                                  typeP=metadata_responseP.get(m)[1];
-                                System.out.println("Consumer Response_variant: "+variantC+" -" +nameC +" - "+ typeC);
+                           ///     System.out.println("Consumer Response_variant: "+variantC+" -" +nameC +" - "+ typeC);
                                match=true;
                               
                             } else if(variantP.equalsIgnoreCase(variantC)&& !variantC.equals(" ")&& !variantP.equals(" ")){
-                                System.out.println("VARIANT-VARIANT MATCH '''''''''''''''''''''''");
+                             //   System.out.println("VARIANT-VARIANT MATCH '''''''''''''''''''''''");
                                 //nameC=metadata_responseC.get(j)[0];
                                 typeP=metadata_responseP.get(m)[1];
-                                 System.out.println("Consumer Response_variant: "+variantC+" -"  +nameC +" - "+ typeC);
-                                 System.out.println("Provider reponse_variant: " +variantP+" -" +nameP +" - "+ typeP);
+                             //    System.out.println("Consumer Response_variant: "+variantC+" -"  +nameC +" - "+ typeC);
+                               //  System.out.println("Provider reponse_variant: " +variantP+" -" +nameP +" - "+ typeP);
                                match=true;
                                
                             }
@@ -990,7 +991,7 @@ public class ResourceLWGen {
                 
                
           if(match){
-              System.out.println("MATCH --- Provider: " +nameP +" - Consumer: " +nameC);
+            //  System.out.println("MATCH --- Provider: " +nameP +" - Consumer: " +nameC);
               
               if(NestedP){
                          payload.addStatement("$T $L=payload_P.get$L().get$L() ",CodgenUtil.getType(typeP), nameP,NewClassP,nameP);
@@ -1058,7 +1059,7 @@ public class ResourceLWGen {
                      
                      
                        if(NestedC){
-                           System.out.println("number of nested items: "+ childNumberC);
+                   //        System.out.println("number of nested items: "+ childNumberC);
                        if(childNumberC<2)  payload.addStatement(" eu.generator.consumer.$L $L = new  eu.generator.consumer.$L ()", Capitalize(NewClassC), NewClassC, Capitalize(NewClassC));
                          payload.addStatement(" $L.set$L($L_C)",NewClassC, nameC, nameP)
                                  .addStatement("payload_C.set$L($L)",NewClassC,NewClassC);
@@ -1070,7 +1071,7 @@ public class ResourceLWGen {
                 j=elements_responseC.size()+1;
                        
                        
-          } else System.out.println("NO MATCH--Provider: " +nameP +" - Consumer: " +nameC); 
+          }// else System.out.println("NO MATCH--Provider: " +nameP +" - Consumer: " +nameC); 
                 
                 
                 

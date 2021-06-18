@@ -65,7 +65,7 @@ public InterfaceMetadata read(String service,String System) throws GenerationExc
     
       try  {
           
-    	out.println(CDLName);
+    	//out.println(CDLName);
 	 File File1 = new File(CDLName);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();

@@ -5,14 +5,14 @@ import java.lang.Override;
 import java.lang.String;
 
 public class Value {
-  private float temp;
+  private int temp;
 
   private String unit;
 
   public Value() {
   }
 
-  public Value(float temp, String unit) {
+  public Value(int temp, String unit) {
     this.temp = temp;
     this.unit = unit;
   }
@@ -22,11 +22,11 @@ public class Value {
     return "ProviderPayload{" + "temp=" + temp+ ",  "+ "unit=" + unit+ ",  " +"}";
   }
 
-  public float gettemp() {
+  public int gettemp() {
     return temp;
   }
 
-  public void settemp(float temp) {
+  public void settemp(int temp) {
     this.temp=temp;
   }
 

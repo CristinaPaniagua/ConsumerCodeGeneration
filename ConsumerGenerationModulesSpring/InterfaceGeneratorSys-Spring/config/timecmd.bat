@@ -1,7 +1,11 @@
-cd ..
-cd InterfaceLightweight
+@echo off
+@setlocal
+
 set start=%time%
-mvn clean install 
+
+:: Runs your command
+cmd /c %*
+
 set end=%time%
 set options="tokens=1-4 delims=:.,"
 for /f %options% %%a in ("%start%") do set start_h=%%a&set /a start_m=100%%b %% 100&set /a start_s=100%%c %% 100&set /a start_ms=100%%d %% 100
@@ -20,8 +24,3 @@ if 1%ms% lss 100 set ms=0%ms%
 :: Mission accomplished
 set /a totalsecs = %hours%*3600 + %mins%*60 + %secs%
 echo command took %totalsecs%.%ms%s
-
-
-PAUSE
-Start C:\Users\cripan\Desktop\Code_generation\ConsumerCodeGeneration\ConsumerGenerationModulesSpring\InterfaceGeneratorSys-Spring\config\clean.bat
-Exit

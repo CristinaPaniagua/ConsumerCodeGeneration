@@ -9,25 +9,47 @@ import java.lang.String;
     ignoreUnknown = true
 )
 public class ResponseDTO_P0 {
-  private String response;
+  private String n;
+
+  private float v;
+
+  private String u;
 
   public ResponseDTO_P0() {
   }
 
-  public ResponseDTO_P0(String response) {
-    this.response = response;
+  public ResponseDTO_P0(String n, float v, String u) {
+    this.n = n;
+    this.v = v;
+    this.u = u;
   }
 
   @Override
   public String toString() {
-    return "ProviderPayload{" + "response=" + response+ ",  " +"}";
+    return "ProviderPayload{" + "n=" + n+ ",  "+ "v=" + v+ ",  "+ "u=" + u+ ",  " +"}";
   }
 
-  public String getresponse() {
-    return response;
+  public String getn() {
+    return n;
   }
 
-  public void setresponse(String response) {
-    this.response=response;
+  public void setn(String n) {
+    this.n=n;
+  }
+
+  public float getv() {
+    return v;
+  }
+
+  public void setv(float v) {
+    this.v=v;
+  }
+
+  public String getu() {
+    return u;
+  }
+
+  public void setu(String u) {
+    this.u=u;
   }
 }
